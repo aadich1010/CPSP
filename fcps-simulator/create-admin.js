@@ -1,8 +1,24 @@
 const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 
+// Admin credentials are read from the environment — never hardcode a
+// password in a file that gets committed to git. Set these in .env.local
+// (which is gitignored) before running this script:
+//   ADMIN_EMAIL=admin@yourdomain.com
+//   ADMIN_PASSWORD=<a long random password>
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 async function checkAndCreateAdmin() {
+  if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+    console.error(
+      'Missing ADMIN_EMAIL / ADMIN_PASSWORD. Add them to .env.local (gitignored) and re-run:\n' +
+      '  ADMIN_EMAIL=admin@yourdomain.com\n' +
+      '  ADMIN_PASSWORD=<a long random password>'
+    );
+    process.exit(1);
+  }
+
   console.log("Waiting for Supabase to finish starting to create admin...");
   while (true) {
     let envContent = fs.readFileSync('.env.local', 'utf-8');
@@ -15,8 +31,8 @@ async function checkAndCreateAdmin() {
         const supabase = createClient(apiUrlMatch[1].trim(), serviceRoleMatch[1].trim());
         
         const { data, error } = await supabase.auth.admin.createUser({
-          email: 'admin@fcps.com',
-          password: 'Abcd@321',
+          email: ADMIN_EMAIL,
+          password: ADMIN_PASSWORD,
           email_confirm: true,
           user_metadata: { full_name: 'System Administrator' }
         });
