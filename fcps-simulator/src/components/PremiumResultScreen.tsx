@@ -5,11 +5,17 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, L
 
 /* ── Types ─────────────────────────────────────── */
 interface Question {
-  id: string; question_text: string; correct_answer: string; subject: string;
+  id: string; question_text: string; correct_answer?: string; subject: string;
   option_a?: string|null; option_b?: string|null; option_c?: string|null;
   option_d?: string|null; option_e?: string|null; explanation?: string|null;
 }
-interface Props { questions: Question[]; answers: (string|null)[]; subject: string; mode: string; }
+interface Props {
+  questions: Question[]; answers: (string|null)[]; subject: string; mode: string;
+  /** Authoritative score/total from the server-side grading RPC. When present,
+   *  these are trusted over the locally-recomputed stats (which can be wrong
+   *  if the post-submit answer-key reveal degrades gracefully). */
+  score?: number; total?: number;
+}
 
 /* ── Styles (scoped) ────────────────────────────── */
 const S = `
@@ -110,13 +116,16 @@ const RING_R = 52;
 const RING_C = 2*Math.PI*RING_R;
 
 /* ── Component ──────────────────────────────────── */
-export default function PremiumResultScreen({ questions, answers, subject, mode }: Props) {
+export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp }: Props) {
   const [tab, setTab] = useState<'dash'|'review'>('dash');
   const [filter, setFilter] = useState<'all'|'correct'|'wrong'|'skipped'>('all');
   const [mounted, setMounted] = useState(false);
   useEffect(()=>setMounted(true),[]);
 
-  const { correct, wrong, skipped, total } = calcStats(questions, answers);
+  const localStats = calcStats(questions, answers);
+  const correct = score !== undefined ? score : localStats.correct;
+  const total   = totalProp !== undefined ? totalProp : localStats.total;
+  const { wrong, skipped } = localStats;
   const pct = Math.round((correct/total)*100);
   const pass = pct >= 60;
   const subjectData = calcSubjects(questions, answers);
