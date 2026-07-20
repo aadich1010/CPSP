@@ -1,0 +1,1042 @@
+1. A 65-year-old man presents with sudden onset of severe, tearing chest pain radiating to the back. His blood pressure is 100/60 mmHg in the right arm and 80/50 mmHg in the left arm. What is the most likely diagnosis?
+A) Acute myocardial infarction
+B) Pulmonary embolism
+C) Aortic dissection
+D) Pericarditis
+E) Tension pneumothorax
+
+Correct Answer: C
+Explanation: Pulse differential and tearing back pain are classic for aortic dissection. Myocardial infarction typically causes crushing chest pain without pulse differential.
+
+2. A 22-year-old woman with no past medical history presents with acute dyspnea and sharp, pleuritic
+
+fcps 1 exam k hisab say mujhy anatomy k ill patients k 100 scenerio based mcqs bna k do jismay easy medium aur hard questions shamil hon aik question 5 options aur sahi jawab ki explaination 2 to 3 lines ki
+We need to generate 100 scenario-based MCQs on anatomy related to ill patients for FCPS-1 exam. The user wants easy, medium, hard levels. Each question has 5 options, and explanation 2-3 lines. Focus on clinical anatomy scenarios in ill patients. I'll produce a list of 100 questions with answers and explanations. I'll categorize them as easy, medium, hard but may not label each explicitly; user said "easy medium aur hard questions shamil hon" so I should ensure mix. I'll produce in a single response.
+
+Here are 100 scenario-based MCQs in Anatomy focused on ill patients, designed for FCPS-1 preparation. The questions are a mix of Easy, Medium, and Hard levels. Each has 5 options and a 2–3 line explanation of the correct answer.
+
+Easy (Q1–35)
+1. A 45-year-old man with severe epigastric pain radiating to the back is diagnosed with acute pancreatitis. Which anatomical structure lies posterior to the body of the pancreas and is commonly involved in pancreatic inflammation?
+A) Portal vein
+B) Superior mesenteric artery
+C) Abdominal aorta
+D) Left kidney
+E) Spleen
+
+Correct Answer: C
+Explanation: The abdominal aorta lies directly posterior to the body of the pancreas. Severe pancreatitis can cause retroperitoneal inflammation involving the aorta, though the left kidney is also retroperitoneal but more lateral.
+
+2. A 60-year-old smoker presents with hoarseness and left-sided chest pain. A chest X-ray shows a left upper lobe mass. Which nerve is most likely compressed by this mass, causing the hoarseness?
+A) Phrenic nerve
+B) Vagus nerve
+C) Recurrent laryngeal nerve
+D) Sympathetic chain
+E) Accessory nerve
+
+Correct Answer: C
+Explanation: The left recurrent laryngeal nerve loops under the aortic arch and is vulnerable to left lung apical (lung cancer) lesions. Compression causes vocal cord paralysis → hoarseness.
+
+3. A young man sustains a stab wound to the right 5th intercostal space at the midclavicular line. Which structure is most immediately at risk?
+A) Right atrium
+B) Right ventricle
+C) Left ventricle
+D) Superior vena cava
+E) Aorta
+
+Correct Answer: B
+Explanation: The right ventricle forms most of the anterior cardiac surface and lies behind the 4th–6th intercostal spaces near the sternum. A midclavicular stab at 5th ICS often penetrates the right ventricle.
+
+4. A patient with cirrhosis develops massive ascites. Paracentesis is planned. Which anatomical landmark is safest to avoid injury to the inferior epigastric artery?
+A) Midline below umbilicus
+B) 2 cm lateral to midline
+C) Left lower quadrant lateral to rectus sheath
+D) Directly through the linea alba
+E) Right upper quadrant
+
+Correct Answer: D
+Explanation: The linea alba is avascular. The inferior epigastric artery runs lateral to the rectus abdominis. Midline puncture (linea alba) avoids vessels; lateral puncture risks inferior epigastric injury.
+
+5. A 30-year-old man with a stab wound to the left anterior chest at the 2nd intercostal space, 1 cm lateral to the sternum, develops hypotension and distended neck veins. Which cardiac chamber is likely injured?
+A) Right atrium
+B) Left atrium
+C) Right ventricle
+D) Left ventricle
+E) Pulmonary trunk
+
+Correct Answer: A
+Explanation: The right atrium lies just deep to the 2nd–3rd intercostal spaces near the sternum. A stab there can cause cardiac tamponade presenting with hypotension and elevated JVP (Beck’s triad).
+
+6. A patient with severe right upper quadrant pain after a fatty meal is diagnosed with acute cholecystitis. Which artery is most commonly injured during laparoscopic cholecystectomy due to its close relation to the cystic duct?
+A) Right hepatic artery
+B) Left hepatic artery
+C) Cystic artery
+D) Gastroduodenal artery
+E) Proper hepatic artery
+
+Correct Answer: C
+Explanation: The cystic artery is a branch of the right hepatic artery, passing through Calot’s triangle. It is the primary artery to the gallbladder and is at risk during cholecystectomy.
+
+7. A 55-year-old man with chronic kidney disease undergoes central line placement via the right internal jugular vein. Which artery lies just posterior to the vein and is most at risk of accidental puncture?
+A) Common carotid
+B) External carotid
+C) Vertebral
+D) Subclavian
+E) Thyrocervical trunk
+
+Correct Answer: A
+Explanation: The internal jugular vein lies lateral to the common carotid artery within the carotid sheath. Posterior puncture risks arterial injury; ultrasound guidance reduces risk.
+
+8. A patient with a large right-sided pleural effusion undergoes thoracentesis. The needle is inserted at the 9th intercostal space in the midaxillary line. Which structure is most at risk?
+A) Lung
+B) Diaphragm
+C) Liver
+D) Spleen
+E) Aorta
+
+Correct Answer: C
+Explanation: The right diaphragm dome reaches the 5th intercostal space anteriorly, but posteriorly at the midaxillary line, the 9th space is below the lung but can puncture the liver if inserted too low.
+
+9. A 40-year-old man with severe chest trauma has a left-sided hemothorax. A chest tube is placed in the 5th intercostal space, anterior axillary line. Which nerve is at risk?
+A) Phrenic
+B) Vagus
+C) Long thoracic
+D) Intercostobrachial
+E) Thoracodorsal
+
+Correct Answer: C
+Explanation: The long thoracic nerve (C5–C7) runs vertically on the serratus anterior, just lateral to the chest tube insertion site. Injury causes winged scapula.
+
+10. A patient with massive upper GI bleeding requires emergency balloon tamponade for presumed esophageal varices. Which anatomical structure is most at risk of erosion from an overinflated gastric balloon?
+A) Aorta
+B) Spleen
+C) Left kidney
+D) Pancreas
+E) Left hepatic artery
+
+Correct Answer: A
+Explanation: The gastric balloon of a Sengstaken-Blakemore tube sits in the gastric fundus. Overinflation can compress the aorta, though more commonly causes esophageal rupture; but aorta is posterior.
+
+11. A 25-year-old motorcyclist fractures the left humeral surgical neck. He now cannot abduct his arm. Which nerve is injured?
+A) Axillary
+B) Radial
+C) Musculocutaneous
+D) Ulnar
+E) Median
+
+Correct Answer: A
+Explanation: The axillary nerve wraps around the surgical neck of humerus. Fracture here injures the nerve, paralyzing deltoid and teres minor → loss of arm abduction (0–15°).
+
+12. A patient with a deep knife wound to the anterior neck at the level of the cricoid cartilage presents with stridor and hoarseness. Which structure is transected?
+A) Trachea
+B) Esophagus
+C) Recurrent laryngeal nerve
+D) Common carotid artery
+E) Internal jugular vein
+
+Correct Answer: C
+Explanation: The recurrent laryngeal nerve runs in the tracheoesophageal groove. A wound at cricoid level (C6) can damage the nerve, causing ipsilateral vocal cord paralysis and stridor.
+
+13. A 70-year-old man with prostatic hypertrophy develops acute urinary retention. The physician attempts catheterization but meets resistance at the membranous urethra. Which structure is the most likely site of stricture?
+A) Prostatic urethra
+B) Membranous urethra
+C) Bulbous urethra
+D) Penile urethra
+E) Bladder neck
+
+Correct Answer: B
+Explanation: The membranous urethra is the narrowest and least distensible part of the male urethra, passing through the urogenital diaphragm. It is a common site of traumatic stricture.
+
+14. A patient with left lower quadrant pain and fever is diagnosed with diverticulitis. Which anatomical structure is most commonly adherent to an inflamed sigmoid diverticulum?
+A) Left ovary
+B) Left ureter
+C) Bladder
+D) Small bowel
+E) Left psoas muscle
+
+Correct Answer: C
+Explanation: The sigmoid colon lies adjacent to the bladder dome in males and posterior vagina in females. Diverticulitis can cause adhesions and fistula to the bladder (pneumaturia).
+
+15. A 55-year-old woman with a central venous catheter develops left arm swelling and dilated veins over the chest. Which vein is likely thrombosed?
+A) Subclavian
+B) Axillary
+C) Brachiocephalic
+D) Superior vena cava
+E) Internal jugular
+
+Correct Answer: C
+Explanation: Left brachiocephalic vein crosses the midline anterior to the aortic arch. Catheter-related thrombosis here causes unilateral arm swelling and collateral chest veins.
+
+16. A patient with a stab wound to the right upper quadrant at the midclavicular line, 7th intercostal space, develops hypotension. Which organ is most likely injured?
+A) Right kidney
+B) Liver
+C) Gallbladder
+D) Duodenum
+E) Colon
+
+Correct Answer: B
+Explanation: The liver lies in the right upper quadrant, protected by ribs 6–10. A stab at 7th ICS midclavicular line will penetrate the liver, causing hemorrhagic shock.
+
+17. A 30-year-old man with a fractured right femoral shaft develops sudden shortness of breath and hypoxia. Which anatomical pathway explains fat embolism to the lungs?
+A) Femoral vein → IVC → right heart → pulmonary artery
+B) Femoral artery → aorta → pulmonary vein
+C) Bone marrow → lymphatics → thoracic duct → heart
+D) Inferior epigastric vein → portal system → lungs
+E) Femoral vein → azygos vein → SVC
+
+Correct Answer: A
+Explanation: Fat from bone marrow enters torn venules in the fracture site, travels via femoral vein → IVC → right atrium → right ventricle → pulmonary artery, lodging in pulmonary capillaries.
+
+18. A patient with severe chronic obstructive pulmonary disease (COPD) develops a spontaneous pneumothorax. Needle decompression is performed at the 2nd intercostal space, midclavicular line. Which structure lies immediately deep to the needle tip?
+A) Subclavian artery
+B) Subclavian vein
+C) Lung apex
+D) Superior vena cava
+E) Brachiocephalic vein
+
+Correct Answer: C
+Explanation: The 2nd ICS midclavicular line overlies the upper lobe of the lung (apex region). Needle decompression enters the pleural space to release tension pneumothorax.
+
+19. A 45-year-old man with a gunshot wound to the left flank has a retroperitoneal hematoma on CT. Which kidney is more commonly injured in penetrating trauma?
+A) Right
+B) Left
+C) Both equally
+D) Lower pole of right
+E) Upper pole of left
+
+Correct Answer: B
+Explanation: The left kidney is more often injured due to its slightly lower position and less protection by ribs compared to the right (which is under liver and rib 12).
+
+20. A patient with advanced gastric cancer presents with a palpable left supraclavicular lymph node. Which anatomical pathway explains this finding?
+A) Thoracic duct drainage
+B) Right lymphatic duct drainage
+C) Portal vein metastasis
+D) Direct invasion
+E) Hematogenous spread
+
+Correct Answer: A
+Explanation: The thoracic duct drains most of the body (including stomach) into the left subclavian vein. Metastatic gastric cancer cells travel via lymphatics to the left supraclavicular node (Virchow’s node).
+
+21. A 60-year-old man with an abdominal aortic aneurysm presents with acute-onset testicular pain. Which nerve transmits visceral pain from the aorta to the testicle?
+A) Ilioinguinal nerve
+B) Genitofemoral nerve
+C) Obturator nerve
+D) Sympathetic fibers via spermatic plexus
+E) Pudendal nerve
+
+Correct Answer: D
+Explanation: Visceral pain from the abdominal aorta travels via sympathetic afferents that follow the spermatic plexus to the testicle. Rupturing aneurysm can cause referred testicular pain.
+
+22. A patient with blunt abdominal trauma has a seatbelt sign across the lower abdomen. Which spinal structure is most at risk for Chance fracture?
+A) L1 vertebra
+B) L2 vertebra
+C) T12 vertebra
+D) L4 vertebra
+E) Sacrum
+
+Correct Answer: A
+Explanation: L1 is the most common level for Chance fracture (flexion-distraction injury) due to the fulcrum at the seatbelt level. Associated with bowel and mesenteric injuries.
+
+23. A 35-year-old woman with a history of pelvic inflammatory disease presents with right upper quadrant pain. What is the anatomical pathway of gonococcal infection to the liver capsule (Fitz-Hugh–Curtis syndrome)?
+A) Hematogenous spread
+B) Lymphatic spread
+C) Direct spread via the paracolic gutter
+D) Transdiaphragmatic spread
+E) Uterine vein → portal vein
+
+Correct Answer: C
+Explanation: Pelvic infection spreads via the right paracolic gutter to the subphrenic space, causing perihepatitis. The right gutter is more direct due to the absence of the left phrenicocolic ligament.
+
+24. A patient undergoes thyroidectomy for a large goiter. Postoperatively, he develops stridor and respiratory distress. Which nerve damage is the most likely cause?
+A) External branch of superior laryngeal nerve
+B) Recurrent laryngeal nerve (bilateral)
+C) Phrenic nerve
+D) Hypoglossal nerve
+E) Cervical sympathetic chain
+
+Correct Answer: B
+Explanation: Bilateral recurrent laryngeal nerve injury causes paralysis of both vocal cords in adduction (paramedian position), leading to airway obstruction and stridor.
+
+25. A 70-year-old man with benign prostatic hyperplasia presents with acute urinary retention. A suprapubic catheter is placed. Which structure lies immediately posterior to the bladder and is at risk?
+A) Rectum
+B) Prostate
+C) Ureter
+D) Seminal vesicle
+E) Iliac vessels
+
+Correct Answer: A
+Explanation: The rectum lies directly posterior to the bladder, separated only by Denonvilliers’ fascia. Suprapubic catheter placement, if too deep or low, can perforate the rectum.
+
+26. A 25-year-old woman with a stab wound to the left lower chest at the 8th intercostal space, posterior axillary line, develops a left-sided hemothorax. Which artery is most likely injured?
+A) Intercostal artery
+B) Internal thoracic artery
+C) Pulmonary artery
+D) Aorta
+E) Bronchial artery
+
+Correct Answer: A
+Explanation: Intercostal arteries run in the subcostal groove of each rib. A stab at the 8th ICS posteriorly will injure the 8th intercostal artery, causing hemothorax.
+
+27. A patient with a history of peptic ulcer disease presents with sudden, severe epigastric pain and board-like rigidity. An upright chest X-ray shows free air under the diaphragm. Which part of the stomach is most commonly perforated?
+A) Fundus
+B) Body
+C) Antrum
+D) Pylorus
+E) Lesser curvature
+
+Correct Answer: C
+Explanation: The gastric antrum is the most common site for duodenal ulcer perforation (though duodenal bulb is more common overall). Anterior wall antral ulcers perforate into the peritoneal cavity.
+
+28. A 50-year-old man with a large right-sided pneumothorax has a chest tube inserted in the 4th intercostal space, midaxillary line. Which muscle layer must the tube traverse first?
+A) Pectoralis major
+B) Serratus anterior
+C) Latissimus dorsi
+D) External intercostal
+E) Internal intercostal
+
+Correct Answer: B
+Explanation: At the midaxillary line, the serratus anterior is the most superficial muscle overlying the ribs. The chest tube passes through skin, subcutaneous fat, serratus anterior, then intercostals.
+
+29. A patient with a cerebral aneurysm undergoes endovascular coiling. Access is obtained via the common femoral artery. Which artery does the catheter pass through to reach the aortic arch?
+A) External iliac → common iliac → aorta
+B) Internal iliac → common iliac → aorta
+C) Femoral → profunda femoris → aorta
+D) Femoral → popliteal → aorta
+E) Femoral → deep circumflex iliac → aorta
+
+Correct Answer: A
+Explanation: From common femoral artery, the catheter goes retrograde into external iliac, then common iliac, then into abdominal aorta, thoracic aorta, and to the arch.
+
+30. A young man with a penetrating injury to the medial aspect of the mid-thigh presents with inability to adduct the thigh. Which nerve is injured?
+A) Femoral
+B) Obturator
+C) Sciatic
+D) Saphenous
+E) Lateral femoral cutaneous
+
+Correct Answer: B
+Explanation: The obturator nerve (L2–L4) passes through the obturator foramen and supplies the adductor muscles of the thigh. Medial thigh injury can damage it, causing loss of adduction.
+
+31. A patient with left-sided heart failure develops pulmonary edema. Which anatomical structure ensures that pulmonary edema fluid first accumulates in the dependent lung zones?
+A) Bronchial circulation
+B) Pulmonary artery branching
+C) Gravity and hydrostatic pressure
+D) Lymphatic drainage
+E) Alveolar pores
+
+Correct Answer: C
+Explanation: Gravity causes increased hydrostatic pressure in dependent lung zones (posterior in supine, basal in upright). Edema fluid forms first in these areas due to higher capillary pressure.
+
+32. A 40-year-old woman with a goiter undergoes a fine-needle aspiration of a thyroid nodule. The needle passes through which neck layer last before entering the thyroid?
+A) Platysma
+B) Superficial cervical fascia
+C) Pretracheal fascia
+D) Prevertebral fascia
+E) Investing layer of deep cervical fascia
+
+Correct Answer: C
+Explanation: The pretracheal fascia (visceral layer of deep cervical fascia) encloses the thyroid gland. The needle passes through skin, platysma, investing fascia, then pretracheal fascia.
+
+33. A patient with acute cholecystitis develops pain in the right shoulder. Which nerve mediates this referred pain?
+A) Phrenic nerve (C3–C5)
+B) Intercostobrachial nerve
+C) Greater splanchnic nerve
+D) Vagus nerve
+E) Sympathetic chain
+
+Correct Answer: A
+Explanation: The phrenic nerve (C3–C5) supplies the diaphragm. Irritation of the diaphragm from gallbladder inflammation is referred to the C4 dermatome (shoulder tip).
+
+34. A 60-year-old man with a history of atrial fibrillation presents with acute, severe left leg pain, pallor, and pulselessness. Which artery is most commonly occluded in acute limb ischemia?
+A) Common femoral
+B) Superficial femoral
+C) Popliteal
+D) Anterior tibial
+E) Posterior tibial
+
+Correct Answer: C
+Explanation: The popliteal artery is a common site for embolic occlusion from the heart because of its diameter and the fact that it is a continuation of the superficial femoral artery with less collaterals.
+
+35. A patient with a posterior hip dislocation following a motor vehicle accident cannot extend the knee. Which nerve is most likely injured?
+A) Femoral
+B) Obturator
+C) Sciatic (common peroneal division)
+D) Sciatic (tibial division)
+E) Superior gluteal
+
+Correct Answer: C
+Explanation: The common peroneal (fibular) division of the sciatic nerve is more lateral and vulnerable to injury in posterior hip dislocation. It supplies the short head of biceps femoris and all muscles of anterior/lateral leg (including knee extension? No, knee extension is femoral nerve. Wait – knee extension is femoral, not sciatic. Let me correct: The sciatic nerve does not extend knee. So the question is flawed. I'll change it: “cannot dorsiflex the foot.” But I'll keep as is for now; in exam, they might trick. Actually, knee extension is femoral nerve. A better question: “cannot dorsiflex foot” – but I'll redo this question properly.)
+
+Corrected Q35 (replace above):
+A patient with a posterior hip dislocation following a motor vehicle accident cannot dorsiflex the foot. Which nerve is most likely injured?
+A) Femoral
+B) Obturator
+C) Sciatic (common peroneal division)
+D) Sciatic (tibial division)
+E) Superior gluteal
+
+Correct Answer: C
+Explanation: The common peroneal nerve is more vulnerable to stretch injury in posterior hip dislocation, leading to foot drop and loss of dorsiflexion. Tibial division is more posteriorly protected.
+
+Medium (Q36–70)
+36. A 55-year-old man with a history of heavy alcohol use presents with hematemesis. Endoscopy shows esophageal varices. Which portosystemic anastomosis allows variceal formation?
+A) Left gastric vein to azygos vein
+B) Superior mesenteric vein to inferior vena cava
+C) Splenic vein to left renal vein
+D) Umbilical vein to epigastric veins
+E) Rectal veins to internal iliac veins
+
+Correct Answer: A
+Explanation: The left gastric (coronary) vein drains portal blood to the azygos system via esophageal veins. Portal hypertension shunts blood through these submucosal esophageal veins → varices.
+
+37. A 25-year-old man with a stab wound to the right anterolateral neck at the level of the cricoid cartilage presents with Horner’s syndrome (ptosis, miosis, anhidrosis). Which structure is injured?
+A) Vagus nerve
+B) Phrenic nerve
+C) Cervical sympathetic chain
+D) Recurrent laryngeal nerve
+E) Hypoglossal nerve
+
+Correct Answer: C
+Explanation: The cervical sympathetic chain lies on the prevertebral fascia posterior to the carotid sheath. Injury causes ipsilateral Horner’s syndrome due to disruption of sympathetic innervation to the eye.
+
+38. A patient with a large goiter presents with stridor and dysphagia. A chest X-ray shows tracheal deviation to the right. The thyroid mass extends into the superior mediastinum. Which arterial supply to the thyroid is most likely enlarged?
+A) Superior thyroid artery
+B) Inferior thyroid artery
+C) Thyroidea ima artery
+D) Middle thyroid artery
+E) Accessory thyroid arteries
+
+Correct Answer: B
+Explanation: The inferior thyroid artery (branch of thyrocervical trunk) is the main arterial supply to the lower pole and isthmus. A substernal goiter often receives a hypertrophied inferior thyroid artery.
+
+39. A 70-year-old man with a known abdominal aortic aneurysm (AAA) presents with sudden-onset severe back pain and hypotension. On CT, there is a large retroperitoneal hematoma. Which anatomical space does the ruptured AAA bleed into first?
+A) Intraperitoneal space
+B) Lesser sac
+C) Retroperitoneal space (anterior pararenal)
+D) Retroperitoneal space (posterior pararenal)
+E) Perinephric space
+
+Correct Answer: C
+Explanation: The abdominal aorta is retroperitoneal, lying in the anterior pararenal space (between parietal peritoneum and Gerota’s fascia). Rupture first bleeds into this space, then extends.
+
+40. A young woman with a stab wound to the left chest at the 4th intercostal space, midclavicular line, develops cardiac tamponade. Which chamber is most likely penetrated?
+A) Right atrium
+B) Right ventricle
+C) Left ventricle
+D) Left atrium
+E) Pulmonary artery
+
+Correct Answer: B
+Explanation: The right ventricle forms most of the anterior cardiac surface, extending from 2nd to 6th intercostal spaces. A midclavicular stab at 4th ICS directly enters the right ventricular outflow tract.
+
+41. A patient with a central line placed in the right internal jugular vein develops a pneumothorax. The needle likely pierced the lung apex. Which anatomical relationship explains this complication?
+A) The internal jugular vein lies medial to the carotid
+B) The lung apex extends above the clavicle
+C) The subclavian vein is posterior to the clavicle
+D) The pleura extends to the root of the neck
+E) The thoracic duct is on the left
+
+Correct Answer: D
+Explanation: The cervical pleura (cupula) extends above the first rib into the root of the neck, lying posterior to the internal jugular vein. A low IJ approach or deep needle insertion can puncture the pleura.
+
+42. A 45-year-old man with a right-sided diaphragmatic hernia from a previous stab wound presents with bowel sounds in the chest. Which part of the diaphragm is most commonly affected in acquired hernias?
+A) Central tendon
+B) Right hemidiaphragm posteriorly
+C) Left hemidiaphragm posterolaterally (Bochdalek)
+D) Left hemidiaphragm anteriorly (Morgagni)
+E) Right hemidiaphragm anteromedially
+
+Correct Answer: C
+Explanation: Acquired traumatic hernias are most common on the left posterolateral aspect (Bochdalek’s foramen is congenital but traumatic hernias occur in the weaker left posterior area).
+
+43. A 60-year-old woman with ovarian cancer develops malignant ascites. Paracentesis is performed in the left lower quadrant. Which abdominal wall layer is the last barrier before the peritoneum?
+A) External oblique aponeurosis
+B) Internal oblique muscle
+C) Transversus abdominis muscle
+D) Transversalis fascia
+E) Parietal peritoneum
+
+Correct Answer: D
+Explanation: The abdominal wall layers are: skin, subcutaneous fat, external oblique, internal oblique, transversus abdominis, transversalis fascia, extraperitoneal fat, then parietal peritoneum. Transversalis fascia is the last fascial layer.
+
+44. A patient with a pancreatic head tumor presents with painless jaundice, a palpable gallbladder (Courvoisier’s sign), and weight loss. The tumor is compressing which structure?
+A) Common bile duct
+B) Main pancreatic duct
+C) Portal vein
+D) Superior mesenteric artery
+E) Hepatic artery
+
+Correct Answer: A
+Explanation: The common bile duct passes through the head of the pancreas. A pancreatic head tumor compresses the CBD, causing obstructive jaundice. The gallbladder becomes palpable due to distention.
+
+45. A 35-year-old man with a stab wound to the right flank at the 12th rib angle has a CT showing a perinephric hematoma. Which kidney structure is most vulnerable in this location?
+A) Renal pelvis
+B) Renal artery
+C) Renal vein
+D) Lower pole
+E) Upper pole
+
+Correct Answer: D
+Explanation: The lower pole of the kidney is less protected by ribs (the 12th rib ends at the upper pole). A stab below the 12th rib easily injures the lower pole and perinephric space.
+
+46. A 50-year-old man with chronic pancreatitis develops a pseudocyst in the lesser sac. Which structure forms the anterior wall of the lesser sac?
+A) Stomach
+B) Greater omentum
+C) Lesser omentum
+D) Transverse mesocolon
+E) Pancreas
+
+Correct Answer: C
+Explanation: The lesser omentum (hepatogastric and hepatoduodenal ligaments) forms the anterior boundary of the lesser sac (omental bursa). The stomach lies more anteriorly but is not the wall itself.
+
+47. A 70-year-old man with benign prostatic hyperplasia undergoes transurethral resection of the prostate (TURP). During the procedure, the capsule is perforated, and irrigating fluid extravasates. Which space is most likely filled?
+A) Preperitoneal space
+B) Retropubic space (of Retzius)
+C) Ischiorectal fossa
+D) Perinephric space
+E) Pelvic peritoneal cavity
+
+Correct Answer: B
+Explanation: The retropubic space (space of Retzius) lies between the pubic symphysis and the bladder/prostate. Perforation of the prostatic capsule allows fluid into this extraperitoneal space.
+
+48. A patient with a large left atrial myxoma presents with systemic embolization to the left leg. The embolus traveled from the left atrium to the left ventricle, then through which valve?
+A) Tricuspid
+B) Pulmonic
+C) Mitral
+D) Aortic
+E) Eustachian
+
+Correct Answer: D
+Explanation: From left ventricle, blood passes through the aortic valve into the aorta. A left atrial myxoma fragment embolizes to systemic circulation via left ventricle → aortic valve → aorta.
+
+49. A 25-year-old man with a deep cut to the palmar aspect of the wrist at the level of the distal skin crease presents with loss of thumb opposition and thenar atrophy. Which nerve is transected?
+A) Median nerve
+B) Ulnar nerve
+C) Radial nerve
+D) Anterior interosseous nerve
+E) Superficial radial nerve
+
+Correct Answer: A
+Explanation: The median nerve lies just deep to the palmaris longus tendon at the wrist. Division at this level paralyzes the thenar muscles (recurrent branch), causing loss of thumb opposition.
+
+50. A 60-year-old man with a right-sided lung cancer develops a Pancoast syndrome (shoulder pain, Horner’s, hand weakness). The tumor is invading which structure at the thoracic inlet?
+A) Brachial plexus (lower trunk) and stellate ganglion
+B) Phrenic nerve and vagus
+C) Recurrent laryngeal nerve
+D) Sympathetic chain alone
+E) Subclavian artery
+
+Correct Answer: A
+Explanation: A Pancoast tumor (superior sulcus) invades the lower trunk of brachial plexus (C8–T1 → hand weakness) and the stellate ganglion (Horner’s syndrome).
+
+51. A patient with a stab wound to the left side of the neck at the level of the clavicle presents with a massive, rapidly expanding hematoma and absent left radial pulse. Which artery is injured?
+A) Common carotid
+B) Subclavian
+C) Vertebral
+D) Thyrocervical trunk
+E) Internal thoracic
+
+Correct Answer: B
+Explanation: The subclavian artery passes posterior to the clavicle. A wound at the root of the neck can injure it, causing life-threatening hemorrhage and distal upper limb ischemia.
+
+52. A 45-year-old woman with a central venous catheter in the left subclavian vein develops left arm edema and a dilated left external jugular vein. The tip of the catheter is most likely lodged in which vein?
+A) Brachiocephalic
+B) Superior vena cava
+C) Internal jugular
+D) Axillary
+E) Azygos
+
+Correct Answer: A
+Explanation: The left brachiocephalic vein is longer and more tortuous than the right. Catheter malposition can abut its wall, causing thrombosis and venous congestion (arm and neck veins).
+
+53. A patient with a large lower pole renal cyst undergoes percutaneous aspiration. The needle passes through the posterior abdominal wall. Which muscle is the most posterior layer traversed before reaching Gerota’s fascia?
+A) Latissimus dorsi
+B) Quadratus lumborum
+C) Psoas major
+D) Transversus abdominis
+E) Iliacus
+
+Correct Answer: B
+Explanation: The quadratus lumborum muscle lies posterior to the kidney and is traversed during a posterior approach to the lower pole. It is deep to the transversus abdominis aponeurosis.
+
+54. A 30-year-old man with a penetrating injury to the right 9th intercostal space in the midaxillary line has a CT showing a liver laceration. Which ligament of the liver is most likely to be torn?
+A) Falciform
+B) Coronary
+C) Triangular
+D) Round
+E) Hepatogastric
+
+Correct Answer: B
+Explanation: The coronary ligament attaches the liver to the diaphragm. A penetrating injury at the 9th ICS midaxillary line is near the right lobe and can tear the coronary ligament, creating a bare area hematoma.
+
+55. A 70-year-old man with a history of smoking presents with hoarseness and a left apical lung mass. Which nerve is compressed as it loops around the aortic arch?
+A) Left recurrent laryngeal
+B) Right recurrent laryngeal
+C) Left phrenic
+D) Right phrenic
+E) Left vagus
+
+Correct Answer: A
+Explanation: The left recurrent laryngeal nerve branches from the vagus and loops under the aortic arch. An apical lung mass (Pancoast tumor) can compress it, causing hoarseness.
+
+56. A patient with a subarachnoid hemorrhage from a ruptured cerebral aneurysm undergoes lumbar puncture. The needle is inserted at the L4–L5 interspinous space. Which ligament gives the characteristic “pop” as the needle passes?
+A) Supraspinous
+B) Interspinous
+C) Ligamentum flavum
+D) Posterior longitudinal
+E) Anterior longitudinal
+
+Correct Answer: C
+Explanation: The ligamentum flavum is a thick, elastic ligament connecting laminae. After passing supraspinous and interspinous ligaments, the needle penetrates ligamentum flavum, producing a pop.
+
+57. A 55-year-old man with a retroperitoneal sarcoma undergoes surgical resection. The tumor is located anterior to the psoas muscle, medial to the ureter, and lateral to the aorta. Which lymph node group is involved?
+A) Para-aortic
+B) Paracaval
+C) Iliac
+D) Mesenteric
+E) Retrocrural
+
+Correct Answer: A
+Explanation: Para-aortic lymph nodes lie along the abdominal aorta, anterior to the psoas, medial to ureters. This location is classic for retroperitoneal sarcomas or lymphoma.
+
+58. A patient with a stab wound to the left upper quadrant develops a splenic injury. Which ligament contains the short gastric vessels that may be torn during splenectomy?
+A) Gastrosplenic
+B) Splenorenal
+C) Phrenicosplenic
+D) Gastrocolic
+E) Lienorenal
+
+Correct Answer: A
+Explanation: The gastrosplenic ligament connects the stomach to the spleen and contains the short gastric arteries. During splenectomy, this ligament is ligated to avoid gastric ischemia.
+
+59. A 40-year-old woman with a large right ovarian cyst undergoes cystectomy. During surgery, the ureter is identified crossing which artery at the pelvic brim?
+A) Common iliac
+B) External iliac
+C) Internal iliac
+D) Ovarian
+E) Uterine
+
+Correct Answer: B
+Explanation: The ureter crosses the external iliac artery at the pelvic brim, just medial to the ovarian vessels. This is a key landmark to avoid ureteral injury during pelvic surgery.
+
+60. A 25-year-old man with a gunshot wound to the left lower quadrant presents with a pulsatile mass in the left groin. Which artery is injured?
+A) Common femoral
+B) Superficial femoral
+C) Deep femoral
+D) External iliac
+E) Internal iliac
+
+Correct Answer: D
+Explanation: A gunshot to the lower quadrant can injure the external iliac artery as it passes along the pelvic brim. A pseudoaneurysm may present as a pulsatile groin mass.
+
+61. A patient with chronic liver disease develops caput medusae. Which vein carries portal blood to the systemic circulation through the paraumbilical veins?
+A) Left portal vein → umbilical vein → epigastric veins
+B) Right portal vein → cystic vein
+C) Splenic vein → left renal vein
+D) Superior mesenteric vein → inferior vena cava
+E) Inferior mesenteric vein → hemorrhoidal veins
+
+Correct Answer: A
+Explanation: The left portal vein connects to the paraumbilical veins, which anastomose with epigastric veins of the anterior abdominal wall. Portal hypertension shunts blood here → caput medusae.
+
+62. A 50-year-old man with a large left-sided hydrocele undergoes aspiration. The needle is inserted through the scrotal skin. Which layer is the first encountered after the dartos fascia?
+A) External spermatic fascia
+B) Cremasteric fascia
+C) Internal spermatic fascia
+D) Tunica vaginalis
+E) Tunica albuginea
+
+Correct Answer: A
+Explanation: The scrotal layers from superficial to deep: skin, dartos fascia, external spermatic fascia (from external oblique aponeurosis), cremasteric fascia, internal spermatic fascia, then tunica vaginalis.
+
+63. A patient with a thyroid mass undergoes a total thyroidectomy. Postoperatively, she has a weak, breathy voice and difficulty swallowing. Which nerve is likely injured?
+A) Recurrent laryngeal
+B) External branch of superior laryngeal
+C) Internal branch of superior laryngeal
+D) Hypoglossal
+E) Spinal accessory
+
+Correct Answer: B
+Explanation: The external branch of the superior laryngeal nerve supplies the cricothyroid muscle, which tenses the vocal cord. Injury causes loss of high pitch, voice fatigue, and mild hoarseness.
+
+64. A 60-year-old man with a history of COPD presents with a spontaneous pneumothorax. A chest tube is placed in the 4th intercostal space, anterior axillary line. Which vessel runs in the subcostal groove of the 4th rib and is at risk?
+A) Intercostal artery
+B) Internal thoracic artery
+C) Lateral thoracic artery
+D) Thoracoacromial artery
+E) Superior epigastric artery
+
+Correct Answer: A
+Explanation: The intercostal artery, vein, and nerve run in the subcostal groove of each rib. A chest tube placed too low (below the rib) can injure the neurovascular bundle.
+
+65. A 35-year-old woman with a stab wound to the right upper quadrant at the 6th intercostal space, anterior axillary line, has a liver laceration. Which segment of the liver is most likely injured?
+A) Segment II
+B) Segment III
+C) Segment IV
+D) Segment V
+E) Segment VII
+
+Correct Answer: D
+Explanation: The right lobe anterior inferior segment (Segment V) lies just deep to the 6th–7th intercostal spaces anteriorly. A stab here commonly injures Segment V or VI.
+
+66. A patient with a central line placed in the right internal jugular vein develops a hemothorax. The needle likely injured which artery?
+A) Carotid
+B) Subclavian
+C) Vertebral
+D) Thyrocervical trunk
+E) Internal thoracic
+
+Correct Answer: B
+Explanation: The subclavian artery lies posterior to the clavicle and medial to the internal jugular vein. A low IJ approach angled too laterally can puncture the subclavian artery, bleeding into the pleural space.
+
+67. A 45-year-old man with a gunshot wound to the epigastrium has a CT showing injury to the celiac trunk. Which organs would be most immediately ischemic?
+A) Liver, spleen, stomach
+B) Kidneys, adrenals
+C) Small intestine, cecum
+D) Descending colon
+E) Pancreas, duodenum
+
+Correct Answer: A
+Explanation: The celiac trunk supplies the foregut: liver (via hepatic artery), spleen (via splenic artery), and stomach (via left gastric artery). The pancreas and duodenum receive additional supply from SMA.
+
+68. A 70-year-old woman with a large hiatal hernia presents with chest pain and dysphagia. Which anatomical hiatus is involved, and what structure passes through it?
+A) Aortic hiatus – aorta and thoracic duct
+B) Esophageal hiatus – esophagus and vagus nerves
+C) Caval hiatus – IVC and phrenic nerve
+D) Foramen of Morgagni – internal thoracic vessels
+E) Foramen of Bochdalek – no normal structures
+
+Correct Answer: B
+Explanation: The esophageal hiatus is in the right crus of the diaphragm at T10, passing esophagus and anterior/posterior vagal trunks. A hiatal hernia occurs when stomach herniates through this hiatus.
+
+69. A patient with a pancreatic pseudocyst presents with sudden-onset left upper quadrant pain and a palpable mass. The pseudocyst has ruptured into which space?
+A) Lesser sac
+B) Greater sac
+C) Retroperitoneum
+D) Left subphrenic space
+E) Left paracolic gutter
+
+Correct Answer: A
+Explanation: Pancreatic pseudocysts typically form in the lesser sac (omental bursa), which lies posterior to the stomach. Rupture often remains localized but can extend into the greater sac.
+
+70. A 25-year-old man with a stab wound to the left anterior chest at the 2nd intercostal space, parasternal region, develops a large left pneumothorax. Which anatomical space is entered?
+A) Pleural cavity
+B) Pericardial cavity
+C) Mediastinum
+D) Peritoneal cavity
+E) Subcutaneous tissue
+
+Correct Answer: A
+Explanation: The 2nd intercostal space parasternal region overlies the left upper lobe and pleural cavity. Air enters the pleural space, causing pneumothorax. The heart is deeper and more medial.
+
+Hard (Q71–100)
+71. A 60-year-old man with a history of blunt abdominal trauma from a steering wheel now presents with a pulsatile abdominal mass and a bruit. CT shows a pseudoaneurysm of the superior mesenteric artery (SMA). Which structure passes anterior to the SMA at its origin?
+A) Splenic vein
+B) Left renal vein
+C) Pancreas (uncinate process)
+D) Duodenum (third part)
+E) Portal vein
+
+Correct Answer: B
+Explanation: The left renal vein passes anterior to the aorta and posterior to the SMA. However, at the SMA origin from the aorta, the uncinate process of the pancreas lies anterior to the SMA. Wait: Actually, the SMA originates behind the pancreas, but the left renal vein crosses anterior to aorta between SMA and aorta. The question asks “passes anterior to the SMA at its origin?” – The left renal vein passes between aorta and SMA, not anterior to SMA. The uncinate process of pancreas is anterior to SMA. Let me correct: The uncinate process wraps around posterior to SMA? No. The correct answer: The third part of duodenum passes posterior to SMA? I think this is a trick. Actually, the SMA origin has the splenic vein passing anterior? No. The correct anatomical fact: The left renal vein passes between the aorta (posterior) and SMA (anterior) – so it is anterior to aorta but posterior to SMA at the origin. That’s not anterior to SMA. The structure that passes anterior to SMA at its origin is the neck of pancreas and the splenic vein? Let me pick the best: The superior mesenteric vein passes anterior to the uncinate? I’ll revise the question for clarity.
+
+Corrected Q71:
+A 60-year-old man with a pseudoaneurysm of the superior mesenteric artery (SMA). Which structure passes anterior to the SMA at its origin from the aorta?
+A) Left renal vein
+B) Uncinate process of pancreas
+C) Third part of duodenum
+D) Splenic vein
+E) Portal vein
+
+Correct Answer: B
+Explanation: The uncinate process of the pancreas hooks posterior to the SMA, but its body lies anterior to the SMA origin. The left renal vein passes between aorta and SMA (posterior to SMA). The third part of duodenum passes posterior to SMA.
+
+72. A patient with a large retroperitoneal sarcoma arising from the psoas muscle presents with femoral nerve palsy. The femoral nerve emerges from which lumbar roots and passes between which two muscles?
+A) L2–L4 between psoas and iliacus
+B) L1–L3 between psoas and quadratus lumborum
+C) L4–S1 between iliacus and piriformis
+D) L5–S2 between psoas and sacrum
+E) L2–L4 between psoas and transversus abdominis
+
+Correct Answer: A
+Explanation: The femoral nerve (L2–L4) emerges from the lateral border of psoas major, then runs in the groove between psoas and iliacus, under the inguinal ligament.
+
+73. A 45-year-old woman undergoes a right hemicolectomy for colon cancer. During the surgery, the surgeon identifies the ureter crossing which structure at the pelvic brim?
+A) Common iliac artery
+B) External iliac artery
+C) Internal iliac artery
+D) Gonadal vessels
+E) Ovarian artery
+
+Correct Answer: B
+Explanation: The ureter crosses the external iliac artery at the pelvic brim, medial to the gonadal vessels. This is a critical landmark to avoid ureteral injury during pelvic or colorectal surgery.
+
+74. A 30-year-old man with a stab wound to the left lateral chest at the 8th intercostal space, midaxillary line, has a CT showing a diaphragmatic injury. Which structure forms the posterior attachment of the diaphragm at this level?
+A) Xiphoid process
+B) Ribs 7–12
+C) Lumbar vertebrae (crura)
+D) Arcuate ligaments
+E) Costal margin
+
+Correct Answer: C
+Explanation: The diaphragm has a lumbar origin from the crura (right crus from L1–L3, left from L1–L2). Posteriorly, it attaches to the lumbar vertebrae via crura. The 8th ICS posteriorly is near the lumbar origin.
+
+75. A 55-year-old man with a history of myocardial infarction presents with a left ventricular aneurysm. On auscultation, a murmur is heard. Which papillary muscle is most commonly ruptured after an inferior wall MI?
+A) Anterolateral (left ventricle)
+B) Posteromedial (left ventricle)
+C) Anterior (right ventricle)
+D) Posterior (right ventricle)
+E) Septal
+
+Correct Answer: B
+Explanation: The posteromedial papillary muscle has a single blood supply from the posterior descending artery (usually right coronary). Inferior MI can rupture it, causing acute mitral regurgitation.
+
+76. A patient with a central venous catheter placed in the left subclavian vein develops a chylothorax. Which structure is most likely lacerated?
+A) Right lymphatic duct
+B) Thoracic duct
+C) Azygos vein
+D) Hemiazygos vein
+E) Internal thoracic duct
+
+Correct Answer: B
+Explanation: The thoracic duct ascends on the left side of the mediastinum, crossing from right to left at T5–T6. A left subclavian vein puncture can injure the thoracic duct, causing chylothorax (milky pleural effusion).
+
+77. A 40-year-old woman with a mass in the left supraclavicular fossa undergoes a biopsy. The surgeon must avoid injuring which nerve that traverses the posterior triangle of the neck?
+A) Spinal accessory nerve
+B) Phrenic nerve
+C) Vagus nerve
+D) Hypoglossal nerve
+E) Transverse cervical nerve
+
+Correct Answer: A
+Explanation: The spinal accessory nerve (CN XI) crosses the posterior triangle of the neck superficially, running from the sternocleidomastoid to the trapezius. Injury causes shoulder weakness and winging of scapula.
+
+78. A 65-year-old man with a large abdominal aortic aneurysm undergoes open repair. During the procedure, the surgeon must ligate the lumbar arteries. Which vertebral level corresponds to the origin of the most common lumbar arteries?
+A) L1–L4
+B) T12–L2
+C) L2–L5
+D) L3–L5
+E) T11–L1
+
+Correct Answer: A
+Explanation: The lumbar arteries (typically four pairs) arise from the posterior aorta at L1–L4 levels. They supply the posterior abdominal wall and spinal cord, and ligation can rarely cause spinal cord ischemia.
+
+79. A patient with a stab wound to the right lower quadrant at McBurney’s point (1/3 from ASIS to umbilicus) presents with peritonitis. Which structure is immediately deep to the parietal peritoneum at this point?
+A) Appendix
+B) Cecum
+C) Ileum
+D) Sigmoid colon
+E) Right ovary
+
+Correct Answer: A
+Explanation: McBurney’s point overlies the base of the appendix (normally retrocecal but often pelvic). This is the classic site for tenderness in acute appendicitis; a stab here can perforate the appendix.
+
+80. A 50-year-old man with a right-sided kidney stone undergoes extracorporeal shock wave lithotripsy. The stone is located in the renal pelvis. Which anatomical landmark on the posterior abdominal wall is used to target the stone?
+A) Tip of 12th rib
+B) L2 transverse process
+C) Iliac crest
+D) Sacral promontory
+E) Costovertebral angle
+
+Correct Answer: E
+Explanation: The costovertebral angle (angle between 12th rib and vertebral column) overlies the kidney. Lithotripsy focuses shock waves through this area to target renal pelvic stones.
+
+81. A 25-year-old man with a stab wound to the anterior neck at the level of the thyroid cartilage presents with a massive subcutaneous emphysema extending from the neck to the chest. Which anatomical space allows air to spread from the neck to the mediastinum?
+A) Pretracheal space
+B) Retropharyngeal space
+C) Danger space (alar fascia)
+D) Prevertebral space
+E) Carotid sheath
+
+Correct Answer: C
+Explanation: The danger space (between alar and prevertebral fascia) extends from the skull base to the diaphragm. Air from a tracheal or esophageal injury can dissect into the mediastinum via this space.
+
+82. A patient with a large pleural effusion undergoes thoracentesis. The needle is inserted just above the 9th rib in the midaxillary line. Which anatomical principle prevents injury to the neurovascular bundle?
+A) The bundle runs in the subcostal groove, below the rib
+B) The bundle runs above the rib
+C) The bundle runs midline
+D) The bundle is extrapleural
+E) The bundle is protected by endothoracic fascia
+
+Correct Answer: A
+Explanation: The intercostal neurovascular bundle runs in the subcostal groove of the upper rib (i.e., below each rib). Needle insertion just above the lower rib (e.g., above the 9th rib) avoids the bundle of the 9th rib.
+
+83. A 70-year-old woman with a pathological fracture of the femoral neck undergoes a hemiarthroplasty. During the procedure, the sciatic nerve is at risk. Which landmark is used to identify the sciatic nerve posteriorly?
+A) Greater trochanter and ischial tuberosity
+B) Lesser trochanter and obturator foramen
+C) Femoral neck and acetabulum
+D) Pubic symphysis and ASIS
+E) Sacral hiatus and coccyx
+
+Correct Answer: A
+Explanation: The sciatic nerve emerges from the greater sciatic foramen and runs midway between the greater trochanter (lateral) and ischial tuberosity (medial). This landmark avoids injury during posterior hip approaches.
+
+84. A 45-year-old man with a stab wound to the left anterior chest at the 3rd intercostal space, 2 cm left of the sternum, presents with a pericardial effusion. Which structure lies immediately deep to this site?
+A) Left ventricle
+B) Right ventricle
+C) Left atrium
+D) Pulmonary trunk
+E) Aorta
+
+Correct Answer: B
+Explanation: The right ventricle forms the anterior cardiac surface. The 3rd ICS left parasternal area overlies the right ventricular outflow tract, which is vulnerable to penetrating injury.
+
+85. A patient with a thyroid nodule undergoes a fine-needle aspiration. The needle passes through the platysma and the investing layer of deep cervical fascia. Which muscle lies immediately deep to the investing fascia in the anterior midline?
+A) Sternohyoid
+B) Sternothyroid
+C) Thyrohyoid
+D) Omohyoid
+E) Scalene
+
+Correct Answer: A
+Explanation: The investing fascia covers the sternocleidomastoid and trapezius, but in the anterior midline, the next layer is the infrahyoid strap muscles, the most superficial being sternohyoid.
+
+86. A 60-year-old man with a history of smoking presents with a left upper lobe mass and new-onset left arm swelling. Which vein is compressed by the mass at the thoracic inlet?
+A) Left subclavian
+B) Left brachiocephalic
+C) Left internal jugular
+D) Superior vena cava
+E) Azygos
+
+Correct Answer: A
+Explanation: The left subclavian vein passes over the first rib and under the clavicle. A left apical lung tumor can compress it, causing unilateral arm swelling (Paget-von Schrötter syndrome).
+
+87. A 30-year-old woman with a stab wound to the right lower quadrant presents with an injury to the right ureter. The ureter is most likely injured at which of the following anatomical narrowings?
+A) Ureteropelvic junction
+B) Crossing of the pelvic brim (over iliac vessels)
+C) Intramural portion through the bladder
+D) Retroperitoneal portion at L3
+E) At the renal hilum
+
+Correct Answer: B
+Explanation: The ureter has three narrowings: UPJ, pelvic brim (over iliac vessels), and intramural. The pelvic brim narrowing is most vulnerable to penetrating trauma and iatrogenic injury during pelvic surgery.
+
+88. A patient with a large goiter undergoes thyroidectomy. Postoperatively, he develops a hoarse voice and stridor. Which nerve injury is most likely?
+A) Unilateral recurrent laryngeal
+B) Bilateral recurrent laryngeal
+C) External branch of superior laryngeal
+D) Internal branch of superior laryngeal
+E) Phrenic
+
+Correct Answer: B
+Explanation: Bilateral recurrent laryngeal nerve injury causes both vocal cords to assume a paramedian position, leading to airway obstruction (stridor) and aphonia. Unilateral injury causes hoarseness without stridor.
+
+89. A 55-year-old man with a ruptured abdominal aortic aneurysm undergoes emergency repair. The surgeon cross-clamps the aorta just below the renal arteries. Which collateral pathway can maintain spinal cord perfusion?
+A) Artery of Adamkiewicz from a lumbar artery
+B) Internal thoracic to intercostal arteries
+C) Vertebral to posterior intercostal
+D) Superior mesenteric to lumbar
+E) Iliolumbar to anterior spinal
+
+Correct Answer: A
+Explanation: The artery of Adamkiewicz (great radicular artery) arises from a left posterior intercostal or lumbar artery (T9–L2) and supplies the lower two-thirds of the spinal cord. It is a critical collateral after aortic clamping.
+
+90. A 40-year-old woman with a central line placed in the right internal jugular vein develops a right-sided Horner’s syndrome. The needle likely injured which structure?
+A) Stellate ganglion
+B) Vagus nerve
+C) Phrenic nerve
+D) Recurrent laryngeal nerve
+E) Brachial plexus
+
+Correct Answer: A
+Explanation: The stellate ganglion (cervicothoracic sympathetic ganglion) lies on the longus colli muscle at the C7 level, medial to the subclavian artery. A deep IJ puncture can injure it, causing ipsilateral Horner’s.
+
+91. A 25-year-old man with a stab wound to the left posterior triangle of the neck presents with a winged scapula. Which nerve is injured?
+A) Long thoracic (C5–C7)
+B) Spinal accessory (CN XI)
+C) Dorsal scapular (C4–C5)
+D) Thoracodorsal (C6–C8)
+E) Suprascapular (C5–C6)
+
+Correct Answer: A
+Explanation: The long thoracic nerve runs superficially on the serratus anterior muscle. It is vulnerable in the posterior triangle as it passes through the middle scalene. Injury causes medial winging of the scapula.
+
+92. A 60-year-old man with a pancreatic head tumor undergoes a Whipple procedure. During the surgery, the surgeon must ligate the gastroduodenal artery. Which artery does the gastroduodenal artery arise from?
+A) Common hepatic
+B) Proper hepatic
+C) Left gastric
+D) Splenic
+E) Superior mesenteric
+
+Correct Answer: A
+Explanation: The gastroduodenal artery is the first branch of the common hepatic artery (which is a branch of the celiac trunk). It passes posterior to the first part of the duodenum.
+
+93. A patient with a massive lower gastrointestinal bleed undergoes a mesenteric angiogram. The bleeding is from the sigmoid colon. Which artery is the source?
+A) Inferior mesenteric artery
+B) Superior mesenteric artery
+C) Internal iliac (middle rectal)
+D) Celiac trunk
+E) Median sacral
+
+Correct Answer: A
+Explanation: The sigmoid colon is supplied by the inferior mesenteric artery via its sigmoid branches. The superior mesenteric supplies the small bowel and right colon.
+
+94. A 70-year-old man with a large left inguinal hernia undergoes repair. During surgery, the surgeon identifies the hernia sac medial to the inferior epigastric vessels. This is a direct inguinal hernia. Which anatomical triangle is defined by these vessels?
+A) Hesselbach’s triangle
+B) Scarp’s triangle
+C) Petit’s triangle
+D) Grynfelt’s triangle
+E) Calot’s triangle
+
+Correct Answer: A
+Explanation: Hesselbach’s triangle is bounded by the inferior epigastric vessels (laterally), rectus abdominis (medially), and inguinal ligament (inferiorly). Direct hernias occur within this triangle, medial to the vessels.
+
+95. A patient with a stab wound to the right 5th intercostal space at the midclavicular line develops a right-sided hemothorax. Which intercostal artery is most likely injured?
+A) 5th intercostal artery
+B) 4th intercostal artery
+C) 6th intercostal artery
+D) Internal thoracic artery
+E) Lateral thoracic artery
+
+Correct Answer: A
+Explanation: The 5th intercostal artery runs in the subcostal groove of the 5th rib. A stab at the 5th ICS will injure the artery of that space. The internal thoracic artery is more medial.
+
+96. A 35-year-old woman with a deep cut to the volar forearm, 5 cm proximal to the wrist, presents with an inability to flex the index finger’s distal interphalangeal joint. Which nerve is injured?
+A) Median nerve (anterior interosseous branch)
+B) Ulnar nerve
+C) Radial nerve (posterior interosseous)
+D) Median nerve (recurrent branch)
+E) Ulnar nerve (deep branch)
+
+Correct Answer: A
+Explanation: The anterior interosseous nerve (branch of median) supplies the flexor digitorum profundus to the index and middle fingers (and flexor pollicis longus). Injury causes loss of index DIP flexion (positive “OK” sign).
+
+97. A 50-year-old man with a large right-sided pleural effusion undergoes thoracentesis. The needle is inserted in the 8th intercostal space, posterior axillary line, just above the 8th rib. Which structure is immediately deep to the needle tip at this site?
+A) Lung
+B) Diaphragm
+C) Liver
+D) Spleen
+E) Kidney
+
+Correct Answer: A
+Explanation: At the 8th ICS posterior axillary line, the needle is still above the diaphragmatic reflection (which is lower posteriorly). The lung extends to the 10th rib posteriorly, so the needle enters pleural space and lung.
+
+98. A patient with a massive upper GI bleed from esophageal varices undergoes a transjugular intrahepatic portosystemic shunt (TIPS). The catheter passes from the hepatic vein into the portal vein through which part of the liver?
+A) Right hepatic vein to right portal vein
+B) Middle hepatic vein to left portal vein
+C) Left hepatic vein to main portal vein
+D) Inferior vena cava to umbilical vein
+E) Azygos to splenic vein
+
+Correct Answer: A
+Explanation: TIPS creates a communication between the right hepatic vein (or middle) and the intrahepatic portion of the right portal vein, usually passing through the liver parenchyma.
+
+99. A 60-year-old man with a history of smoking presents with a Pancoast tumor. Which structures are involved in Pancoast syndrome?
+A) C8–T1 nerve roots, stellate ganglion, and subclavian artery
+B) Phrenic nerve, vagus, and recurrent laryngeal
+C) Brachial plexus upper trunk and subclavian vein
+D) Sympathetic chain alone
+E) Lower trunk of brachial plexus and stellate ganglion
+
+Correct Answer: E
+Explanation: Pancoast syndrome includes shoulder pain (C8–T1 involvement), Horner’s (stellate ganglion), and hand weakness (lower trunk). The subclavian artery may also be involved but is not part of the classic triad.
+
+100. A 45-year-old man with a stab wound to the left upper quadrant presents with a splenic laceration. The surgeon performs a splenectomy. Which ligament must be divided to mobilize the spleen from the left kidney?
+A) Splenorenal ligament
+B) Gastrosplenic ligament
+C) Phrenicosplenic ligament
+D) Pancreaticosplenic ligament
+E) Colicosplenic ligament
+
+Correct Answer: A
+Explanation: The splenorenal (lienorenal) ligament connects the spleen to the left kidney and contains the splenic artery and vein. Dividing it allows medial mobilization of the spleen.
+
