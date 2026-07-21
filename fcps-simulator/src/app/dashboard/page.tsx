@@ -9,6 +9,13 @@ const SUBJECTS = [
   'Obstetrics & Gynecology', 'Pediatrics', 'ENT', 'Ophthalmology',
 ]
 
+interface SubjectStat {
+  subject: string
+  total_questions: number
+  total_correct: number
+  attempt_count: number
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -31,7 +38,7 @@ export default async function DashboardPage() {
   // attempt row down to the browser just to reduce() it client-side.
   const { data: subjectStats } = await supabase.rpc('get_user_dashboard_stats', {
     p_user_id: user.id,
-  })
+  }) as { data: SubjectStat[] | null }
 
   const totalAttempts = totalAttemptsCount ?? 0
   const totalCorrectAll = subjectStats?.reduce((acc, s) => acc + s.total_correct, 0) ?? 0
