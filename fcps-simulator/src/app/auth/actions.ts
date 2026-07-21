@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 
 export async function login(formData: FormData) {
@@ -81,4 +82,55 @@ export async function logout() {
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
   redirect('/login')
+}
+
+export async function requestPasswordReset(formData: FormData) {
+  const supabase = await createClient()
+  const email = formData.get('email') as string
+
+  if (!email) return { error: 'Please enter your email address.' }
+
+  // Derive origin from the incoming request rather than a hardcoded URL,
+  // so this keeps working if a custom domain replaces the vercel.app one.
+  const headersList = await headers()
+  const host = headersList.get('x-forwarded-host') || headersList.get('host')
+  const protocol = headersList.get('x-forwarded-proto') || 'https'
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${host}`
+
+  // Supabase always returns success here regardless of whether the email
+  // exists, by design, so this response never confirms/denies an account.
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+  })
+
+  if (error) return { error: 'Could not send reset email. Please try again in a moment.' }
+
+  return { success: 'If an account exists for that email, a password reset link has been sent.' }
+}
+
+export async function updatePassword(formData: FormData) {
+  const supabase = await createClient()
+
+  const password = formData.get('password') as string
+  const confirmPassword = formData.get('confirmPassword') as string
+
+  if (!password || password.length < 8) {
+    return { error: 'Password must be at least 8 characters.' }
+  }
+  if (password !== confirmPassword) {
+    return { error: 'Passwords do not match.' }
+  }
+
+  // Requires an active recovery session, established by /auth/callback
+  // after the user clicks the link from requestPasswordReset(). Without
+  // that session this fails with an auth error, which the caller surfaces.
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'This reset link has expired. Please request a new one.' }
+  }
+
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) return { error: error.message }
+
+  return { success: 'Password updated. You can now sign in.' }
 }

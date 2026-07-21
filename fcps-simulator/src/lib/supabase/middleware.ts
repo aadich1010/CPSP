@@ -28,7 +28,7 @@ function getClientIp(request: NextRequest): string {
   )
 }
 
-const RATE_LIMITED_PATHS = ['/login', '/register']
+const RATE_LIMITED_PATHS = ['/login', '/register', '/forgot-password']
 
 export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname
