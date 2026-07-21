@@ -9,7 +9,13 @@ const RATE_LIMIT_WINDOW_MS = 1000
 const RATE_LIMIT_MAX = 5 // 5 req/sec/IP, matches the requirement
 const buckets = new Map<string, { count: number; resetAt: number }>()
 
-function isRateLimited(key: string): boolean {
+// Test-only escape hatch — clears in-memory bucket state between test cases
+// so tests don't leak rate-limit counters into each other.
+export function __resetRateLimitBucketsForTests() {
+  buckets.clear()
+}
+
+export function isRateLimited(key: string): boolean {
   const now = Date.now()
   const bucket = buckets.get(key)
   if (!bucket || now > bucket.resetAt) {
@@ -20,7 +26,7 @@ function isRateLimited(key: string): boolean {
   return bucket.count > RATE_LIMIT_MAX
 }
 
-function getClientIp(request: NextRequest): string {
+export function getClientIp(request: NextRequest): string {
   return (
     request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
     request.headers.get('x-real-ip') ||
