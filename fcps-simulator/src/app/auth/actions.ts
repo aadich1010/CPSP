@@ -51,7 +51,7 @@ export async function register(formData: FormData) {
   const password = formData.get('password') as string
   const fullName = formData.get('fullName') as string
 
-  const { data, error } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -61,18 +61,16 @@ export async function register(formData: FormData) {
 
   if (error) return { error: error.message }
 
-  if (data.user) {
-    // Create profile row (subscription defaults to pending)
-    const { error: profileError } = await supabase.from('profiles').upsert({
-      id: data.user.id,
-      email,
-      full_name: fullName,
-      role: 'student',
-      subscription_status: 'pending',
-    })
-
-    if (profileError) return { error: profileError.message }
-  }
+  // NOTE: profile creation is intentionally NOT done here. The
+  // on_auth_user_created trigger (SECURITY DEFINER, see
+  // 20260514000000_initial_schema.sql) already inserts the profiles row
+  // the instant auth.users gets the new row, with role='student' and
+  // subscription_status='pending'. Doing it again here from the client
+  // was redundant AND broken: `profiles` has no INSERT policy for
+  // `authenticated` (by design — only the trigger and admin/service_role
+  // should ever create a profile), so this upsert failed RLS on every
+  // single signup and showed the user an error message even though their
+  // account had already been created successfully by the trigger.
 
   return { success: 'Account created! Please wait for admin activation before logging in.' }
 }
