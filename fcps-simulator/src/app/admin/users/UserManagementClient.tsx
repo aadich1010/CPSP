@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { activateSubscription, revokeSubscription } from '@/app/admin/user-actions'
 import { useRouter } from 'next/navigation'
 
 interface Profile {
@@ -28,7 +28,6 @@ export default function UserManagementClient({ profiles: initial }: Props) {
   const [loading,   setLoading]   = useState<string | null>(null)
   const [filter,    setFilter]    = useState<'all' | 'active' | 'pending' | 'expired'>('all')
   const router = useRouter()
-  const supabase = createClient()
 
   // Get search from URL if present
   const [search, setSearch] = useState(() => {
@@ -53,18 +52,11 @@ export default function UserManagementClient({ profiles: initial }: Props) {
 
   async function activateUser(userId: string, days: number) {
     setLoading(userId)
-    const expiresAt = new Date()
-    expiresAt.setDate(expiresAt.getDate() + days)
+    const result = await activateSubscription(userId, days)
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        subscription_status:     'active',
-        subscription_expires_at: expiresAt.toISOString(),
-      })
-      .eq('id', userId)
-
-    if (!error) {
+    if (result.success) {
+      const expiresAt = new Date()
+      expiresAt.setDate(expiresAt.getDate() + days)
       setProfiles((prev) =>
         prev.map((p) =>
           p.id === userId
@@ -79,12 +71,9 @@ export default function UserManagementClient({ profiles: initial }: Props) {
   async function revokeAccess(userId: string) {
     if (!confirm('Revoke this user\'s subscription?')) return
     setLoading(userId)
-    const { error } = await supabase
-      .from('profiles')
-      .update({ subscription_status: 'expired' })
-      .eq('id', userId)
+    const result = await revokeSubscription(userId)
 
-    if (!error) {
+    if (result.success) {
       setProfiles((prev) =>
         prev.map((p) =>
           p.id === userId ? { ...p, subscription_status: 'expired' } : p
