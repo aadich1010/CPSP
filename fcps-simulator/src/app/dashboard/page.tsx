@@ -20,28 +20,28 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .single()
 
-  // Fetch attempt stats
-  const { data: attempts } = await supabase
+  // Total attempt count — cheap, uses attempts_user_created_idx, no rows transferred.
+  const { count: totalAttemptsCount } = await supabase
     .from('exam_attempts')
-    .select('score, total_questions, subject, created_at')
+    .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
 
-  const totalAttempts = attempts?.length ?? 0
-  const avgScore =
-    totalAttempts > 0
-      ? Math.round(
-          attempts!.reduce((acc, a) => acc + (a.score / a.total_questions) * 100, 0) /
-            totalAttempts
-        )
-      : 0
+  // Per-subject aggregation happens in Postgres now (see migration
+  // 20260722000000_dashboard_stats_rpc.sql) instead of pulling every
+  // attempt row down to the browser just to reduce() it client-side.
+  const { data: subjectStats } = await supabase.rpc('get_user_dashboard_stats', {
+    p_user_id: user.id,
+  })
+
+  const totalAttempts = totalAttemptsCount ?? 0
+  const totalCorrectAll = subjectStats?.reduce((acc, s) => acc + s.total_correct, 0) ?? 0
+  const totalQuestionsAll = subjectStats?.reduce((acc, s) => acc + s.total_questions, 0) ?? 0
+  const avgScore = totalQuestionsAll > 0 ? Math.round((totalCorrectAll / totalQuestionsAll) * 100) : 0
 
   // Subject performance breakdown
   const subjectMap: Record<string, { total: number; correct: number }> = {}
-  attempts?.forEach((a) => {
-    if (!subjectMap[a.subject]) subjectMap[a.subject] = { total: 0, correct: 0 }
-    subjectMap[a.subject].total   += a.total_questions
-    subjectMap[a.subject].correct += a.score
+  subjectStats?.forEach((s) => {
+    subjectMap[s.subject] = { total: s.total_questions, correct: s.total_correct }
   })
 
   const weakSubjects = Object.entries(subjectMap)
