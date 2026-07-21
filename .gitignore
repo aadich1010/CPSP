@@ -1,0 +1,5 @@
+
+# Question bank source data — lives in the `questions` Postgres table now,
+# not in version control (previously caused a public repo exposure incident).
+/MCQS/
+/Anatomy/
