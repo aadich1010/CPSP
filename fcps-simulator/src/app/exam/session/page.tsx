@@ -16,30 +16,16 @@ export default async function ExamSessionPage({
   const count   = Math.min(Math.max(parseInt(params.count || '50') || 50, 1), 200)
   const mode    = params.mode === 'practice' ? 'practice' : 'exam'
 
-  // Only pull fields the client is allowed to see BEFORE grading.
-  // correct_answer / explanation are NEVER sent to the browser for exam mode.
-  const selectCols =
-    mode === 'practice'
-      ? 'id, question_text, option_a, option_b, option_c, option_d, option_e, correct_answer, explanation, subject'
-      : 'id, question_text, option_a, option_b, option_c, option_d, option_e, subject'
-
-  let allQuestions: any[] = []
-  let from = 0
-  const pageSize = 1000
-  let fetchError = null
-
-  while (true) {
-    let query = supabase.from('questions').select(selectCols).range(from, from + pageSize - 1)
-    if (subject !== 'Mixed (All Subjects)') query = query.eq('subject', subject)
-
-    const { data, error } = await query
-    if (error) { fetchError = error; break }
-    if (!data || data.length === 0) break
-
-    allQuestions = allQuestions.concat(data)
-    if (data.length < pageSize) break
-    from += pageSize
-  }
+  // Questions now come only through get_exam_questions(), a SECURITY DEFINER
+  // RPC that checks subscription_status = 'active' server-side, picks a
+  // random subset itself, and only returns correct_answer/explanation for
+  // practice mode. The raw questions table has no client-readable policy
+  // anymore -- see supabase/migrations/20260722010000_lock_down_questions_table.sql.
+  const { data: allQuestions, error: fetchError } = await supabase.rpc('get_exam_questions', {
+    p_subject: subject,
+    p_count: count,
+    p_mode: mode,
+  })
 
   if (fetchError || !allQuestions?.length) {
     return (
@@ -53,9 +39,10 @@ export default async function ExamSessionPage({
     )
   }
 
-  const shuffled  = [...allQuestions].sort(() => Math.random() - 0.5)
-  const questions = shuffled.slice(0, count)
-  const questionIds = questions.map((q) => q.id)
+  // get_exam_questions() already picks a random subset limited to `count`
+  // server-side, so no further client-side shuffle/slice is needed.
+  const questions = allQuestions
+  const questionIds = questions.map((q: { id: string }) => q.id)
 
   const timeLimitSeconds =
     count <= 10 ? 300 : count <= 25 ? 1800 : count <= 50 ? 3600 : count <= 100 ? 7200 : 10800

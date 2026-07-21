@@ -85,18 +85,19 @@ export default function ExamEngine({ sessionId, questions, subject, mode, userId
       setResult({ score: graded.score, total: graded.total_questions })
 
       if (mode === 'exam') {
-        // Safe to reveal correct answers now that grading already happened server-side.
-        const ids = questions.map((q) => q.id)
-        const { data: revealed, error: revealError } = await supabase
-          .from('questions')
-          .select('id, question_text, option_a, option_b, option_c, option_d, option_e, correct_answer, explanation, subject')
-          .in('id', ids)
+        // Safe to reveal correct answers now that grading already happened
+        // server-side. reveal_exam_answers() checks the session belongs to
+        // this user and is already submitted before returning answers --
+        // see supabase/migrations/20260722010000_lock_down_questions_table.sql.
+        const { data: revealed, error: revealError } = await supabase.rpc('reveal_exam_answers', {
+          p_session_id: sessionId,
+        }) as { data: Question[] | null; error: { message?: string } | null }
 
         if (revealError || !revealed) {
           logger.error('post_submit_reveal_failed', { sessionId, error: revealError?.message })
           setGradedQuestions(questions) // degrade gracefully: show without answer key
         } else {
-          const byId = new Map(revealed.map((q) => [q.id, q]))
+          const byId = new Map(revealed.map((q: Question) => [q.id, q]))
           setGradedQuestions(questions.map((q) => byId.get(q.id) ?? q))
         }
       }
