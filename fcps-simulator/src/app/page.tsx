@@ -780,7 +780,7 @@ export default function Home() {
               <a href="#pricing" className="footer-link">Pricing</a>
               <a href="#testimonials" className="footer-link">Success Stories</a>
               <a href="#faq" className="footer-link">FAQ</a>
-              <a href="https://wa.me/" className="footer-link">WhatsApp Support</a>
+              <a href="https://wa.me/923324737436" className="footer-link">WhatsApp Support</a>
               <a href="#" className="footer-link">Facebook Community</a>
               <a href="#" className="footer-link">Instagram</a>
             </div>

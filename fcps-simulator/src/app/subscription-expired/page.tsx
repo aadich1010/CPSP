@@ -13,7 +13,7 @@ export default function SubscriptionExpiredPage() {
   const [editingProvider, setEditingProvider] = useState<any>(null)
   const supabase = createClient()
 
-  const whatsappNumber = "923000000000" // Placeholder
+  const whatsappNumber = "923324737436"
   const whatsappMsg = encodeURIComponent("Hi Admin, I have paid for the FCPS Simulator. Please activate my account.\n\nEmail: [My Registered Email]")
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${whatsappMsg}`
 
