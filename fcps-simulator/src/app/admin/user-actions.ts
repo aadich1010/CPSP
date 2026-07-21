@@ -1,9 +1,10 @@
 'use server'
 
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, requireAdmin } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 export async function quickActivateUser(userId: string, days: number = 30) {
+  await requireAdmin()
   const adminDb = await createAdminClient()
   
   const expiresAt = new Date()

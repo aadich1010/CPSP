@@ -1,10 +1,11 @@
 'use server'
 
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, requireAdmin } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function addQuestion(formData: FormData) {
+  await requireAdmin()
   const adminDb = await createAdminClient()
 
   const question_text    = formData.get('question_text')    as string
@@ -50,6 +51,7 @@ export async function importQuestionsBulk(questions: {
   difficulty?:    string | null
 }[]) {
   try {
+    await requireAdmin()
     const adminDb = await createAdminClient()
     
     // De-duplicate within the array to prevent ON CONFLICT errors
@@ -104,6 +106,7 @@ export async function importQuestionsBulk(questions: {
 }
 
 export async function updateQuestion(id: string, formData: FormData) {
+  await requireAdmin()
   const adminDb = await createAdminClient()
 
   const question_text    = formData.get('question_text')    as string
@@ -137,6 +140,7 @@ export async function updateQuestion(id: string, formData: FormData) {
 }
 
 export async function deleteQuestion(id: string) {
+  await requireAdmin()
   const adminDb = await createAdminClient()
   const { error } = await adminDb.from('questions').delete().eq('id', id)
   if (error) throw new Error(error.message)
@@ -145,6 +149,7 @@ export async function deleteQuestion(id: string) {
 }
 
 export async function deleteAllQuestions() {
+  await requireAdmin()
   const adminDb = await createAdminClient()
   const { error } = await adminDb.from('questions').delete().neq('id', '00000000-0000-0000-0000-000000000000') // Delete all
   if (error) throw new Error(error.message)
@@ -154,6 +159,7 @@ export async function deleteAllQuestions() {
 
 export async function backupQuestions() {
   try {
+    await requireAdmin()
     const adminDb = await createAdminClient()
     let allQuestions: any[] = []
     let from = 0
@@ -182,6 +188,7 @@ export async function backupQuestions() {
 
 export async function restoreQuestions(questions: any[]) {
   try {
+    await requireAdmin()
     const adminDb = await createAdminClient()
     
     // 1. Delete all questions
