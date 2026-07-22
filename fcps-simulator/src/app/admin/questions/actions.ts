@@ -4,6 +4,52 @@ import { createAdminClient, requireAdmin } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
+type QuestionInput = {
+  question_text:  string
+  option_a:       string
+  option_b:       string
+  option_c:       string
+  option_d:       string
+  option_e?:      string | null
+  correct_answer: string
+  explanation?:   string | null
+  subject:        string
+  difficulty?:    string | null
+}
+
+const VALID_DIFFICULTIES = ['Easy', 'Medium', 'Hard']
+
+// submit_exam_attempt() grades by comparing the student's chosen letter
+// straight against `correct_answer`. If this is ever malformed (blank,
+// lowercase, "AA", pointing at an empty option_e, or a value like "1"
+// left over from a spreadsheet) every student silently gets that
+// question wrong forever -- there's no error, no crash, just quietly
+// wrong grading nobody notices until a student complains. Validate at
+// import time instead of trusting the input.
+function validateQuestion(q: QuestionInput, index?: number): string | null {
+  const where = index !== undefined ? `Row ${index + 1}` : 'Question'
+
+  if (!q.question_text?.trim()) return `${where}: question text is required.`
+  if (!q.option_a?.trim() || !q.option_b?.trim() || !q.option_c?.trim() || !q.option_d?.trim()) {
+    return `${where}: options A-D are all required.`
+  }
+  if (!q.subject?.trim()) return `${where}: subject is required.`
+
+  const answer = q.correct_answer?.trim().toUpperCase()
+  if (!answer || !['A', 'B', 'C', 'D', 'E'].includes(answer)) {
+    return `${where}: correct_answer must be A, B, C, D, or E (got "${q.correct_answer}").`
+  }
+  if (answer === 'E' && !q.option_e?.trim()) {
+    return `${where}: correct_answer is E but option_e is empty.`
+  }
+
+  if (q.difficulty && !VALID_DIFFICULTIES.includes(q.difficulty)) {
+    return `${where}: difficulty must be Easy, Medium, or Hard (got "${q.difficulty}").`
+  }
+
+  return null
+}
+
 export async function addQuestion(formData: FormData) {
   await requireAdmin()
   const adminDb = await createAdminClient()
@@ -14,10 +60,16 @@ export async function addQuestion(formData: FormData) {
   const option_c         = formData.get('option_c')         as string
   const option_d         = formData.get('option_d')         as string
   const option_e         = formData.get('option_e')         as string | null
-  const correct_answer   = formData.get('correct_answer')   as string
+  const correct_answer   = (formData.get('correct_answer') as string || '').trim().toUpperCase()
   const explanation      = formData.get('explanation')      as string | null
   const subject          = formData.get('subject')          as string
   const difficulty       = formData.get('difficulty')       as string || 'Medium'
+
+  const validationError = validateQuestion({
+    question_text, option_a, option_b, option_c, option_d, option_e,
+    correct_answer, explanation, subject, difficulty,
+  })
+  if (validationError) throw new Error(validationError)
 
   const { error } = await adminDb.from('questions').insert({
     question_text,
@@ -38,25 +90,38 @@ export async function addQuestion(formData: FormData) {
   redirect('/admin/questions')
 }
 
-export async function importQuestionsBulk(questions: {
-  question_text:  string
-  option_a:       string
-  option_b:       string
-  option_c:       string
-  option_d:       string
-  option_e?:      string | null
-  correct_answer: string
-  explanation?:   string | null
-  subject:        string
-  difficulty?:    string | null
-}[]) {
+export async function importQuestionsBulk(questions: QuestionInput[]) {
   try {
     await requireAdmin()
     const adminDb = await createAdminClient()
-    
+
+    // Validate every row before touching the database. Collect all
+    // failures at once so the admin can fix a whole spreadsheet's worth
+    // of mistakes in one pass instead of one-error-at-a-time.
+    const invalidRows: string[] = []
+    questions.forEach((q, i) => {
+      const err = validateQuestion(q, i)
+      if (err) invalidRows.push(err)
+    })
+    if (invalidRows.length > 0) {
+      return {
+        error: `${invalidRows.length} row(s) failed validation, nothing was imported:\n` +
+          invalidRows.slice(0, 20).join('\n') +
+          (invalidRows.length > 20 ? `\n...and ${invalidRows.length - 20} more.` : ''),
+      }
+    }
+
+    // Normalize correct_answer to uppercase so grading comparisons in
+    // submit_exam_attempt() are consistent regardless of how it was typed
+    // in the source spreadsheet.
+    const normalizedQuestions = questions.map(q => ({
+      ...q,
+      correct_answer: q.correct_answer.trim().toUpperCase(),
+    }))
+
     // De-duplicate within the array to prevent ON CONFLICT errors
     const uniqueQuestions = Array.from(
-      new Map(questions.map(q => [q.question_text.trim(), q])).values()
+      new Map(normalizedQuestions.map(q => [q.question_text.trim(), q])).values()
     )
 
     console.log(`[Import] Processing ${uniqueQuestions.length} unique questions out of ${questions.length} total.`)
