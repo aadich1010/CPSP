@@ -174,7 +174,7 @@ export default function ExamEngine({ sessionId, questions, subject, mode, userId
 
   return (
     <div className="h-screen w-screen overflow-hidden no-select" style={{ display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
-      <header style={{ flexShrink: 0, background: '#ffffff', borderBottom: '2px solid #0d9488', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 2px 12px rgba(13,148,136,0.08)' }}>
+      <header className="exam-header" style={{ flexShrink: 0, background: '#ffffff', borderBottom: '2px solid #0d9488', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 2px 12px rgba(13,148,136,0.08)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#0d9488', boxShadow: '0 0 0 3px rgba(13,148,136,0.15)' }} />
           <div>
@@ -208,8 +208,8 @@ export default function ExamEngine({ sessionId, questions, subject, mode, userId
         </div>
       )}
 
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        <div style={{ flex: 1, padding: '10px 18px', overflow: 'hidden', maxWidth: 'calc(100% - 240px)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div className="exam-layout">
+        <div className="exam-main">
           <div className="animate-fade-in" key={currentIndex} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', gap: 6 }}>
             <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderLeft: '4px solid #0d9488', borderRadius: 12, padding: '12px 16px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', flexShrink: 0, maxHeight: '34vh', overflowY: 'auto' }}>
               <div style={{ fontSize: '0.58rem', fontWeight: 800, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -253,11 +253,11 @@ export default function ExamEngine({ sessionId, questions, subject, mode, userId
           </div>
         </div>
 
-        <aside style={{ width: 200, background: '#ffffff', borderLeft: '1px solid #e2e8f0', padding: '10px 8px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 20px rgba(0,0,0,0.03)' }}>
+        <aside className="exam-palette">
           <div style={{ fontSize: '0.58rem', fontWeight: 800, color: '#0f172a', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
             📅 Question Palette
           </div>
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 2, alignContent: 'start', overflow: 'hidden' }}>
+          <div className="exam-palette-grid">
             {questions.map((_, i) => (
               <button key={i}
                 className={i === currentIndex ? 'palette-btn current' : answers[i] ? 'palette-btn answered-v2' : 'palette-btn'}

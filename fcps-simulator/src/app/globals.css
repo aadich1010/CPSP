@@ -632,3 +632,79 @@ tr:hover td {
   background-color: rgba(13, 148, 136, 0.08);
   color: #0d9488;
 }
+
+/* ── Exam engine responsive layout ──────────────────────────────────
+   Desktop: question content + fixed 200px question-palette side by
+   side. Below 768px (phones) that leaves ~135px for the actual
+   question on a typical 375px screen -- unusable under exam time
+   pressure. Stack them instead: question full-width on top, palette
+   becomes a horizontally-scrollable strip underneath. */
+.exam-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.exam-main {
+  flex: 1;
+  padding: 10px 18px;
+  overflow: hidden;
+  max-width: calc(100% - 240px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.exam-palette {
+  width: 200px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-left: 1px solid #e2e8f0;
+  padding: 10px 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.03);
+}
+
+.exam-palette-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+  align-content: start;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .exam-layout {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .exam-main {
+    max-width: 100%;
+    padding: 8px 12px;
+    overflow: visible;
+  }
+
+  .exam-palette {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
+    max-height: 110px;
+    flex-shrink: 0;
+  }
+
+  .exam-palette-grid {
+    grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
+    overflow-y: auto;
+  }
+
+  /* header items get tight on a phone screen -- allow wrapping */
+  .exam-header {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+}
