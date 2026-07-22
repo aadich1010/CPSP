@@ -5,7 +5,6 @@ import {
   LineChart, Line, BarChart, Bar, RadarChart, Radar,
   PolarGrid, PolarAngleAxis, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  Legend
 } from "recharts";
 
 // ─── MOCK DATA (replace with Supabase queries) ───────────────────────────────

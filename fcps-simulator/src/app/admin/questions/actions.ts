@@ -3,52 +3,7 @@
 import { createAdminClient, requireAdmin } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-
-type QuestionInput = {
-  question_text:  string
-  option_a:       string
-  option_b:       string
-  option_c:       string
-  option_d:       string
-  option_e?:      string | null
-  correct_answer: string
-  explanation?:   string | null
-  subject:        string
-  difficulty?:    string | null
-}
-
-const VALID_DIFFICULTIES = ['Easy', 'Medium', 'Hard']
-
-// submit_exam_attempt() grades by comparing the student's chosen letter
-// straight against `correct_answer`. If this is ever malformed (blank,
-// lowercase, "AA", pointing at an empty option_e, or a value like "1"
-// left over from a spreadsheet) every student silently gets that
-// question wrong forever -- there's no error, no crash, just quietly
-// wrong grading nobody notices until a student complains. Validate at
-// import time instead of trusting the input.
-function validateQuestion(q: QuestionInput, index?: number): string | null {
-  const where = index !== undefined ? `Row ${index + 1}` : 'Question'
-
-  if (!q.question_text?.trim()) return `${where}: question text is required.`
-  if (!q.option_a?.trim() || !q.option_b?.trim() || !q.option_c?.trim() || !q.option_d?.trim()) {
-    return `${where}: options A-D are all required.`
-  }
-  if (!q.subject?.trim()) return `${where}: subject is required.`
-
-  const answer = q.correct_answer?.trim().toUpperCase()
-  if (!answer || !['A', 'B', 'C', 'D', 'E'].includes(answer)) {
-    return `${where}: correct_answer must be A, B, C, D, or E (got "${q.correct_answer}").`
-  }
-  if (answer === 'E' && !q.option_e?.trim()) {
-    return `${where}: correct_answer is E but option_e is empty.`
-  }
-
-  if (q.difficulty && !VALID_DIFFICULTIES.includes(q.difficulty)) {
-    return `${where}: difficulty must be Easy, Medium, or Hard (got "${q.difficulty}").`
-  }
-
-  return null
-}
+import { validateQuestion, type QuestionInput } from './validate-question'
 
 export async function addQuestion(formData: FormData) {
   await requireAdmin()
@@ -255,22 +210,42 @@ export async function restoreQuestions(questions: any[]) {
   try {
     await requireAdmin()
     const adminDb = await createAdminClient()
-    
-    // 1. Delete all questions
-    const { error: deleteError } = await adminDb.from('questions').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    if (deleteError) throw new Error(deleteError.message)
-    
-    // 2. Insert the restored ones in batches of 100 to avoid limits if payload is huge
-    const batchSize = 100
-    for (let i = 0; i < questions.length; i += batchSize) {
-      const batch = questions.slice(i, i + batchSize)
-      const { error: insertError } = await adminDb.from('questions').insert(batch)
-      if (insertError) throw new Error(insertError.message)
+
+    // Row-level validation up front, same messages as importQuestionsBulk,
+    // so the admin gets a readable error before anything happens at all.
+    // The database function below re-validates independently — this
+    // check exists purely to give a fast, friendly error message; it is
+    // not the safety net (see the migration for why).
+    if (!Array.isArray(questions) || questions.length === 0) {
+      return { error: 'Restore file contains no questions. Nothing was deleted.' }
     }
-    
+    const invalidRows: string[] = []
+    questions.forEach((q, i) => {
+      const err = validateQuestion(q, i)
+      if (err) invalidRows.push(err)
+    })
+    if (invalidRows.length > 0) {
+      return {
+        error: `${invalidRows.length} row(s) failed validation, nothing was deleted or restored:\n` +
+          invalidRows.slice(0, 20).join('\n') +
+          (invalidRows.length > 20 ? `\n...and ${invalidRows.length - 20} more.` : ''),
+      }
+    }
+
+    // delete + insert both happen inside restore_questions_bulk()'s
+    // single PL/pgSQL transaction, so a mid-restore failure (a bad row
+    // the DB-side check catches, a unique-constraint hit, a dropped
+    // connection) rolls the whole thing back instead of leaving the
+    // question bank half-deleted. See
+    // supabase/migrations/20260723000000_atomic_restore_questions.sql.
+    const { data: count, error } = await adminDb.rpc('restore_questions_bulk', {
+      p_questions: questions,
+    })
+    if (error) throw new Error(error.message)
+
     revalidatePath('/admin')
     revalidatePath('/admin/questions')
-    return { success: true, count: questions.length }
+    return { success: true, count: count ?? questions.length }
   } catch (err: any) {
     return { error: err.message || 'Error restoring questions' }
   }

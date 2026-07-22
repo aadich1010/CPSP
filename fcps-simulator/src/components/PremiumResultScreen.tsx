@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid } from "recharts";
 
@@ -119,8 +119,18 @@ const RING_C = 2*Math.PI*RING_R;
 export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp }: Props) {
   const [tab, setTab] = useState<'dash'|'review'>('dash');
   const [filter, setFilter] = useState<'all'|'correct'|'wrong'|'skipped'>('all');
-  const [mounted, setMounted] = useState(false);
-  useEffect(()=>setMounted(true),[]);
+  // Client-only mount gate: this screen intentionally renders nothing
+  // during SSR/hydration (see the `if (!mounted) return null` below) and
+  // only paints once mounted on the client. useSyncExternalStore gets
+  // that same "false on server, true after client mount" value without
+  // a setState call inside an effect (which the previous
+  // useState+useEffect version did, triggering an extra cascading
+  // render every time).
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const localStats = calcStats(questions, answers);
   const correct = score !== undefined ? score : localStats.correct;

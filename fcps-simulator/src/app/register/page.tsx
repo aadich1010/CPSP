@@ -99,7 +99,7 @@ export default function RegisterPage() {
               )}
 
               <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 text-teal-800 text-[11px] leading-relaxed">
-                <strong>Note:</strong> Your account requires manual activation by the admin after registration and payment. You'll be prompted to send payment proof via WhatsApp on your next login — no email will be sent, so please check back or message us directly.
+                <strong>Note:</strong> Your account requires manual activation by the admin after registration and payment. You&apos;ll be prompted to send payment proof via WhatsApp on your next login — no email will be sent, so please check back or message us directly.
               </div>
 
               <button

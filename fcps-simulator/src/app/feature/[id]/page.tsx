@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { notFound, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { FEATURES } from '@/lib/featuresData';
 import { useMemo } from 'react';
 

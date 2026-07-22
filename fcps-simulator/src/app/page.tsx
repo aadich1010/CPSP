@@ -715,7 +715,7 @@ export default function Home() {
             <div className="testi-grid">
               {TESTIMONIALS.map((t, i) => (
                 <div className="testi-card" key={i}>
-                  <div className="testi-mark">"</div>
+                  <div className="testi-mark">&quot;</div>
                   <p className="testi-text">{t.quote}</p>
                   <div className="testi-author">
                     <div className="author-av">{t.name.replace('Dr. ', '')[0]}</div>

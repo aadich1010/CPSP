@@ -1,0 +1,56 @@
+name: CI
+
+# Runs on every push and PR. Deliberately scoped to what npm test can do
+# without a live database: the unit suites (requireAdmin, middleware
+# gating, validateQuestion, auth callback) run here on every commit. The
+# submit_exam_attempt() integration suite talks to a real Postgres
+# instance and is skipped automatically when TEST_SUPABASE_URL /
+# TEST_SUPABASE_SERVICE_ROLE_KEY aren't set (see that test file's header
+# comment) — wiring those up against a dedicated Supabase "test" project
+# is a follow-up, not something to fake here with a mocked DB.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: fcps-simulator
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: fcps-simulator/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        # Non-blocking for now: this codebase has ~44 pre-existing lint
+        # errors/warnings that predate this workflow (mostly unused vars
+        # and one real React hooks issue in PremiumResultScreen.tsx —
+        # see the audit notes). Shipping CI red on day one from unrelated
+        # debt just trains everyone to ignore it. Flip this to a hard
+        # failure once that backlog is paid down.
+        run: npm run lint || true
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        # Needs real-looking env vars at build time even though nothing
+        # here talks to a live project — Next.js evaluates
+        # NEXT_PUBLIC_* at build time and createClient() would throw on
+        # an empty URL during static analysis of client components.
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
+        run: npm run build

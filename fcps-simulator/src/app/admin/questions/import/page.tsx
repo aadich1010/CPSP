@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { importQuestionsBulk } from '../actions'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -56,7 +56,7 @@ export default function ImportQuestionsPage() {
     
     setTimeout(() => {
       try {
-        let trimmed = rawText.trim()
+        const trimmed = rawText.trim()
         let jsonParsed: any[] = []
 
         // Try standard JSON parse

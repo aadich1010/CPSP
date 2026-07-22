@@ -12,6 +12,16 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Standalone one-off CommonJS maintenance/ops scripts run directly
+    // via `node <script>.js` (admin bootstrap, data-cleanup utilities).
+    // They're not part of the Next.js app bundle, so the app's
+    // TS/ESM-oriented rules (no-require-imports, etc.) don't apply.
+    "check_mcqs_counts.js",
+    "create-admin.js",
+    "fix-admin.js",
+    "fix_syntax.js",
+    "remove-duplicates.js",
+    "update-env.js",
   ]),
 ]);
 
