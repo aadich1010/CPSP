@@ -75,6 +75,7 @@ export default async function AdminLayout({
             { href: '/admin',          label: 'Dashboard',  icon: '📊' },
             { href: '/admin/users',    label: 'Users',      icon: '👥' },
             { href: '/admin/questions',label: 'Questions',  icon: '📝' },
+            { href: '/admin/settings/payment', label: 'Payment Settings', icon: '💳' },
           ].map((item) => (
             <Link
               key={item.href}
