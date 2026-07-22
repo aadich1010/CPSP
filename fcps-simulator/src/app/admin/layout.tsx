@@ -20,9 +20,10 @@ export default async function AdminLayout({
   if (profile?.role !== 'admin') redirect('/dashboard')
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#ffffff' }}>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#ffffff', flexWrap: 'wrap' }}>
       {/* Admin Sidebar */}
       <aside
+        className="admin-sidebar"
         style={{
           width: 220,
           background: '#ffffff',
@@ -125,7 +126,7 @@ export default async function AdminLayout({
       </aside>
 
       {/* Main */}
-      <main style={{ marginLeft: 220, flex: 1, padding: '16px 20px', height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <main className="admin-main" style={{ marginLeft: 220, flex: 1, padding: '16px 20px', height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {children}
       </main>
     </div>

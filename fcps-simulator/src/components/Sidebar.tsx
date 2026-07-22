@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logout } from '@/app/auth/actions'
@@ -24,6 +25,18 @@ interface SidebarProps {
 
 export default function Sidebar({ profile, daysLeft }: SidebarProps) {
   const pathname = usePathname()
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [lastPathname, setLastPathname] = useState(pathname)
+
+  // Close the mobile drawer whenever the route changes (i.e. after
+  // tapping a nav link). Adjusting state during render instead of in a
+  // useEffect, per https://react.dev/learn/you-might-not-need-an-effect
+  // -- avoids an extra render pass and the cascading-setState-in-effect
+  // lint warning.
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname)
+    setMobileOpen(false)
+  }
 
   const initials = (profile.full_name || profile.email || 'U')
     .split(' ')
@@ -33,7 +46,21 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
     .slice(0, 2)
 
   return (
-    <aside className="sidebar shadow-lg">
+    <>
+      <button
+        className="mobile-menu-toggle"
+        onClick={() => setMobileOpen((v) => !v)}
+        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+      >
+        {mobileOpen ? '✕' : '☰'}
+      </button>
+
+      <div
+        className={`sidebar-backdrop ${mobileOpen ? 'visible' : ''}`}
+        onClick={() => setMobileOpen(false)}
+      />
+
+      <aside className={`sidebar shadow-lg ${mobileOpen ? 'mobile-open' : ''}`}>
       {/* Logo Section */}
       <div className="p-6 border-b border-teal-500/10">
         <div className="flex items-center gap-3">
@@ -137,6 +164,7 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
           </button>
         </form>
       </div>
-    </aside>
+      </aside>
+    </>
   )
 }
