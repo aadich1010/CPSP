@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local Supabase CLI status dump (local dev keys only, but shouldn't be
+# committed regardless — avoids confusion with real project credentials)
+status.json
