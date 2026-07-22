@@ -73,6 +73,7 @@ export default async function AdminLayout({
         <nav style={{ flex: 1, padding: '14px 0' }}>
           {[
             { href: '/admin',          label: 'Dashboard',  icon: '📊' },
+            { href: '/admin/analytics', label: 'Analytics', icon: '📈' },
             { href: '/admin/users',    label: 'Users',      icon: '👥' },
             { href: '/admin/questions',label: 'Questions',  icon: '📝' },
             { href: '/admin/settings/payment', label: 'Payment Settings', icon: '💳' },

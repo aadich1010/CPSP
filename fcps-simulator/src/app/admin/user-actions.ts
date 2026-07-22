@@ -3,7 +3,7 @@
 import { createAdminClient, requireAdmin } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export async function activateSubscription(userId: string, days: number = 30) {
+export async function activateSubscription(userId: string, days: number = 30, amountPkr?: number | null) {
   const admin = await requireAdmin()
   const adminDb = await createAdminClient()
 
@@ -26,16 +26,24 @@ export async function activateSubscription(userId: string, days: number = 30) {
   // Best-effort audit log write. If this fails we don't want to tell the
   // admin the activation itself failed — the subscription update above
   // already succeeded and the student's access is already live.
+  // amount_pkr is optional (admin may skip entering it) — it's what
+  // powers the revenue analytics on /admin/analytics, but it should
+  // never block activation itself.
   const { error: auditError } = await adminDb.from('admin_audit_log').insert({
     actor_id: admin.id,
     action: 'activate',
     target_user_id: userId,
-    details: { days, expires_at: expiresAt.toISOString() },
+    details: {
+      days,
+      expires_at: expiresAt.toISOString(),
+      amount_pkr: typeof amountPkr === 'number' && amountPkr > 0 ? amountPkr : null,
+    },
   })
   if (auditError) console.error('Audit log write failed (activation still succeeded):', auditError)
 
   revalidatePath('/admin')
   revalidatePath('/admin/users')
+  revalidatePath('/admin/analytics')
   return { success: true }
 }
 

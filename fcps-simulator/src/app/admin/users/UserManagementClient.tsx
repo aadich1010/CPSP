@@ -50,9 +50,23 @@ export default function UserManagementClient({ profiles: initial }: Props) {
     return matchSearch
   })
 
-  async function activateUser(userId: string, days: number) {
+  async function activateUser(userId: string, days: number, label: string) {
+    const amountInput = window.prompt(
+      `Amount received for ${label} plan (PKR)? Leave blank to skip — this is only used for the revenue report on the Analytics page and never blocks activation.`
+    )
+    // User hit Cancel — don't activate at all, since a Cancel usually
+    // means "wait, let me check something" rather than "activate with
+    // amount 0".
+    if (amountInput === null) return
+
+    const amountPkr = amountInput.trim() === '' ? null : Number(amountInput)
+    if (amountInput.trim() !== '' && (Number.isNaN(amountPkr as number) || (amountPkr as number) < 0)) {
+      alert('Amount must be a positive number, or left blank.')
+      return
+    }
+
     setLoading(userId)
-    const result = await activateSubscription(userId, days)
+    const result = await activateSubscription(userId, days, amountPkr)
 
     if (result.success) {
       const expiresAt = new Date()
@@ -181,7 +195,7 @@ export default function UserManagementClient({ profiles: initial }: Props) {
                         {DURATIONS.map((d) => (
                           <button
                             key={d.days}
-                            onClick={() => activateUser(p.id, d.days)}
+                            onClick={() => activateUser(p.id, d.days, d.label)}
                             disabled={loading === p.id}
                             className="btn btn-sm"
                             style={{
