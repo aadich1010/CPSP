@@ -66,10 +66,25 @@ export default async function DashboardLayout({
               fontSize: '0.875rem',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
               gap: 10,
             }}
           >
-            ⚠️ Your subscription expires in <strong>{daysLeft} day{daysLeft !== 1 ? 's' : ''}</strong>. Contact admin to renew.
+            <span>
+              ⚠️ Your subscription expires in <strong>{daysLeft} day{daysLeft !== 1 ? 's' : ''}</strong>.
+            </span>
+            <a
+              href="/subscription-expired"
+              style={{
+                color: '#92400e',
+                fontWeight: 800,
+                textDecoration: 'underline',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Renew now →
+            </a>
           </div>
         )}
         {children}
