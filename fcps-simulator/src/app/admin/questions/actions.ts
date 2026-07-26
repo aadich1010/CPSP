@@ -86,15 +86,29 @@ export async function importQuestionsBulk(questions: QuestionInput[]) {
       return { count: 0, newCount: 0, updatedCount: 0 }
     }
 
-    // Check which ones already exist to provide better feedback
-    const { data: existing, error: fetchError } = await adminDb
-      .from('questions')
-      .select('question_text')
-      .in('question_text', uniqueQuestions.map(q => q.question_text))
+    // Check which ones already exist to provide better feedback.
+    // Supabase's .in() sends every value as a URL query param, so passing
+    // hundreds of full question stems in one call can exceed the request-URI
+    // length limit (Cloudflare then returns a 414 and the whole existence
+    // check silently fails). Chunk it instead -- each request stays well
+    // under the limit regardless of import size.
+    const IN_CHUNK_SIZE = 50
+    const allTexts = uniqueQuestions.map(q => q.question_text)
+    const existingTexts = new Set<string>()
 
-    if (fetchError) console.error('[Import] Error fetching existing:', fetchError)
+    for (let i = 0; i < allTexts.length; i += IN_CHUNK_SIZE) {
+      const chunk = allTexts.slice(i, i + IN_CHUNK_SIZE)
+      const { data: existingChunk, error: fetchError } = await adminDb
+        .from('questions')
+        .select('question_text')
+        .in('question_text', chunk)
 
-    const existingTexts = new Set(existing?.map(e => e.question_text) || [])
+      if (fetchError) {
+        console.error('[Import] Error fetching existing (chunk):', fetchError)
+        continue
+      }
+      existingChunk?.forEach(e => existingTexts.add(e.question_text))
+    }
     const newCount = uniqueQuestions.filter(q => !existingTexts.has(q.question_text)).length
     const updatedCount = uniqueQuestions.length - newCount
 
