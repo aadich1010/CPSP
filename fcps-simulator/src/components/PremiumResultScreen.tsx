@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useSyncExternalStore } from "react";
+import React, { useState, useEffect, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid } from "recharts";
+import { createClient } from "@/lib/supabase/client";
 
 /* ── Types ─────────────────────────────────────── */
 interface Question {
@@ -15,6 +16,9 @@ interface Props {
    *  these are trusted over the locally-recomputed stats (which can be wrong
    *  if the post-submit answer-key reveal degrades gracefully). */
   score?: number; total?: number;
+  /** Needed to fetch this student's real past-attempt history for the
+   *  Learning Curve chart -- previously this was hardcoded mock data. */
+  userId?: string;
 }
 
 /* ── Styles (scoped) ────────────────────────────── */
@@ -110,15 +114,45 @@ function calcSubjects(questions: Question[], answers: (string|null)[]) {
     .sort((a,b)=>b.pct-a.pct);
 }
 
-const MOCK_HISTORY = [62,58,71,65,74,70,78,0].map((score,i)=>({ name:`E${i+1}`, score: i===7?undefined:score, avg:65 }));
-
 const RING_R = 52;
 const RING_C = 2*Math.PI*RING_R;
 
 /* ── Component ──────────────────────────────────── */
-export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp }: Props) {
+export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, userId }: Props) {
   const [tab, setTab] = useState<'dash'|'review'>('dash');
   const [filter, setFilter] = useState<'all'|'correct'|'wrong'|'skipped'>('all');
+  // Real attempt history (replaces previous hardcoded mock numbers). Each
+  // entry is { name, score } where score is that attempt's percentage.
+  const [history, setHistory] = useState<{ name: string; score: number }[]>([]);
+
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    (async () => {
+      const supabase = createClient();
+      // RLS ("Users can view own attempts") already restricts this to the
+      // caller's own rows -- no new policy needed.
+      // limit 8: the just-submitted attempt is already the newest row here
+      // (the server inserts it before returning), so this naturally includes
+      // it as the last point -- no need to append a synthetic "current" entry.
+      const { data, error } = await supabase
+        .from('exam_attempts')
+        .select('score, total_questions, created_at')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(8);
+      if (cancelled || error || !data) return;
+      const past = data
+        .slice()
+        .reverse()
+        .map((a: { score: number; total_questions: number }, i: number) => ({
+          name: `E${i + 1}`,
+          score: a.total_questions > 0 ? Math.round((a.score / a.total_questions) * 100) : 0,
+        }));
+      setHistory(past);
+    })();
+    return () => { cancelled = true; };
+  }, [userId]);
   // Client-only mount gate: this screen intentionally renders nothing
   // during SSR/hydration (see the `if (!mounted) return null` below) and
   // only paints once mounted on the client. useSyncExternalStore gets
@@ -141,11 +175,18 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
   const subjectData = calcSubjects(questions, answers);
   const strongest = subjectData[0];
   const weakest   = subjectData[subjectData.length-1];
-  const negMarks  = (wrong*0.25).toFixed(2);
-  const adjScore  = (correct - wrong*0.25).toFixed(1);
   const fcpsPct   = pct >= 80 ? 'Top 10%' : pct >= 70 ? 'Top 25%' : pct >= 60 ? 'Top 40%' : 'Bottom 50%';
+  // No negative marking: FCPS Part 1 does not deduct marks for wrong answers,
+  // so the score shown here is always the plain correct/total count -- never
+  // an "adjusted" or penalized figure.
+  const attempted = correct + wrong;
+  const accuracy  = attempted > 0 ? Math.round((correct/attempted)*100) : 0;
 
-  const historyData = MOCK_HISTORY.map((d,i) => i===7 ? {...d, score: pct} : d);
+  const historyData = history.length > 0 ? history : [{ name: 'E1', score: pct }];
+  const personalAvg = historyData.length > 0
+    ? Math.round(historyData.reduce((s, d) => s + d.score, 0) / historyData.length)
+    : pct;
+  const historyChartData = historyData.map(d => ({ ...d, avg: personalAvg }));
   const dashAspect = (RING_C*(pct/100)).toFixed(1);
 
   const filteredQs = questions.map((q,i)=>({q,i,a:answers[i]})).filter(({q,i,a})=>{
@@ -205,6 +246,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                   </div>
 
                   <div className={`rs-verdict ${pass?'rs-pass':'rs-fail'}`}>{pass?'PASS — ELIGIBLE':'FAIL — PRACTICE MORE'}</div>
+                  <div style={{fontSize:'0.6rem',color:'#94a3b8',fontWeight:600,marginTop:4}}>No negative marking — score reflects correct answers only</div>
 
                   {/* Breakdown */}
                   <div className="rs-bk">
@@ -225,8 +267,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                   {/* KPIs */}
                   <div className="rs-kpis">
                     {[
-                      {k:'Adjusted Score',v:`${adjScore} / ${total}`,cls:'blue'},
-                      {k:'Negative Marks',v:`−${negMarks}`,cls:'red'},
+                      {k:'Accuracy (Attempted)',v:`${accuracy}%`,cls:'blue'},
                       {k:'FCPS Percentile',v:fcpsPct,cls:'blue'},
                       {k:'Strength',v:strongest?.name||'—',cls:'green'},
                       {k:'Weakness',v:weakest?.name||'—',cls:'amber'},
@@ -259,13 +300,12 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                       </div>
                     ))}
                   </div>
-                  {/* Topper comparison */}
+                  {/* Personal progress insight -- based only on this student's own real data */}
                   <div style={{marginTop:12,padding:'8px 10px',background:'rgba(13,148,136,0.06)',borderRadius:9,border:'1px solid rgba(13,148,136,0.15)'}}>
-                    <div className="rs-label" style={{marginBottom:4}}>Topper Benchmark</div>
+                    <div className="rs-label" style={{marginBottom:4}}>Study Insight</div>
                     <div style={{fontSize:'0.7rem',color:'#475569',lineHeight:1.5}}>
-                      Top performers scored <strong style={{color:'#0f172a'}}>92%</strong> in {strongest?.name}.
-                      Your score: <strong style={{color:'#0d9488'}}>{strongest?.pct}%</strong>.
-                      {weakest && <> Focus next study block on <strong style={{color:'#d97706'}}>{weakest.name}</strong> ({weakest.pct}%).</>}
+                      Your strongest subject is <strong style={{color:'#0d9488'}}>{strongest?.name || '—'}</strong> at <strong style={{color:'#0d9488'}}>{strongest?.pct ?? 0}%</strong>.
+                      {weakest && <> Focus your next study block on <strong style={{color:'#d97706'}}>{weakest.name}</strong> ({weakest.pct}%).</>}
                     </div>
                   </div>
                 </motion.div>
@@ -275,7 +315,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                   <div className="rs-label">Learning Curve — Last 8 Attempts</div>
                   <div style={{flex:1,marginTop:8}}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={historyData} margin={{top:4,right:8,left:-24,bottom:0}}>
+                      <LineChart data={historyChartData} margin={{top:4,right:8,left:-24,bottom:0}}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(13,148,136,0.1)" vertical={false}/>
                         <XAxis dataKey="name" tick={{fontSize:10,fill:'#64748b'}} axisLine={false} tickLine={false}/>
                         <YAxis tick={{fontSize:10,fill:'#64748b'}} axisLine={false} tickLine={false} domain={[0,100]}/>
@@ -286,7 +326,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                     </ResponsiveContainer>
                   </div>
                   <div style={{display:'flex',gap:12,marginTop:6}}>
-                    {[{c:'#0d9488',l:'Your Score'},{c:'#94a3b8',l:'Cohort Avg (65%)'}].map(d=>(
+                    {[{c:'#0d9488',l:'Your Score'},{c:'#94a3b8',l:`Your Average (${personalAvg}%)`}].map(d=>(
                       <div key={d.l} style={{display:'flex',alignItems:'center',gap:5}}>
                         <div style={{width:16,height:2,background:d.c,borderRadius:2}}/>
                         <span style={{fontSize:'0.58rem',color:'#64748b',fontWeight:600}}>{d.l}</span>
