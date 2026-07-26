@@ -165,6 +165,7 @@ export default function ExamEngine({ sessionId, questions, subject, mode, userId
         mode={mode}
         score={result.score}
         total={result.total}
+        userId={userId}
       />
     )
   }
