@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { logout } from '@/app/auth/actions'
 
 export default async function AdminLayout({
   children,
@@ -112,6 +113,7 @@ export default async function AdminLayout({
             style={{
               display: 'block',
               padding: '8px 12px',
+              marginBottom: 8,
               color: '#64748b',
               fontSize: '0.8rem',
               textDecoration: 'none',
@@ -122,6 +124,25 @@ export default async function AdminLayout({
           >
             ← Student View
           </Link>
+          <form action={logout}>
+            <button
+              type="submit"
+              style={{
+                display: 'block',
+                width: '100%',
+                padding: '8px 12px',
+                color: '#dc2626',
+                fontSize: '0.8rem',
+                borderRadius: 8,
+                textAlign: 'center',
+                border: '1px solid rgba(220,38,38,0.3)',
+                background: 'rgba(220,38,38,0.05)',
+                cursor: 'pointer',
+              }}
+            >
+              ⏻ Sign Out
+            </button>
+          </form>
         </div>
       </aside>
 

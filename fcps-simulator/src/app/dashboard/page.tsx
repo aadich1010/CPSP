@@ -23,7 +23,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, email, subscription_expires_at, subscription_status')
+    .select('full_name, email, subscription_expires_at, subscription_status, role')
     .eq('id', user.id)
     .single()
 
@@ -61,6 +61,7 @@ export default async function DashboardPage() {
     .slice(0, 4)
 
   const name = profile?.full_name?.split(' ')[0] ?? 'Doctor'
+  const isPremium = profile?.role === 'admin' || profile?.subscription_status === 'active'
   const expiresAt = profile?.subscription_expires_at
     ? new Date(profile.subscription_expires_at).toLocaleDateString('en-PK', {
         day: 'numeric',
@@ -68,6 +69,9 @@ export default async function DashboardPage() {
         year: 'numeric',
       })
     : 'N/A'
+  const statusLine = isPremium
+    ? `Subscription active · Expires ${expiresAt}`
+    : 'Demo access · 10 questions per exam — ask the admin to upgrade for full access'
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -77,7 +81,7 @@ export default async function DashboardPage() {
           Good day, Dr. {name} 👋
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.75rem' }}>
-          Subscription active · Expires {expiresAt}
+          {statusLine}
         </p>
       </div>
       

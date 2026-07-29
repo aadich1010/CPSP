@@ -130,6 +130,15 @@ describe('updateSession route gating', () => {
     expect(res.headers.get('location')).toBeNull()
   })
 
+  it('lets a brand-new student with subscription_status "demo" through to /dashboard (no admin approval needed)', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'u1' } } })
+    mockSingle.mockResolvedValue({
+      data: { role: 'student', subscription_status: 'demo', subscription_expires_at: null },
+    })
+    const res = await updateSession(makeReq('/dashboard'))
+    expect(res.headers.get('location')).toBeNull()
+  })
+
   it('redirects a student whose subscription_status is not active to /subscription-expired', async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'u1' } } })
     mockSingle.mockResolvedValue({

@@ -51,6 +51,23 @@ export default async function ExamSetupPage({
         </div>
 
         <div className="glass" style={{ padding: '28px 24px' }}>
+          {!isPremium && (
+            <div
+              style={{
+                marginBottom: 20,
+                padding: '10px 14px',
+                borderRadius: 10,
+                background: 'rgba(217,119,6,0.08)',
+                border: '1px solid rgba(217,119,6,0.25)',
+                color: '#b45309',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                lineHeight: 1.4,
+              }}
+            >
+              🔓 Demo Access — 4 subjects, 10 questions per exam. Ask the admin to upgrade your account for the full question bank and longer mocks.
+            </div>
+          )}
           <form method="GET" action="/exam/session">
             <div className="form-group">
               <label className="label" htmlFor="subject">Subject</label>

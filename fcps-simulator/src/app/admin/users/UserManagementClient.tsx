@@ -26,7 +26,7 @@ const DURATIONS = [
 export default function UserManagementClient({ profiles: initial }: Props) {
   const [profiles,  setProfiles]  = useState<Profile[]>(initial)
   const [loading,   setLoading]   = useState<string | null>(null)
-  const [filter,    setFilter]    = useState<'all' | 'active' | 'pending' | 'expired'>('all')
+  const [filter,    setFilter]    = useState<'all' | 'active' | 'demo' | 'pending' | 'expired'>('all')
   const router = useRouter()
 
   // Get search from URL if present
@@ -45,6 +45,7 @@ export default function UserManagementClient({ profiles: initial }: Props) {
 
     if (filter === 'all')     return matchSearch
     if (filter === 'active')  return matchSearch && p.subscription_status === 'active'
+    if (filter === 'demo')    return matchSearch && p.subscription_status === 'demo'
     if (filter === 'pending') return matchSearch && p.subscription_status === 'pending'
     if (filter === 'expired') return matchSearch && p.subscription_status === 'expired'
     return matchSearch
@@ -119,7 +120,7 @@ export default function UserManagementClient({ profiles: initial }: Props) {
           className="input"
           style={{ maxWidth: 320 }}
         />
-        {(['all', 'active', 'pending', 'expired'] as const).map((f) => (
+        {(['all', 'active', 'demo', 'pending', 'expired'] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -172,6 +173,8 @@ export default function UserManagementClient({ profiles: initial }: Props) {
                         className={`badge ${
                           effectiveStatus === 'active'
                             ? 'badge-active'
+                            : effectiveStatus === 'demo'
+                            ? 'badge-demo'
                             : effectiveStatus === 'pending'
                             ? 'badge-pending'
                             : 'badge-expired'

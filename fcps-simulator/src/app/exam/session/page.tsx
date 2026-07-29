@@ -11,10 +11,23 @@ export default async function ExamSessionPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role, subscription_status')
+    .eq('id', user.id)
+    .single()
+  const isPremium = profile?.role === 'admin' || profile?.subscription_status === 'active'
+
   const params  = await searchParams
   const subject = params.subject || 'Mixed (All Subjects)'
-  const count   = Math.min(Math.max(parseInt(params.count || '50') || 50, 1), 200)
+  let   count   = Math.min(Math.max(parseInt(params.count || '50') || 50, 1), 200)
   const mode    = params.mode === 'practice' ? 'practice' : 'exam'
+
+  // Demo accounts are hard-capped to 10 questions / 5 minutes. This is
+  // just for a correct timer -- get_exam_questions() enforces the same
+  // cap server-side regardless of what count is requested here, so this
+  // isn't the real security boundary, just keeping the UI honest.
+  if (!isPremium) count = Math.min(count, 10)
 
   // Questions now come only through get_exam_questions(), a SECURITY DEFINER
   // RPC that checks subscription_status = 'active' server-side, picks a

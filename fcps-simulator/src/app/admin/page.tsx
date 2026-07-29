@@ -16,22 +16,24 @@ export default async function AdminDashboardPage() {
   const [
     { count: totalUsers },
     { count: activeUsers },
-    { count: pendingUsers },
+    { count: demoUsers },
     { count: totalQuestions },
     { count: totalAttempts },
   ] = await Promise.all([
     adminDb.from('profiles').select('*', { count: 'exact', head: true }),
     adminDb.from('profiles').select('*', { count: 'exact', head: true }).eq('subscription_status', 'active'),
-    adminDb.from('profiles').select('*', { count: 'exact', head: true }).eq('subscription_status', 'pending'),
+    adminDb.from('profiles').select('*', { count: 'exact', head: true }).in('subscription_status', ['demo', 'pending']),
     adminDb.from('questions').select('*', { count: 'exact', head: true }),
     adminDb.from('exam_attempts').select('*', { count: 'exact', head: true }),
   ])
 
-  // Recent registrations (pending activation)
-  const { data: pendingProfiles } = await adminDb
+  // Recent registrations still on the free demo tier, awaiting an
+  // admin upgrade to 'active' for full access. ('pending' is kept in
+  // here too for any account an admin manually put on hold pre-demo-tier.)
+  const { data: demoProfiles } = await adminDb
     .from('profiles')
     .select('id, full_name, email, created_at, subscription_status')
-    .eq('subscription_status', 'pending')
+    .in('subscription_status', ['demo', 'pending'])
     .order('created_at', { ascending: false })
     .limit(5)
 
@@ -63,7 +65,7 @@ export default async function AdminDashboardPage() {
         {[
           { label: 'Total Users',    value: totalUsers    ?? 0, icon: '👥', color: '#7c3aed' },
           { label: 'Active Subs',    value: activeUsers   ?? 0, icon: '✅', color: '#16a34a' },
-          { label: 'Pending Access', value: pendingUsers  ?? 0, icon: '⏳', color: '#d97706' },
+          { label: 'Demo Users',     value: demoUsers     ?? 0, icon: '⏳', color: '#d97706' },
           { label: 'Questions',      value: totalQuestions ?? 0, icon: '📝', color: '#0f766e' },
           { label: 'Exam Attempts',  value: totalAttempts ?? 0, icon: '📊', color: '#2563eb' },
         ].map((stat) => (
@@ -109,8 +111,8 @@ export default async function AdminDashboardPage() {
         </Link>
       </div>
 
-      {/* Pending Users Table */}
-      {pendingProfiles && pendingProfiles.length > 0 && (
+      {/* Demo Users Table (awaiting upgrade to full access) */}
+      {demoProfiles && demoProfiles.length > 0 && (
         <div>
           <h2
             style={{
@@ -123,7 +125,7 @@ export default async function AdminDashboardPage() {
               gap: 8,
             }}
           >
-            ⏳ Pending Activation ({pendingProfiles.length})
+            ⏳ Demo Users — Awaiting Upgrade ({demoProfiles.length})
           </h2>
           <div className="table-wrapper">
             <table>
@@ -136,7 +138,7 @@ export default async function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {pendingProfiles.map((p) => (
+                {demoProfiles.map((p) => (
                   <tr key={p.id}>
                     <td style={{ color: '#0f172a', fontWeight: 600 }}>{p.full_name}</td>
                     <td style={{ color: '#475569' }}>{p.email}</td>

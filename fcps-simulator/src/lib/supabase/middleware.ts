@@ -112,11 +112,18 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (isProtectedRoute && profile.role !== 'admin') {
-      const isActive = profile.subscription_status === 'active'
+      // 'demo' is the free, no-approval-needed trial tier every new
+      // signup lands in (see supabase/migrations/20260724000000_demo_account_signup.sql).
+      // It gets through here same as 'active' -- the actual feature
+      // limits (10 questions, 4 subjects) are enforced further down the
+      // chain (exam/setup's SUBJECTS list, and get_exam_questions()
+      // server-side). Only 'pending' (manually held by an admin) and
+      // 'expired' are blocked here.
+      const hasAccess = profile.subscription_status === 'active' || profile.subscription_status === 'demo'
       const notExpired =
         !profile.subscription_expires_at || new Date(profile.subscription_expires_at) > new Date()
 
-      if (!isActive || !notExpired) {
+      if (!hasAccess || !notExpired) {
         const url = request.nextUrl.clone()
         url.pathname = '/subscription-expired'
         return NextResponse.redirect(url)

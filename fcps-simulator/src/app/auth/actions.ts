@@ -63,16 +63,18 @@ export async function register(formData: FormData) {
 
   // NOTE: profile creation is intentionally NOT done here. The
   // on_auth_user_created trigger (SECURITY DEFINER, see
-  // 20260514000000_initial_schema.sql) already inserts the profiles row
-  // the instant auth.users gets the new row, with role='student' and
-  // subscription_status='pending'. Doing it again here from the client
-  // was redundant AND broken: `profiles` has no INSERT policy for
-  // `authenticated` (by design — only the trigger and admin/service_role
-  // should ever create a profile), so this upsert failed RLS on every
-  // single signup and showed the user an error message even though their
-  // account had already been created successfully by the trigger.
+  // 20260514000000_initial_schema.sql, updated by
+  // 20260724000000_demo_account_signup.sql) already inserts the profiles
+  // row the instant auth.users gets the new row, with role='student' and
+  // subscription_status='demo' -- instant free-trial access, no admin
+  // approval needed. Doing it again here from the client was redundant
+  // AND broken: `profiles` has no INSERT policy for `authenticated` (by
+  // design — only the trigger and admin/service_role should ever create
+  // a profile), so this upsert failed RLS on every single signup and
+  // showed the user an error message even though their account had
+  // already been created successfully by the trigger.
 
-  return { success: 'Account created! Please wait for admin activation before logging in.' }
+  return { success: 'Account created! You can log in right away with a free demo (10 questions per exam). Ask the admin to upgrade you for full access.' }
 }
 
 export async function logout() {

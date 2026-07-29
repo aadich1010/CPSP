@@ -38,7 +38,7 @@ export default function RegisterPage() {
           {success ? (
             <div className="text-center py-6">
               <div className="text-6xl mb-6">✨</div>
-              <h3 className="text-2xl font-bold text-teal-600 mb-3">Application Received</h3>
+              <h3 className="text-2xl font-bold text-teal-600 mb-3">Account Ready</h3>
               <p className="text-slate-600 leading-relaxed mb-8">
                 {success}
               </p>
@@ -99,7 +99,7 @@ export default function RegisterPage() {
               )}
 
               <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 text-teal-800 text-[11px] leading-relaxed">
-                <strong>Note:</strong> Your account requires manual activation by the admin after registration and payment. You&apos;ll be prompted to send payment proof via WhatsApp on your next login — no email will be sent, so please check back or message us directly.
+                <strong>Note:</strong> Your account is activated instantly with a free demo (10 questions per exam, Anatomy/Physiology/Biochemistry/Pathology). For the full question bank and longer mocks, send payment proof via WhatsApp from your dashboard and the admin will upgrade your account.
               </div>
 
               <button
