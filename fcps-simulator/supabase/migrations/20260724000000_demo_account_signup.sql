@@ -1,23 +1,33 @@
 -- ═══════════════════════════════════════════════════════════
 -- FEATURE: instant "demo" access on signup, no admin approval needed.
 --
+-- IMPORTANT: this migration was rebuilt against the ACTUAL live
+-- definitions of these functions/policies (introspected directly from
+-- the production database via pg_get_functiondef / pg_policies), not
+-- against the older versions checked into earlier files in this
+-- folder. Several hardening fixes had been applied straight to
+-- production and were never backported into this migrations folder
+-- (null-safe auth.uid() checks, per-user rate limiting on
+-- submit_exam_attempt, the dual UUID-key/positional answer format,
+-- and the `(select auth.uid())` RLS-initplan perf wrapping). This
+-- migration preserves all of that and only adds the 'demo' tier on
+-- top -- it does NOT reset any function to an older shape.
+--
 -- Previously every new signup landed in subscription_status = 'pending',
 -- which middleware.ts and every subscription-gated RPC treat as fully
--- blocked (redirected to /subscription-expired) until an admin manually
--- ran activateSubscription(). That meant nobody could try the product
--- at all before paying.
---
--- This migration adds a new status, 'demo', that:
+-- blocked (redirected to /subscription-expired) until an admin
+-- manually activated them. This migration adds a new status, 'demo',
+-- that:
 --   - is granted automatically to every new signup (no admin action),
 --   - lets the student straight into /dashboard and /exam,
---   - is hard-capped server-side to 10 questions per exam (the RPC
---     enforces this -- it is NOT just a client-side dropdown limit),
+--   - is hard-capped server-side to 10 questions per exam (enforced in
+--     get_exam_questions() itself, not just the UI dropdown),
 --   - still requires an admin to upgrade the account to 'active' for
 --     the full subject list / question counts (see /admin/users).
 --
 -- 'pending' is kept as a valid value for any admin who wants to
 -- manually put an account on hold -- it still means "fully blocked",
--- same as before. Only the *default* changes.
+-- same as before. Only the *default* for new signups changes.
 -- ═══════════════════════════════════════════════════════════
 
 -- ── 1. Allow 'demo' as a valid subscription_status ─────────────
@@ -43,8 +53,11 @@ end;
 $$;
 
 -- ── 3. get_exam_questions() -- allow 'demo', hard-cap it to 10 ─────
--- Rebuilt from the latest version (20260722060000_rate_limit_question_rpcs.sql)
--- so the per-user rate limit introduced there is preserved.
+-- Rebuilt from the live function definition (qualified p./q. columns
+-- from the "fix_ambiguous_id_reference_in_get_exam_questions" fix, and
+-- the rate-limit call from "lock_down_rate_limit_helper_execute" /
+-- the original rate-limit migration) -- only the v_status check and
+-- the new demo cap are new here.
 create or replace function public.get_exam_questions(
   p_subject text,
   p_count   integer,
@@ -75,9 +88,9 @@ begin
     raise exception 'UNAUTHENTICATED';
   end if;
 
-  select role, subscription_status into v_role, v_status
-  from public.profiles
-  where id = auth.uid();
+  select p.role, p.subscription_status into v_role, v_status
+  from public.profiles p
+  where p.id = auth.uid();
 
   if v_role is null then
     raise exception 'PROFILE_NOT_FOUND';
@@ -122,14 +135,17 @@ revoke all on function public.get_exam_questions(text, integer, text) from publi
 grant execute on function public.get_exam_questions(text, integer, text) to authenticated;
 
 -- ── 4. exam_sessions insert -- allow 'demo' to start sessions too ──
+-- Rebuilt from the live policy (which already wraps auth.uid()/auth.role()
+-- in `(select ...)` per the "rls_initplan_perf_fix" migration) -- only
+-- the subscription_status check changes.
 drop policy if exists "Users can create own sessions" on public.exam_sessions;
 create policy "Users can create own sessions"
   on public.exam_sessions for insert
   with check (
-    auth.uid() = user_id
+    (select auth.uid()) = user_id
     and exists (
       select 1 from public.profiles p
-      where p.id = auth.uid()
+      where p.id = (select auth.uid())
         and (
           p.role = 'admin'
           or (
@@ -141,6 +157,10 @@ create policy "Users can create own sessions"
   );
 
 -- ── 5. submit_exam_attempt() -- same allowance, mirrors the policy ──
+-- Rebuilt from the live function: preserves the auth.uid() null check,
+-- the per-user rate limit, the null-safe "is distinct from" ownership
+-- check, the PROFILE_NOT_FOUND guard, and the dual UUID-key/positional
+-- answer-format lookup. Only the subscription check changes.
 create or replace function public.submit_exam_attempt(
   p_session_id uuid,
   p_answers    jsonb
@@ -165,6 +185,12 @@ declare
   v_correct       text;
   v_idx           integer := 0;
 begin
+  if auth.uid() is null then
+    raise exception 'UNAUTHENTICATED';
+  end if;
+
+  perform public.enforce_rpc_rate_limit('submit_exam_attempt', 10, interval '10 minutes');
+
   select * into v_session
   from public.exam_sessions
   where id = p_session_id
@@ -174,7 +200,7 @@ begin
     raise exception 'SESSION_NOT_FOUND';
   end if;
 
-  if v_session.user_id <> auth.uid() then
+  if v_session.user_id is distinct from auth.uid() then
     raise exception 'FORBIDDEN';
   end if;
 
@@ -186,6 +212,10 @@ begin
     into v_role, v_status, v_expires
   from public.profiles
   where id = auth.uid();
+
+  if v_role is null then
+    raise exception 'PROFILE_NOT_FOUND';
+  end if;
 
   if v_role <> 'admin'
      and (v_status not in ('active', 'demo') or (v_expires is not null and v_expires <= now())) then
@@ -201,7 +231,9 @@ begin
 
   for v_idx in 0 .. v_total - 1 loop
     v_qid := v_session.question_ids[v_idx + 1];
-    v_answer := p_answers ->> v_idx;
+
+    -- Accept EITHER format: answers keyed by question UUID (object), or a positional array.
+    v_answer := coalesce(p_answers ->> v_qid::text, p_answers ->> v_idx);
 
     select q.correct_answer into v_correct
     from public.questions q
