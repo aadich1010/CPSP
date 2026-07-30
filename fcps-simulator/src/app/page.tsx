@@ -695,7 +695,7 @@ export default function Home() {
                       <li key={j}><span className="check">✓</span>{f}</li>
                     ))}
                   </ul>
-                  <Link href="/register" className={`btn-plan ${plan.featured ? 'btn-plan-feat' : 'btn-plan-std'}`} style={{ textDecoration: 'none', textAlign: 'center' }}>
+                  <Link href="/subscription-expired" className={`btn-plan ${plan.featured ? 'btn-plan-feat' : 'btn-plan-std'}`} style={{ textDecoration: 'none', textAlign: 'center' }}>
                     {plan.cta}
                   </Link>
                 </div>

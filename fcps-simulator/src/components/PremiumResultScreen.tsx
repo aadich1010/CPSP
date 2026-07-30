@@ -19,6 +19,9 @@ interface Props {
   /** Needed to fetch this student's real past-attempt history for the
    *  Learning Curve chart -- previously this was hardcoded mock data. */
   userId?: string;
+  /** Candidate's display name, shown in the header and included when the
+   *  report is printed so a printed result is identifiable. */
+  candidateName?: string;
 }
 
 /* ── Styles (scoped) ────────────────────────────── */
@@ -27,6 +30,8 @@ const S = `
 .rs-header{flex-shrink:0;height:52px;background:#ffffff;border-bottom:2px solid #0d9488;display:flex;align-items:center;justify-content:space-between;padding:0 28px;box-shadow:0 2px 12px rgba(13,148,136,0.08)}
 .rs-logo{font-size:0.78rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#0f172a}
 .rs-logo span{color:#0d9488;margin-right:6px}
+.rs-logo-wrap{display:flex;flex-direction:column;gap:1px}
+.rs-print-meta{font-size:0.6rem;font-weight:600;letter-spacing:0.02em;text-transform:none;color:#64748b}
 .rs-tabs{display:flex;gap:2px;background:rgba(13,148,136,0.08);border-radius:8px;padding:3px}
 .rs-tab{padding:5px 16px;border-radius:6px;font-size:0.72rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#64748b;transition:all 0.2s}
 .rs-tab.active{background:#ffffff;color:#0d9488;box-shadow:0 1px 4px rgba(13,148,136,0.15)}
@@ -131,7 +136,7 @@ const RING_R = 52;
 const RING_C = 2*Math.PI*RING_R;
 
 /* ── Component ──────────────────────────────────── */
-export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, userId }: Props) {
+export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, userId, candidateName }: Props) {
   const [tab, setTab] = useState<'dash'|'review'>('dash');
   const [filter, setFilter] = useState<'all'|'correct'|'wrong'|'skipped'>('all');
   // Real attempt history (replaces previous hardcoded mock numbers). Each
@@ -182,18 +187,38 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
   const localStats = calcStats(questions, answers);
   const correct = score !== undefined ? score : localStats.correct;
   const total   = totalProp !== undefined ? totalProp : localStats.total;
-  const { wrong, skipped } = localStats;
+  // `skipped` only needs to know which answers are null -- it never depends
+  // on correct_answer, so it's reliable even when the answer-key reveal
+  // below is stale. `wrong` is then derived as whatever's left after the
+  // authoritative `correct` and the reliable `skipped` are accounted for,
+  // instead of trusting calcStats' own correct_answer-based wrong count
+  // (which, like subjectData below, can silently disagree with the real
+  // server-graded score when `questions` doesn't carry the true answer key
+  // -- e.g. ExamEngine's "degrade gracefully" fallback after a failed
+  // reveal_exam_answers() call).
+  const skipped = answers.filter(a => !a).length;
+  const wrong   = Math.max(0, total - skipped - correct);
   const pct = Math.round((correct/total)*100);
   const pass = pct >= 60;
+  const printDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const subjectData = calcSubjects(questions, answers);
+  // The per-subject correct counts above come from comparing answers against
+  // questions[i].correct_answer client-side. That answer key is ONLY
+  // trustworthy once reveal_exam_answers() has actually populated it -- if
+  // that reveal degraded (see ExamEngine), correct_answer can be stale/wrong
+  // and subjectData ends up crediting "correct" answers that don't add up to
+  // the real, server-graded score. Cross-checking the two catches exactly
+  // that: only if they agree do we trust subjectData enough to call anything
+  // a "strongest" or "weakest" subject.
+  const subjectCorrectSum = subjectData.reduce((s, d) => s + d.correct, 0);
+  const subjectDataReliable = subjectCorrectSum === correct;
   // A subject only counts as the "strongest" if the student actually got at
   // least one question right in it (pct > 0). Previously subjectData[0] was
   // used unconditionally after sorting descending, so with an all-wrong
   // attempt (every subject at 0%) the top of that sort still got labelled
-  // "strongest" -- a false/dummy signal that misled the student. Weakest is
-  // legitimately still the lowest scorer even at 0%, so that logic is kept.
-  const strongest = subjectData.length > 0 && subjectData[0].pct > 0 ? subjectData[0] : undefined;
-  const weakest   = subjectData.length > 0 ? subjectData[subjectData.length-1] : undefined;
+  // "strongest" -- a false/dummy signal that misled the student.
+  const strongest = subjectDataReliable && subjectData.length > 0 && subjectData[0].pct > 0 ? subjectData[0] : undefined;
+  const weakest   = subjectDataReliable && subjectData.length > 0 ? subjectData[subjectData.length-1] : undefined;
   const fcpsPct   = pct >= 80 ? 'Top 10%' : pct >= 70 ? 'Top 25%' : pct >= 60 ? 'Top 40%' : 'Bottom 50%';
   // No negative marking: FCPS Part 1 does not deduct marks for wrong answers,
   // so the score shown here is always the plain correct/total count -- never
@@ -243,7 +268,10 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
 
         {/* Header */}
         <header className="rs-header">
-          <div className="rs-logo"><span>FCPS</span>Performance Report</div>
+          <div className="rs-logo-wrap">
+            <div className="rs-logo"><span>FCPS</span>Performance Report</div>
+            <div className="rs-print-meta">{candidateName || 'Candidate'} · {subject} · {printDate}</div>
+          </div>
           <div className="rs-tabs">
             {(['dash','review'] as const).map(t=>(
               <button key={t} className={`rs-tab${tab===t?' active':''}`} onClick={()=>setTab(t)}>
@@ -330,20 +358,27 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                         <div className="rs-bar-track">
                           <motion.div className="rs-bar-fill"
                             initial={{width:0}}
-                            animate={{width:`${s.pct}%`}}
+                            animate={{width:`${subjectDataReliable?s.pct:0}%`}}
                             transition={{delay:0.2+idx*0.07,duration:0.8}}
                             style={{background: s===strongest?'#0d9488': s===weakest?'#ef4444': idx%2===0?'#14b8a6':'#0f766e'}}
                           />
                         </div>
-                        <div className="rs-bar-pct">{s.pct}%</div>
+                        <div className="rs-bar-pct">{subjectDataReliable?`${s.pct}%`:'—'}</div>
                       </div>
                     ))}
                   </div>
+                  {!subjectDataReliable && (
+                    <div style={{marginTop:6,fontSize:'0.6rem',color:'#94a3b8',fontStyle:'italic'}}>
+                      Per-subject breakdown unavailable for this attempt — overall score above is accurate.
+                    </div>
+                  )}
                   {/* Personal progress insight -- based only on this student's own real data */}
                   <div style={{marginTop:12,padding:'8px 10px',background:'rgba(13,148,136,0.06)',borderRadius:9,border:'1px solid rgba(13,148,136,0.15)'}}>
                     <div className="rs-label" style={{marginBottom:4}}>Study Insight</div>
                     <div style={{fontSize:'0.7rem',color:'#475569',lineHeight:1.5}}>
-                      {strongest ? (
+                      {!subjectDataReliable ? (
+                        <>Your overall score is <strong style={{color:'#0d9488'}}>{pct}%</strong> ({correct}/{total} correct). Subject-level detail isn&apos;t available for this attempt.</>
+                      ) : strongest ? (
                         <>Your strongest subject is <strong style={{color:'#0d9488'}}>{strongest.name}</strong> at <strong style={{color:'#0d9488'}}>{strongest.pct}%</strong>.</>
                       ) : (
                         <>You haven&apos;t answered any questions correctly yet — no subject can be called a strength.</>
@@ -417,23 +452,30 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                 {/* Bottom-far-right: Colorful subject accuracy bars */}
                 <motion.div className="rs-card" initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{delay:0.3}} style={{display:'flex',flexDirection:'column'}}>
                   <div className="rs-label">Subject Accuracy — By Question</div>
-                  <div style={{flex:1,marginTop:4,minHeight:0}}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={subjectData} margin={{top:6,right:6,left:-24,bottom:0}}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(13,148,136,0.1)" vertical={false}/>
-                        <XAxis dataKey="name" tick={{fontSize:9,fill:'#64748b'}} axisLine={false} tickLine={false} interval={0}
-                          tickFormatter={(v:string)=>v.length>8?v.slice(0,8)+'…':v}/>
-                        <YAxis tick={{fontSize:10,fill:'#64748b'}} axisLine={false} tickLine={false} domain={[0,100]}/>
-                        <Tooltip contentStyle={{background:'#ffffff',border:'1px solid rgba(13,148,136,0.2)',borderRadius:8,fontSize:'0.72rem'}}
-                          formatter={((v: number, _n: string, p: { payload: { correct: number; total: number } }) =>
-                            [`${v}% (${p.payload.correct}/${p.payload.total})`, 'Accuracy']) as never}/>
-                        <Bar dataKey="pct" radius={[6,6,0,0]}>
-                          {subjectData.map((s,idx)=>(<Cell key={s.name} fill={RAINBOW[idx%RAINBOW.length]}/>))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
+                  {subjectDataReliable ? (
+                    <div style={{flex:1,marginTop:4,minHeight:0}}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={subjectData} margin={{top:6,right:6,left:-24,bottom:0}}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(13,148,136,0.1)" vertical={false}/>
+                          <XAxis dataKey="name" tick={{fontSize:9,fill:'#64748b'}} axisLine={false} tickLine={false} interval={0}
+                            tickFormatter={(v:string)=>v.length>8?v.slice(0,8)+'…':v}/>
+                          <YAxis tick={{fontSize:10,fill:'#64748b'}} axisLine={false} tickLine={false} domain={[0,100]}/>
+                          <Tooltip contentStyle={{background:'#ffffff',border:'1px solid rgba(13,148,136,0.2)',borderRadius:8,fontSize:'0.72rem'}}
+                            formatter={((v: number, _n: string, p: { payload: { correct: number; total: number } }) =>
+                              [`${v}% (${p.payload.correct}/${p.payload.total})`, 'Accuracy']) as never}/>
+                          <Bar dataKey="pct" radius={[6,6,0,0]}>
+                            {subjectData.map((s,idx)=>(<Cell key={s.name} fill={RAINBOW[idx%RAINBOW.length]}/>))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  ) : (
+                    <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center',padding:'0 12px'}}>
+                      <span style={{fontSize:'0.68rem',color:'#94a3b8',fontStyle:'italic'}}>Per-subject breakdown unavailable for this attempt.</span>
+                    </div>
+                  )}
                 </motion.div>
+
 
               </motion.div>
             )}

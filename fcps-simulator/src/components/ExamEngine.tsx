@@ -25,6 +25,9 @@ interface ExamEngineProps {
   mode:             'exam' | 'practice'
   userId:           string
   timeLimitSeconds: number
+  /** Shown on the result screen's header and included on the printed
+   *  report so a printout is identifiable as this candidate's. */
+  candidateName?:   string
 }
 
 type Answer = string | null
@@ -45,7 +48,7 @@ function formatTime(secs: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-export default function ExamEngine({ sessionId, questions, subject, mode, userId, timeLimitSeconds }: ExamEngineProps) {
+export default function ExamEngine({ sessionId, questions, subject, mode, userId, timeLimitSeconds, candidateName }: ExamEngineProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers,      setAnswers]      = useState<Answer[]>(Array(questions.length).fill(null))
   const [submitted,    setSubmitted]    = useState(false)
@@ -166,6 +169,7 @@ export default function ExamEngine({ sessionId, questions, subject, mode, userId
         score={result.score}
         total={result.total}
         userId={userId}
+        candidateName={candidateName}
       />
     )
   }

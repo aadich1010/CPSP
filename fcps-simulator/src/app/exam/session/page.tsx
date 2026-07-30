@@ -13,10 +13,11 @@ export default async function ExamSessionPage({
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role, subscription_status')
+    .select('role, subscription_status, full_name')
     .eq('id', user.id)
     .single()
   const isPremium = profile?.role === 'admin' || profile?.subscription_status === 'active'
+  const candidateName = profile?.full_name || user.email || 'Candidate'
 
   const params  = await searchParams
   const subject = params.subject || 'Mixed (All Subjects)'
@@ -90,6 +91,7 @@ export default async function ExamSessionPage({
       mode={mode}
       userId={user.id}
       timeLimitSeconds={timeLimitSeconds}
+      candidateName={candidateName}
     />
   )
 }
