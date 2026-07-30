@@ -118,6 +118,21 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
         )}
       </nav>
 
+      {/* Unlock Full Access CTA -- links to the Elite pricing plans on the
+          landing page so the user can pick a plan and pay. Not shown to
+          admins, who already have full access to everything. */}
+      {profile.role !== 'admin' && (
+        <div className="px-4 mb-4">
+          <Link
+            href="/#pricing"
+            className="unlock-cta flex items-center justify-center gap-2 w-full rounded-xl px-4 py-3 text-[12px] font-black uppercase tracking-wider text-white shadow-md"
+          >
+            <span className="text-base">🔓</span>
+            Unlock Full Access
+          </Link>
+        </div>
+      )}
+
       {/* Subscription Status Card */}
       {daysLeft !== null && (
         <div className="px-4 mb-4">

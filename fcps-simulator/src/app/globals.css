@@ -552,6 +552,17 @@ tr:hover td {
   font-weight: 700;
 }
 
+.unlock-cta {
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.unlock-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(124, 58, 237, 0.45);
+}
+
 /* ─── WATERMARK ──────────────────────────────────────────── */
 .forensic-watermark {
   position: fixed;

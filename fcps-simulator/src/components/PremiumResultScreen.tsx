@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid } from "recharts";
+import { BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid, PieChart, Pie } from "recharts";
 import { createClient } from "@/lib/supabase/client";
 
 /* ── Types ─────────────────────────────────────── */
@@ -35,9 +35,22 @@ const S = `
 .rs-btn:hover{background:#f0fdfa;border-color:#0d9488;color:#0d9488}
 .rs-btn.primary{background:linear-gradient(135deg,#0f766e,#0d9488);border-color:#0d9488;color:white;box-shadow:0 4px 14px rgba(13,148,136,0.3)}
 .rs-btn.primary:hover{background:linear-gradient(135deg,#0d9488,#14b8a6);box-shadow:0 6px 20px rgba(13,148,136,0.4)}
+.rs-btn.print{background:linear-gradient(135deg,#7c3aed,#ec4899);border-color:transparent;color:white;box-shadow:0 4px 14px rgba(124,58,237,0.3)}
+.rs-btn.print:hover{background:linear-gradient(135deg,#6d28d9,#db2777);box-shadow:0 6px 20px rgba(124,58,237,0.4)}
+@media print{
+  .rs-header .rs-tabs,.rs-header .rs-hbtns{display:none!important}
+  .rs-root{height:auto!important;overflow:visible!important}
+  .rs-body{overflow:visible!important}
+  .rs-dash{height:auto!important;display:grid!important;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;page-break-inside:avoid}
+  .rs-card{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-shadow:none!important;break-inside:avoid}
+  .rs-score-card{grid-column:1/3;grid-row:1}
+}
 .rs-body{flex:1;overflow:hidden}
 /* Dashboard grid */
-.rs-dash{height:100%;display:grid;grid-template-columns:260px 1fr;grid-template-rows:1fr 1fr;gap:10px;padding:10px}
+.rs-dash{height:100%;display:grid;grid-template-columns:240px 1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;padding:8px}
+.rs-pie-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;justify-content:center}
+.rs-pie-legend-item{display:flex;align-items:center;gap:4px;font-size:0.6rem;font-weight:700;color:#475569}
+.rs-pie-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .rs-card{background:#ffffff;border:1px solid rgba(13,148,136,0.12);border-radius:14px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.04);transition:transform 0.2s,box-shadow 0.2s}
 .rs-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(13,148,136,0.1)}
 .rs-label{font-size:0.58rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#0d9488;margin-bottom:4px}
@@ -173,14 +186,29 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
   const pct = Math.round((correct/total)*100);
   const pass = pct >= 60;
   const subjectData = calcSubjects(questions, answers);
-  const strongest = subjectData[0];
-  const weakest   = subjectData[subjectData.length-1];
+  // A subject only counts as the "strongest" if the student actually got at
+  // least one question right in it (pct > 0). Previously subjectData[0] was
+  // used unconditionally after sorting descending, so with an all-wrong
+  // attempt (every subject at 0%) the top of that sort still got labelled
+  // "strongest" -- a false/dummy signal that misled the student. Weakest is
+  // legitimately still the lowest scorer even at 0%, so that logic is kept.
+  const strongest = subjectData.length > 0 && subjectData[0].pct > 0 ? subjectData[0] : undefined;
+  const weakest   = subjectData.length > 0 ? subjectData[subjectData.length-1] : undefined;
   const fcpsPct   = pct >= 80 ? 'Top 10%' : pct >= 70 ? 'Top 25%' : pct >= 60 ? 'Top 40%' : 'Bottom 50%';
   // No negative marking: FCPS Part 1 does not deduct marks for wrong answers,
   // so the score shown here is always the plain correct/total count -- never
   // an "adjusted" or penalized figure.
   const attempted = correct + wrong;
   const accuracy  = attempted > 0 ? Math.round((correct/attempted)*100) : 0;
+
+  // Colorful donut breakdown data (only include non-zero slices so an
+  // all-skipped or all-correct attempt doesn't draw an empty gray ring).
+  const pieData = [
+    { name: 'Correct', value: correct, color: '#22c55e' },
+    { name: 'Wrong',   value: wrong,   color: '#ef4444' },
+    { name: 'Skipped', value: skipped, color: '#f59e0b' },
+  ].filter(d => d.value > 0);
+  const RAINBOW = ['#0d9488','#6366f1','#ec4899','#f59e0b','#22c55e','#06b6d4','#a855f7','#ef4444'];
 
   const historyData = history.length > 0 ? history : [{ name: 'E1', score: pct }];
   const personalAvg = historyData.length > 0
@@ -195,6 +223,16 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
     if(filter==='skipped') return !a;
     return true;
   });
+
+  // Printing must show the analytics dashboard (score ring + all the
+  // charts), not whichever tab happens to be open, so switch tabs first
+  // and let the DOM settle for a tick before invoking the native print
+  // dialog. The @media print rules above then strip the header chrome
+  // and let every chart card lay out on the page instead of scrolling.
+  function handlePrint() {
+    setTab('dash');
+    setTimeout(() => window.print(), 120);
+  }
 
   if(!mounted) return null;
 
@@ -214,6 +252,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
             ))}
           </div>
           <div className="rs-hbtns">
+            <button className="rs-btn print" onClick={handlePrint}>🖨️ Print Result</button>
             <a href="/exam/setup" className="rs-btn primary">New Attempt</a>
             <a href="/dashboard" className="rs-btn">Exit</a>
           </div>
@@ -304,9 +343,49 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                   <div style={{marginTop:12,padding:'8px 10px',background:'rgba(13,148,136,0.06)',borderRadius:9,border:'1px solid rgba(13,148,136,0.15)'}}>
                     <div className="rs-label" style={{marginBottom:4}}>Study Insight</div>
                     <div style={{fontSize:'0.7rem',color:'#475569',lineHeight:1.5}}>
-                      Your strongest subject is <strong style={{color:'#0d9488'}}>{strongest?.name || '—'}</strong> at <strong style={{color:'#0d9488'}}>{strongest?.pct ?? 0}%</strong>.
+                      {strongest ? (
+                        <>Your strongest subject is <strong style={{color:'#0d9488'}}>{strongest.name}</strong> at <strong style={{color:'#0d9488'}}>{strongest.pct}%</strong>.</>
+                      ) : (
+                        <>You haven&apos;t answered any questions correctly yet — no subject can be called a strength.</>
+                      )}
                       {weakest && <> Focus your next study block on <strong style={{color:'#d97706'}}>{weakest.name}</strong> ({weakest.pct}%).</>}
                     </div>
+                  </div>
+                </motion.div>
+
+                {/* Top-far-right: Result Breakdown donut */}
+                <motion.div className="rs-card" initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{delay:0.18}} style={{display:'flex',flexDirection:'column'}}>
+                  <div className="rs-label">Result Breakdown</div>
+                  <div style={{flex:1,minHeight:0,position:'relative'}}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={pieData}
+                          dataKey="value"
+                          nameKey="name"
+                          innerRadius="55%"
+                          outerRadius="82%"
+                          paddingAngle={pieData.length>1?3:0}
+                          startAngle={90}
+                          endAngle={-270}
+                          isAnimationActive
+                        >
+                          {pieData.map((d)=>(<Cell key={d.name} fill={d.color}/>))}
+                        </Pie>
+                        <Tooltip contentStyle={{background:'#ffffff',border:'1px solid rgba(13,148,136,0.2)',borderRadius:8,fontSize:'0.72rem'}}/>
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',pointerEvents:'none'}}>
+                      <div style={{fontSize:'1.3rem',fontWeight:900,color:'#0f172a'}}>{pct}%</div>
+                      <div style={{fontSize:'0.55rem',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.08em'}}>Scored</div>
+                    </div>
+                  </div>
+                  <div className="rs-pie-legend">
+                    {pieData.map(d=>(
+                      <div key={d.name} className="rs-pie-legend-item">
+                        <span className="rs-pie-dot" style={{background:d.color}}/>{d.name} ({d.value})
+                      </div>
+                    ))}
                   </div>
                 </motion.div>
 
@@ -332,6 +411,27 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                         <span style={{fontSize:'0.58rem',color:'#64748b',fontWeight:600}}>{d.l}</span>
                       </div>
                     ))}
+                  </div>
+                </motion.div>
+
+                {/* Bottom-far-right: Colorful subject accuracy bars */}
+                <motion.div className="rs-card" initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{delay:0.3}} style={{display:'flex',flexDirection:'column'}}>
+                  <div className="rs-label">Subject Accuracy — By Question</div>
+                  <div style={{flex:1,marginTop:4,minHeight:0}}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={subjectData} margin={{top:6,right:6,left:-24,bottom:0}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(13,148,136,0.1)" vertical={false}/>
+                        <XAxis dataKey="name" tick={{fontSize:9,fill:'#64748b'}} axisLine={false} tickLine={false} interval={0}
+                          tickFormatter={(v:string)=>v.length>8?v.slice(0,8)+'…':v}/>
+                        <YAxis tick={{fontSize:10,fill:'#64748b'}} axisLine={false} tickLine={false} domain={[0,100]}/>
+                        <Tooltip contentStyle={{background:'#ffffff',border:'1px solid rgba(13,148,136,0.2)',borderRadius:8,fontSize:'0.72rem'}}
+                          formatter={((v: number, _n: string, p: { payload: { correct: number; total: number } }) =>
+                            [`${v}% (${p.payload.correct}/${p.payload.total})`, 'Accuracy']) as never}/>
+                        <Bar dataKey="pct" radius={[6,6,0,0]}>
+                          {subjectData.map((s,idx)=>(<Cell key={s.name} fill={RAINBOW[idx%RAINBOW.length]}/>))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
                 </motion.div>
 
