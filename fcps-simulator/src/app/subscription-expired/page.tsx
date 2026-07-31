@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { logout } from '@/app/auth/actions'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
-import { Edit2, Save, X, Loader2 } from 'lucide-react'
+import { Save, X, Loader2 } from 'lucide-react'
 
 interface PaymentSetting {
   provider: 'jazzcash' | 'easypaisa' | 'bank'
@@ -88,8 +87,6 @@ export default function SubscriptionExpiredPage() {
     )
   }
 
-  const jazzcash = settings.find(s => s.provider === 'jazzcash')
-  const easypaisa = settings.find(s => s.provider === 'easypaisa')
   const bank = settings.find(s => s.provider === 'bank')
 
   return (
@@ -132,119 +129,102 @@ export default function SubscriptionExpiredPage() {
         </p>
       </motion.div>
 
-      {/* Main Content Grid */}
+      {/* Centered QR — Bank Transfer only */}
       <div style={{ 
         width: '100%', 
-        maxWidth: 1000,
+        maxWidth: 460,
         display: 'flex',
         flexDirection: 'column',
+        alignItems: 'center',
         gap: 20
       }}>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-          gap: 16
-        }}>
-          {jazzcash && (
-            <PaymentCard 
-              data={jazzcash}
-              title="JazzCash" 
-              icon="📱" 
-              color="#f59e0b"
-              delay={0.1}
-              isAdmin={isAdmin}
-              onEdit={() => setEditingProvider(jazzcash)}
-            />
-          )}
-
-          {easypaisa && (
-            <PaymentCard 
-              data={easypaisa}
-              title="EasyPaisa" 
-              icon="💸" 
-              color="#16a34a"
-              delay={0.2}
-              isAdmin={isAdmin}
-              onEdit={() => setEditingProvider(easypaisa)}
-            />
-          )}
-
-          {bank && (
-            <PaymentCard 
-              data={bank}
-              title="Bank Transfer" 
-              icon="🏛️" 
-              color="#2563eb"
-              delay={0.3}
-              isAdmin={isAdmin}
-              onEdit={() => setEditingProvider(bank)}
-            />
-          )}
-        </div>
-
-        {/* Instructions & CTA Section */}
         <motion.div 
-          initial={{ opacity: 0, scale: 0.98 }}
+          initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.15 }}
           className="glass-card" 
           style={{ 
-            padding: '20px 24px',
+            padding: '28px 24px',
             textAlign: 'center',
             border: '2px solid rgba(13, 148, 136, 0.3)',
             background: 'white',
+            width: '100%',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 20,
-            flexWrap: 'wrap'
+            gap: 14
           }}
         >
-          <div style={{ textAlign: 'left', flex: 1, minWidth: 280 }}>
-            <h3 style={{ fontWeight: 800, marginBottom: 4, fontSize: '1.05rem' }}>
-              Final Step: Send Payment Proof
-            </h3>
-            <p style={{ color: '#475569', fontSize: '0.82rem', lineHeight: 1.4 }}>
-              Share your <strong>Transaction ID</strong> or <strong>Screenshot</strong> via WhatsApp.
-            </p>
-          </div>
+          <h3 style={{ fontWeight: 800, fontSize: '1.15rem', letterSpacing: '-0.01em' }}>
+            Scan to Unlock
+          </h3>
+          <p style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: 1.5, maxWidth: 320 }}>
+            Scan the QR code below with your banking app to send payment and unlock full access.
+          </p>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <a 
-              href={whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary" 
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src="/payment-qr.jpeg" 
+            alt="Scan this QR code to send payment"
+            style={{ 
+              width: '100%',
+              maxWidth: 300,
+              height: 'auto',
+              borderRadius: 16,
+              boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)'
+            }}
+          />
+
+          {bank && (
+            <div style={{ marginTop: 4, textAlign: 'center' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0f172a' }}>{bank.account_name}</div>
+              {bank.extra_info && (
+                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#0d9488', marginTop: 2 }}>{bank.extra_info}</div>
+              )}
+            </div>
+          )}
+
+          <a 
+            href={whatsappLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ 
+              marginTop: 6,
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: 8, 
+              padding: '11px 22px', 
+              fontSize: '0.9rem',
+              fontWeight: 700,
+              color: 'white',
+              borderRadius: 10,
+              background: '#25D366',
+              textDecoration: 'none',
+              boxShadow: '0 4px 12px rgba(37, 211, 102, 0.2)'
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.417-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.305 1.652zm6.599-3.835c1.511.895 3.156 1.368 4.872 1.368 5.161 0 9.359-4.198 9.362-9.361 0-2.502-1.001-4.853-2.82-6.671-1.819-1.818-4.17-2.819-6.671-2.82-5.163 0-9.36 4.198-9.362 9.361-.001 1.832.532 3.615 1.541 5.115l-.997 3.64 3.738-.981z"/>
+            </svg>
+            Send Payment Proof
+          </a>
+
+          {isAdmin && bank && (
+            <button 
+              onClick={() => setEditingProvider(bank)}
               style={{ 
-                display: 'inline-flex', 
-                alignItems: 'center', 
-                gap: 8, 
-                padding: '12px 24px', 
-                fontSize: '0.95rem',
-                background: '#25D366',
-                border: 'none',
-                boxShadow: '0 4px 12px rgba(37, 211, 102, 0.2)'
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.417-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.305 1.652zm6.599-3.835c1.511.895 3.156 1.368 4.872 1.368 5.161 0 9.359-4.198 9.362-9.361 0-2.502-1.001-4.853-2.82-6.671-1.819-1.818-4.17-2.819-6.671-2.82-5.163 0-9.36 4.198-9.362 9.361-.001 1.832.532 3.615 1.541 5.115l-.997 3.64 3.738-.981z"/>
-              </svg>
-              WhatsApp Proof
-            </a>
-
-            <form action={logout}>
-              <button type="submit" style={{ 
+                marginTop: 2,
                 background: 'transparent', 
                 border: 'none', 
-                color: '#64748b', 
-                fontSize: '0.75rem', 
+                color: '#94a3b8', 
+                fontSize: '0.72rem', 
                 cursor: 'pointer',
                 textDecoration: 'underline' 
-              }}>
-                Sign Out
-              </button>
-            </form>
-          </div>
+              }}
+            >
+              Edit bank details
+            </button>
+          )}
         </motion.div>
       </div>
 
@@ -266,89 +246,6 @@ export default function SubscriptionExpiredPage() {
         <span>📞 24/7 Support</span>
       </div>
     </div>
-  )
-}
-
-interface PaymentCardProps {
-  data: PaymentSetting
-  title: string
-  icon: string
-  color: string
-  delay: number
-  isAdmin: boolean
-  onEdit: () => void
-}
-
-function PaymentCard({ data, title, icon, color, delay, isAdmin, onEdit }: PaymentCardProps) {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay }}
-      className="glass-card" 
-      style={{ 
-        padding: '18px', 
-        borderTop: `3px solid ${color}`,
-        position: 'relative',
-        overflow: 'hidden',
-        background: 'white'
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: '1.8rem' }}>{icon}</div>
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 800 }}>{title}</h3>
-        </div>
-        {isAdmin && (
-          <button 
-            onClick={onEdit}
-            style={{ 
-              background: 'rgba(13, 148, 136, 0.1)', 
-              color: '#0d9488', 
-              border: 'none', 
-              padding: '6px', 
-              borderRadius: '8px',
-              cursor: 'pointer'
-            }}
-          >
-            <Edit2 size={14} />
-          </button>
-        )}
-      </div>
-      
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <div>
-          <div style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>Account #</div>
-          <div style={{ fontSize: '0.95rem', fontWeight: 800, fontFamily: 'monospace', color: '#1e293b' }}>{data.account_number}</div>
-        </div>
-        
-        <div>
-          <div style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>Name</div>
-          <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#1e293b' }}>{data.account_name}</div>
-        </div>
-
-        {data.extra_info && (
-          <div style={{ gridColumn: 'span 2', marginTop: 4 }}>
-            <div style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>
-              {data.provider === 'bank' ? 'Bank Name' : 'Notes'}
-            </div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0d9488' }}>{data.extra_info}</div>
-          </div>
-        )}
-      </div>
-
-      <div style={{ 
-        position: 'absolute', 
-        right: -8, 
-        top: -8, 
-        fontSize: '2.5rem', 
-        opacity: 0.04, 
-        transform: 'rotate(-10deg)',
-        pointerEvents: 'none'
-      }}>
-        {icon}
-      </div>
-    </motion.div>
   )
 }
 
