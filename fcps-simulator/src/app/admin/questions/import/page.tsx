@@ -26,6 +26,20 @@ interface ParsedQuestion {
   difficulty?: string
 }
 
+// Shape of a single record from arbitrary/untrusted pasted JSON before
+// it's normalized into ParsedQuestion. Field names vary by source
+// (ChatGPT export, spreadsheet export, etc.), so this stays loose by
+// design — but `unknown`-typed, not `any`, so every access below is
+// still checked.
+type RawImportRecord = Record<string, unknown>
+
+interface ImportResult {
+  error?: string
+  count?: number
+  newCount?: number
+  updatedCount?: number
+}
+
 export default function ImportQuestionsPage() {
   const [rawText, setRawText] = useState('')
   const [subject, setSubject] = useState(SUBJECTS[0])
@@ -33,7 +47,7 @@ export default function ImportQuestionsPage() {
   const [parsed, setParsed] = useState<ParsedQuestion[]>([])
   const [parseError, setParseError] = useState('')
   const [importing, setImporting] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<ImportResult | null>(null)
   const router = useRouter()
 
   function detectSubjectFromText(text: string): string {
@@ -57,7 +71,7 @@ export default function ImportQuestionsPage() {
     setTimeout(() => {
       try {
         const trimmed = rawText.trim()
-        let jsonParsed: any[] = []
+        let jsonParsed: RawImportRecord[] = []
 
         // Try standard JSON parse
         try {
@@ -78,27 +92,33 @@ export default function ImportQuestionsPage() {
 
         if (!Array.isArray(jsonParsed)) jsonParsed = [jsonParsed]
 
-        const mapped = jsonParsed.map((q: any) => {
-          const qText = q.question || q.question_text || q.stem || q.text || q.q || ''
-          
-          let optA = q.option_a || q.A || q.a || ''
-          let optB = q.option_b || q.B || q.b || ''
-          let optC = q.option_c || q.C || q.c || ''
-          let optD = q.option_d || q.D || q.d || ''
-          let optE = q.option_e || q.E || q.e || ''
+        // Pull the first defined value for any of the given keys out of an
+        // untyped record, e.g. field(q, 'option_a', 'A', 'a').
+        const field = (q: RawImportRecord, ...keys: string[]): unknown =>
+          keys.map((k) => q[k]).find((v) => v !== undefined && v !== null && v !== '')
 
-          if (Array.isArray(q.options)) {
-            optA = q.options[0] || optA
-            optB = q.options[1] || optB
-            optC = q.options[2] || optC
-            optD = q.options[3] || optD
-            optE = q.options[4] || optE
+        const mapped = jsonParsed.map((q: RawImportRecord) => {
+          const qText = field(q, 'question', 'question_text', 'stem', 'text', 'q') ?? ''
+
+          let optA = field(q, 'option_a', 'A', 'a') ?? ''
+          let optB = field(q, 'option_b', 'B', 'b') ?? ''
+          let optC = field(q, 'option_c', 'C', 'c') ?? ''
+          let optD = field(q, 'option_d', 'D', 'd') ?? ''
+          let optE = field(q, 'option_e', 'E', 'e') ?? ''
+
+          const options = q.options
+          if (Array.isArray(options)) {
+            optA = options[0] ?? optA
+            optB = options[1] ?? optB
+            optC = options[2] ?? optC
+            optD = options[3] ?? optD
+            optE = options[4] ?? optE
           }
 
-          let ansLetter = String(q.answer || q.correct_answer || q.ans || '').toUpperCase().trim()
+          let ansLetter = String(field(q, 'answer', 'correct_answer', 'ans') ?? '').toUpperCase().trim()
           if (ansLetter.length > 1) ansLetter = ansLetter.charAt(0)
 
-          const subName = q.subject || q.Subject || detectSubjectFromText(String(qText))
+          const subName = field(q, 'subject', 'Subject') ?? detectSubjectFromText(String(qText))
 
           return {
             question_text: String(qText).trim(),
@@ -108,9 +128,9 @@ export default function ImportQuestionsPage() {
             option_d: String(optD).trim(),
             option_e: String(optE).trim(),
             correct_answer: ansLetter,
-            subject: subName,
-            explanation: String(q.explanation || q.exp || '').trim(),
-            difficulty: String(q.difficulty || q.Difficulty || 'Medium').trim(),
+            subject: String(subName).trim(),
+            explanation: String(field(q, 'explanation', 'exp') ?? '').trim(),
+            difficulty: String(field(q, 'difficulty', 'Difficulty') ?? 'Medium').trim(),
           }
         }).filter(q => q.question_text && q.option_a && q.correct_answer)
 

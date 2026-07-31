@@ -26,8 +26,11 @@ export default async function DashboardLayout({
     ? new Date(profile.subscription_expires_at)
     : null
 
+  // Server Component: computed once per request on the server, not during
+  // a client re-render, so a fresh "now" here is intentional and safe.
+  const now = new Date()
   const daysLeft = expiresAt
-    ? Math.ceil((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    ? Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
     : null
 
   return (

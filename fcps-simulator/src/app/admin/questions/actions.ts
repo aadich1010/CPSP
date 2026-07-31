@@ -196,7 +196,7 @@ export async function backupQuestions() {
   try {
     await requireAdmin()
     const adminDb = await createAdminClient()
-    let allQuestions: any[] = []
+    let allQuestions: QuestionInput[] = []
     let from = 0
     const limit = 1000
 
@@ -222,7 +222,7 @@ export async function backupQuestions() {
   }
 }
 
-export async function restoreQuestions(questions: any[]) {
+export async function restoreQuestions(questions: QuestionInput[]) {
   try {
     await requireAdmin()
     const adminDb = await createAdminClient()

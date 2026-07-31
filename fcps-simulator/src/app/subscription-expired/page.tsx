@@ -6,11 +6,18 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { Edit2, Save, X, Loader2 } from 'lucide-react'
 
+interface PaymentSetting {
+  provider: 'jazzcash' | 'easypaisa' | 'bank'
+  account_number: string
+  account_name: string
+  extra_info: string | null
+}
+
 export default function SubscriptionExpiredPage() {
-  const [settings, setSettings] = useState<any[]>([])
+  const [settings, setSettings] = useState<PaymentSetting[]>([])
   const [loading, setLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
-  const [editingProvider, setEditingProvider] = useState<any>(null)
+  const [editingProvider, setEditingProvider] = useState<PaymentSetting | null>(null)
   const supabase = createClient()
 
   const whatsappNumber = "923324737436"
@@ -52,7 +59,7 @@ export default function SubscriptionExpiredPage() {
     fetchData()
   }, [])
 
-  const handleUpdate = async (updatedData: any) => {
+  const handleUpdate = async (updatedData: PaymentSetting) => {
     const { error } = await supabase
       .from('payment_settings')
       .upsert({
@@ -262,7 +269,17 @@ export default function SubscriptionExpiredPage() {
   )
 }
 
-function PaymentCard({ data, title, icon, color, delay, isAdmin, onEdit }: any) {
+interface PaymentCardProps {
+  data: PaymentSetting
+  title: string
+  icon: string
+  color: string
+  delay: number
+  isAdmin: boolean
+  onEdit: () => void
+}
+
+function PaymentCard({ data, title, icon, color, delay, isAdmin, onEdit }: PaymentCardProps) {
   return (
     <motion.div 
       initial={{ opacity: 0, x: -10 }}
@@ -335,8 +352,14 @@ function PaymentCard({ data, title, icon, color, delay, isAdmin, onEdit }: any) 
   )
 }
 
-function EditModal({ data, onClose, onSave }: any) {
-  const [formData, setFormData] = useState(data)
+interface EditModalProps {
+  data: PaymentSetting
+  onClose: () => void
+  onSave: (data: PaymentSetting) => void
+}
+
+function EditModal({ data, onClose, onSave }: EditModalProps) {
+  const [formData, setFormData] = useState<PaymentSetting>(data)
 
   return (
     <motion.div 

@@ -80,7 +80,19 @@ const T = {
 };
 
 // ─── CUSTOM TOOLTIP ───────────────────────────────────────────────────────────
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface TooltipPayloadEntry {
+  name?: string;
+  value?: number | string;
+  color?: string;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayloadEntry[];
+  label?: string;
+}
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null;
   return (
     <div style={{
@@ -90,7 +102,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       fontSize: 13, color: T.text,
     }}>
       <div style={{ fontWeight: 600, marginBottom: 2, color: T.tealDark }}>{label}</div>
-      {payload.map((p: any, i: number) => (
+      {payload.map((p, i) => (
         <div key={i} style={{ color: p.color || T.teal }}>
           {p.name}: <strong>{p.value}{p.name === "Score" ? "%" : p.name === "Accuracy" ? "%" : ""}</strong>
         </div>
@@ -100,7 +112,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 // ─── STAT CARD ────────────────────────────────────────────────────────────────
-const StatCard = ({ label, value, sub, accent }: any) => (
+interface StatCardProps {
+  label: string;
+  value: string | number;
+  sub?: string;
+  accent?: string;
+}
+
+const StatCard = ({ label, value, sub, accent }: StatCardProps) => (
   <div style={{
     background: T.white, border: `1px solid ${T.border}`,
     borderRadius: 12, padding: "20px 24px",
@@ -118,7 +137,13 @@ const StatCard = ({ label, value, sub, accent }: any) => (
 );
 
 // ─── SECTION CARD ─────────────────────────────────────────────────────────────
-const Card = ({ title, children, style }: any) => (
+interface CardProps {
+  title?: string;
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+}
+
+const Card = ({ title, children, style }: CardProps) => (
   <div style={{
     background: T.white, border: `1px solid ${T.border}`,
     borderRadius: 12, padding: "20px 24px", ...style,
@@ -134,7 +159,13 @@ const Card = ({ title, children, style }: any) => (
 );
 
 // ─── DIFFICULTY BAR ───────────────────────────────────────────────────────────
-const DiffBar = ({ name, value, color }: any) => (
+interface DiffBarProps {
+  name: string;
+  value: number;
+  color: string;
+}
+
+const DiffBar = ({ name, value, color }: DiffBarProps) => (
   <div style={{ marginBottom: 14 }}>
     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: T.text, marginBottom: 5 }}>
       <span style={{ fontWeight: 500 }}>{name}</span>
@@ -150,7 +181,15 @@ const DiffBar = ({ name, value, color }: any) => (
 );
 
 // ─── MAIN DASHBOARD ───────────────────────────────────────────────────────────
-export default function AnalyticsDashboard({ attempts = [] }: { attempts: any[] }) {
+export interface QuizAttempt {
+  score: number;
+  total_questions: number;
+  subject: string;
+  difficulty?: string;
+  created_at: string;
+}
+
+export default function AnalyticsDashboard({ attempts = [] }: { attempts: QuizAttempt[] }) {
   const [activeTab, setActiveTab] = useState("overview");
 
   // Computed Values
@@ -351,7 +390,7 @@ export default function AnalyticsDashboard({ attempts = [] }: { attempts: any[] 
                     labelLine={false}>
                     {difficultyData.map((d, i) => <Cell key={i} fill={d.color} />)}
                   </Pie>
-                  <Tooltip formatter={(v: any) => `${v}%`} />
+                  <Tooltip formatter={(v) => `${v}%`} />
                 </PieChart>
               </ResponsiveContainer>
             </Card>
