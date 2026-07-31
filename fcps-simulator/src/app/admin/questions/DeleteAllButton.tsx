@@ -18,8 +18,8 @@ export default function DeleteAllButton() {
       await deleteAllQuestions()
       alert('All questions deleted successfully.')
       router.refresh()
-    } catch (err: any) {
-      alert('Error: ' + err.message)
+    } catch (err: unknown) {
+      alert('Error: ' + (err instanceof Error ? err.message : String(err)))
     } finally {
       setLoading(false)
     }

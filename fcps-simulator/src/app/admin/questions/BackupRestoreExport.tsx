@@ -32,8 +32,8 @@ export default function BackupRestoreExport() {
       document.body.appendChild(downloadAnchor)
       downloadAnchor.click()
       downloadAnchor.remove()
-    } catch (err: any) {
-      alert('Error backing up: ' + err.message)
+    } catch (err: unknown) {
+      alert('Error backing up: ' + (err instanceof Error ? err.message : String(err)))
     } finally {
       setLoading(false)
     }
@@ -79,8 +79,8 @@ export default function BackupRestoreExport() {
           alert(`Successfully restored ${res.count} questions from backup!`)
           window.location.reload()
         }
-      } catch (err: any) {
-        alert('Error parsing backup file: ' + err.message)
+      } catch (err: unknown) {
+        alert('Error parsing backup file: ' + (err instanceof Error ? err.message : String(err)))
       } finally {
         setLoading(false)
         if (fileInputRef.current) fileInputRef.current.value = ''
@@ -208,8 +208,8 @@ export default function BackupRestoreExport() {
         `)
         printWindow.document.close()
       }
-    } catch (err: any) {
-      alert('Error exporting: ' + err.message)
+    } catch (err: unknown) {
+      alert('Error exporting: ' + (err instanceof Error ? err.message : String(err)))
     } finally {
       setLoading(false)
     }

@@ -106,8 +106,9 @@ export default function ExamEngine({ sessionId, questions, subject, mode, userId
       }
 
       setSubmitted(true)
-    } catch (err: any) {
-      logger.error('exam_submit_failed', { sessionId, userId, error: err?.message })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      logger.error('exam_submit_failed', { sessionId, userId, error: message })
       setSubmitError('We could not submit your exam. Please check your connection and try again.')
       submittingRef.current = false
     } finally {

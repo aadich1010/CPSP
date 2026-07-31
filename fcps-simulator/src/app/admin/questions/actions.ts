@@ -133,9 +133,10 @@ export async function importQuestionsBulk(questions: QuestionInput[]) {
       inputCount: questions.length, 
       uniqueCount: uniqueQuestions.length 
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Uncaught Bulk Import Error:', err)
-    return { error: err.message || 'An unexpected error occurred during import' }
+    const message = err instanceof Error ? err.message : 'An unexpected error occurred during import'
+    return { error: message }
   }
 }
 
@@ -215,8 +216,9 @@ export async function backupQuestions() {
     }
 
     return { data: allQuestions }
-  } catch (err: any) {
-    return { error: err.message || 'Error backing up questions' }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Error backing up questions'
+    return { error: message }
   }
 }
 
@@ -260,7 +262,8 @@ export async function restoreQuestions(questions: any[]) {
     revalidatePath('/admin')
     revalidatePath('/admin/questions')
     return { success: true, count: count ?? questions.length }
-  } catch (err: any) {
-    return { error: err.message || 'Error restoring questions' }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Error restoring questions'
+    return { error: message }
   }
 }

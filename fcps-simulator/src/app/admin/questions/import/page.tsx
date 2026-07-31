@@ -116,8 +116,8 @@ export default function ImportQuestionsPage() {
 
         if (mapped.length === 0) throw new Error("No valid questions found. Ensure keys are correct.")
         setParsed(mapped)
-      } catch (err: any) {
-        setParseError(err.message)
+      } catch (err: unknown) {
+        setParseError(err instanceof Error ? err.message : String(err))
       } finally {
         setParsing(false)
       }
@@ -136,8 +136,8 @@ export default function ImportQuestionsPage() {
         setRawText('')
         router.refresh()
       }
-    } catch (err: any) {
-      setResult({ error: err.message })
+    } catch (err: unknown) {
+      setResult({ error: err instanceof Error ? err.message : String(err) })
     } finally {
       setImporting(false)
     }

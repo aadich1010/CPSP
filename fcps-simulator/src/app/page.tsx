@@ -1,8 +1,7 @@
-'use client';
-import { useState } from 'react';
 import Link from 'next/link';
 import { DM_Serif_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import { FEATURES } from '../lib/featuresData';
+import FaqAccordion from '../components/FaqAccordion';
 
 // Preloaded + self-hosted by Next at build time instead of a runtime
 // @import (which was a second, render-blocking font fetch on top of the
@@ -535,8 +534,6 @@ const FAQS = [
 ];
 
 export default function Home() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
@@ -752,19 +749,7 @@ export default function Home() {
               <h2 className="section-h2">Common Questions</h2>
               <p className="section-sub">Everything you need to know before getting started.</p>
             </div>
-            <div className="faq-wrap">
-              {FAQS.map((faq, i) => (
-                <div className="faq-item" key={i}>
-                  <button className="faq-btn" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
-                    {faq.q}
-                    <span className={`faq-icon ${openFaq === i ? 'open' : ''}`}>
-                      {openFaq === i ? '−' : '+'}
-                    </span>
-                  </button>
-                  {openFaq === i && <p className="faq-ans">{faq.a}</p>}
-                </div>
-              ))}
-            </div>
+            <FaqAccordion faqs={FAQS} />
           </div>
         </section>
 
