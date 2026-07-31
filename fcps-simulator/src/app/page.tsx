@@ -1,488 +1,50 @@
 import Link from 'next/link';
-import { DM_Serif_Display, Plus_Jakarta_Sans } from 'next/font/google';
+import {
+  BarChart3,
+  ShieldCheck,
+  Building2,
+  Sparkles,
+  RefreshCw,
+  Crown,
+  ArrowRight,
+  Check,
+  MessageCircle,
+} from 'lucide-react';
 import { FEATURES } from '../lib/featuresData';
 import FaqAccordion from '../components/FaqAccordion';
+import MobileNav from '../components/MobileNav';
+import Reveal from '../components/Reveal';
 
-// Preloaded + self-hosted by Next at build time instead of a runtime
-// @import (which was a second, render-blocking font fetch on top of the
-// Inter/Outfit fonts already loaded in layout.tsx).
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-plus-jakarta',
-  display: 'swap',
-});
-const dmSerif = DM_Serif_Display({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--font-dm-serif',
-  display: 'swap',
-});
+// Fonts (Inter + Outfit) are already loaded once, self-hosted, in
+// layout.tsx via next/font — this page intentionally loads no fonts of
+// its own so there's exactly one font fetch for the whole app.
 
-const CSS = `
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+const ICONS: Record<string, typeof BarChart3> = {
+  'smart-analytics': BarChart3,
+  'forensic-security': ShieldCheck,
+  'hospital-grade-ui': Building2,
+  'ai-powered-organization': Sparkles,
+  'real-time-synchronization': RefreshCw,
+  'vvip-support': Crown,
+};
 
-  .lp {
-    font-family: var(--font-plus-jakarta), sans-serif;
-    background: #ffffff;
-    color: #0f172a;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+const NAV_LINKS = [
+  { href: '#features', label: 'Features' },
+  { href: '#hiw', label: 'How it works' },
+  { href: '#testimonials', label: 'Success stories' },
+  { href: '#pricing', label: 'Pricing' },
+];
 
-  /* ─── NAVBAR ─── */
-  .nav {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border-bottom: 1px solid rgba(13,148,136,0.1);
-  }
-  .nav-inner {
-    max-width: 1200px; margin: 0 auto;
-    padding: 0 32px; height: 70px;
-    display: flex; align-items: center; justify-content: space-between; gap: 32px;
-  }
-  .nav-logo {
-    font-size: 17px; font-weight: 800;
-    color: #0f172a; text-decoration: none;
-    letter-spacing: -0.02em;
-  }
-  .nav-logo span { color: #0d9488; }
-  .nav-links { display: flex; gap: 28px; list-style: none; }
-  .nav-links a {
-    color: #475569; text-decoration: none;
-    font-size: 14px; font-weight: 500; transition: color 0.2s;
-  }
-  .nav-links a:hover { color: #0d9488; }
-  .btn-cta {
-    background: linear-gradient(135deg, #0d9488, #3b82f6);
-    color: #ffffff; padding: 10px 22px;
-    border-radius: 8px; font-size: 13px; font-weight: 800;
-    text-decoration: none; transition: all 0.2s;
-    white-space: nowrap; border: none; cursor: pointer;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-  }
-  .btn-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(59,130,246,0.4); }
-
-  /* ─── HERO ─── */
-  .hero {
-    position: relative; overflow: hidden;
-    padding: 100px 32px 80px;
-  }
-  .hero-bg-grad {
-    position: absolute; inset: 0; pointer-events: none;
-    background:
-      radial-gradient(circle at 10% 40%, rgba(139, 92, 246, 0.12), transparent 45%),
-      radial-gradient(circle at 90% 20%, rgba(236, 72, 153, 0.12), transparent 45%),
-      radial-gradient(circle at 50% 90%, rgba(59, 130, 246, 0.1), transparent 50%),
-      radial-gradient(ellipse 70% 35% at 50% 100%, rgba(240,253,250,1) 0%, transparent 65%);
-    filter: blur(20px);
-  }
-  .hero-grid-bg {
-    position: absolute; inset: 0; pointer-events: none;
-    background-image:
-      linear-gradient(rgba(13,148,136,0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(13,148,136,0.02) 1px, transparent 1px);
-    background-size: 56px 56px;
-  }
-  .hero-inner {
-    position: relative; max-width: 1200px; margin: 0 auto;
-    display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
-  }
-  .tag-pill {
-    display: inline-flex; align-items: center; gap: 7px;
-    background: rgba(13,148,136,0.06);
-    border: 1px solid rgba(13,148,136,0.2);
-    color: #0d9488; font-size: 11px; font-weight: 700;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    padding: 6px 14px; border-radius: 30px; margin-bottom: 22px;
-  }
-  .tag-dot { width: 6px; height: 6px; border-radius: 50%; background: #0d9488; animation: blink 2s infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  .hero-h1 {
-    font-family: var(--font-dm-serif), serif;
-    font-size: clamp(32px, 4vw, 52px);
-    line-height: 1.05; font-weight: 400;
-    letter-spacing: -0.02em; margin-bottom: 20px;
-    color: #0f172a;
-  }
-  .hero-h1 em { 
-    background: linear-gradient(135deg, #0d9488, #8b5cf6, #ec4899);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-style: normal; 
-  }
-  .hero-sub {
-    font-size: 15px; line-height: 1.65;
-    color: #475569;
-    max-width: 440px; margin-bottom: 32px;
-  }
-  .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .btn-primary {
-    background: linear-gradient(135deg, #0d9488, #3b82f6);
-    color: #ffffff; border: none; padding: 12px 28px;
-    border-radius: 8px; font-size: 14px; font-weight: 800;
-    cursor: pointer; transition: all 0.2s; text-decoration: none;
-    display: inline-block; font-family: 'Plus Jakarta Sans', sans-serif;
-  }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(59,130,246,0.4); }
-  .btn-ghost {
-    background: #f8fafc;
-    backdrop-filter: blur(10px);
-    color: #475569;
-    border: 1px solid #e2e8f0;
-    padding: 14px 32px; border-radius: 10px; font-size: 15px; font-weight: 600;
-    cursor: pointer; transition: all 0.2s; text-decoration: none;
-    display: inline-block; font-family: 'Plus Jakarta Sans', sans-serif;
-  }
-  .btn-ghost:hover { border-color: #0d9488; color: #0d9488; background: #ffffff; }
-  .hero-trust {
-    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
-    font-size: 12px; color: #94a3b8;
-  }
-  .trust-sep { color: rgba(255,255,255,0.15); }
-
-  /* Hero Mockup */
-  .mockup-wrap { position: relative; }
-  .mockup-glow {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, rgba(236,72,153,0.12) 40%, transparent 70%);
-    filter: blur(30px);
-    pointer-events: none; z-index: 0;
-  }
-  .mockup-card {
-    position: relative; z-index: 1;
-    background: #ffffff;
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border: 1px solid #e2e8f0;
-    border-radius: 18px; padding: 24px;
-    box-shadow: 0 30px 70px rgba(0,0,0,0.08);
-  }
-  .mock-bar {
-    display: flex; align-items: center; gap: 7px;
-    padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 18px;
-  }
-  .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
-  .mock-title { font-size: 11px; color: rgba(255,255,255,0.35); margin-left: auto; }
-  .mock-q-wrap {
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 12px; padding: 16px; margin-bottom: 14px;
-  }
-  .mock-qlabel {
-    font-size: 10px; color: #0d9488; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 9px;
-  }
-  .mock-qtext {
-    font-size: 13px; color: #0f172a;
-    line-height: 1.5; margin-bottom: 14px;
-  }
-  .mock-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-  .mock-opt {
-    background: #f8fafc; border: 1px solid #e2e8f0;
-    border-radius: 8px; padding: 9px 11px; font-size: 11px; color: #64748b;
-  }
-  .mock-opt.sel {
-    background: rgba(13,148,136,0.08); border-color: rgba(13,148,136,0.3); color: #0d9488; font-weight: 600;
-  }
-  .mock-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-  .mock-stat {
-    background: #f8fafc; border: 1px solid #f1f5f9;
-    border-radius: 8px; padding: 10px; text-align: center;
-  }
-  .mock-stat-val { font-size: 15px; font-weight: 800; color: #0d9488; }
-  .mock-stat-lbl { font-size: 9px; color: #94a3b8; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
-
-  /* ─── STATS STRIP ─── */
-  .stats-strip {
-    border-top: 1px solid #f1f5f9;
-    border-bottom: 1px solid #f1f5f9;
-    background: #f0fdfa; padding: 30px 32px;
-  }
-  .stats-inner {
-    max-width: 1100px; margin: 0 auto;
-    display: grid; grid-template-columns: repeat(3,1fr);
-    text-align: center;
-  }
-  .stat-box { padding: 10px; border-right: 1px solid rgba(255,255,255,0.05); }
-  .stat-box:last-child { border-right: none; }
-  .stat-val {
-    font-family: var(--font-dm-serif), serif;
-    font-size: 38px; font-weight: 400;
-    color: #0d9488; line-height: 1; margin-bottom: 4px;
-  }
-  .stat-lbl { font-size: 11px; color: #64748b; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
-
-  /* ─── SECTION COMMON ─── */
-  .section { padding: 64px 32px; }
-  .section-inner { max-width: 1200px; margin: 0 auto; }
-  .section-head { text-align: center; margin-bottom: 40px; }
-  .section-h2 {
-    font-family: var(--font-dm-serif), serif;
-    font-size: clamp(26px, 3vw, 38px);
-    font-weight: 400; line-height: 1.1;
-    letter-spacing: -0.01em; margin-bottom: 10px;
-    color: #0f172a;
-  }
-  .section-sub {
-    font-size: 14px; color: #64748b;
-    line-height: 1.6; max-width: 460px; margin: 0 auto;
-  }
-
-  /* ─── FEATURES ─── */
-  .features-grid {
-    display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
-  }
-  .feat-link { text-decoration: none; display: block; height: 100%; }
-  .feat-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px; padding: 22px;
-    transition: all 0.3s; cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-    height: 100%;
-  }
-  .feat-card:hover {
-    border-color: #0d9488;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(13,148,136,0.08);
-  }
-  .feat-icon {
-    width: 44px; height: 44px;
-    border-radius: 12px; display: flex;
-    align-items: center; justify-content: center;
-    font-size: 20px; margin-bottom: 16px;
-  }
-  .feat-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
-  .feat-desc { font-size: 12px; color: #64748b; line-height: 1.6; }
-
-  /* ─── HOW IT WORKS ─── */
-  .hiw-bg {
-    background: #f8fafc;
-    border-top: 1px solid #f1f5f9;
-    border-bottom: 1px solid #f1f5f9;
-  }
-  .steps-grid {
-    display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; position: relative;
-  }
-  .steps-grid::before {
-    content: '';
-    position: absolute; top: 38px; left: 18%; right: 18%; height: 1px;
-    background: linear-gradient(90deg, transparent, #e2e8f0, #e2e8f0, transparent);
-  }
-  .step-card {
-    text-align: center; padding: 36px 24px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px; position: relative;
-    transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-  }
-  .step-card:hover { border-color: #0d9488; background: #ffffff; transform: translateY(-3px); }
-  .step-num {
-    font-family: var(--font-dm-serif), serif; font-size: 50px; font-weight: 400;
-    background: linear-gradient(135deg, #8b5cf6, #ec4899, #f59e0b);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text; line-height: 1; margin-bottom: 18px;
-  }
-  .step-title { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 10px; }
-  .step-desc { font-size: 13px; color: #64748b; line-height: 1.7; }
-
-  /* ─── PRICING ─── */
-  .pricing-grid {
-    display: grid; grid-template-columns: repeat(4,1fr);
-    gap: 16px; max-width: 1200px; margin: 0 auto;
-  }
-  .plan-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 22px; padding: 30px 20px; position: relative;
-    transition: all 0.3s;
-    display: flex; flex-direction: column;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-  }
-  .plan-card.featured {
-    border-color: #0d9488;
-    background: #f0fdfa;
-    box-shadow: 0 20px 40px rgba(13,148,136,0.1);
-  }
-  .plan-badge {
-    position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
-    background: linear-gradient(135deg, #8b5cf6, #ec4899);
-    color: #ffffff; font-size: 11px; font-weight: 800;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 4px 18px; border-radius: 30px; white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(236,72,153,0.3);
-  }
-  .plan-name { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
-  .plan-price {
-    font-family: var(--font-dm-serif), serif; font-size: 40px; font-weight: 400;
-    color: #0d9488; line-height: 1; margin: 18px 0 4px;
-  }
-  .plan-period { font-size: 13px; color: #94a3b8; margin-bottom: 28px; }
-  .plan-feats { list-style: none; margin-bottom: 32px; }
-  .plan-feats li {
-    display: flex; align-items: flex-start; gap: 10px;
-    font-size: 14px; color: #475569;
-    padding: 9px 0; border-bottom: 1px solid #f1f5f9;
-  }
-  .plan-feats li:last-child { border-bottom: none; }
-  .check { color: #0d9488; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
-  .btn-plan {
-    width: 100%; padding: 14px; border-radius: 10px;
-    font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s;
-    font-family: 'Plus Jakarta Sans', sans-serif; border: none; display: block;
-  }
-  .btn-plan-feat {
-    background: linear-gradient(135deg, #8b5cf6, #ec4899); color: #ffffff;
-  }
-  .btn-plan-feat:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(236,72,153,0.3); }
-  .btn-plan-std {
-    background: #f8fafc; color: #475569;
-    border: 1px solid #e2e8f0 !important;
-  }
-  .btn-plan-std:hover { background: #ffffff; border-color: #0d9488 !important; color: #0d9488; }
-
-  /* ─── TESTIMONIALS ─── */
-  .testi-bg {
-    background: #f0fdfa;
-    border-top: 1px solid #ccfbf1;
-    border-bottom: 1px solid #ccfbf1;
-  }
-  .testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
-  .testi-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 18px; padding: 28px; transition: all 0.3s;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-  }
-  .testi-card:hover { border-color: #0d9488; background: #ffffff; box-shadow: 0 10px 30px rgba(13,148,136,0.1); }
-  .testi-mark {
-    font-family: var(--font-dm-serif), serif; font-size: 40px;
-    color: #ccfbf1; line-height: 1; margin-bottom: 10px;
-  }
-  .testi-text { font-size: 14px; color: #475569; line-height: 1.75; margin-bottom: 22px; }
-  .testi-author { display: flex; align-items: center; gap: 12px; }
-  .author-av {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: #f0fdfa;
-    border: 1px solid #ccfbf1;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; color: #0d9488; flex-shrink: 0;
-  }
-  .author-name { font-size: 14px; font-weight: 700; color: #0f172a; }
-  .author-role { font-size: 11px; color: #94a3b8; margin-top: 2px; }
-
-  /* ─── FAQ ─── */
-  .faq-wrap { max-width: 720px; margin: 0 auto; }
-  .faq-item { border-bottom: 1px solid #f1f5f9; }
-  .faq-btn {
-    width: 100%; background: none; border: none; color: #0f172a;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 22px 0; cursor: pointer; text-align: left;
-    font-size: 16px; font-weight: 600; gap: 20px;
-    font-family: 'Plus Jakarta Sans', sans-serif; transition: color 0.2s;
-  }
-  .faq-btn:hover { color: #0d9488; }
-  .faq-icon {
-    width: 26px; height: 26px; border-radius: 50%;
-    border: 1px solid #e2e8f0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; flex-shrink: 0; transition: all 0.25s;
-    color: #94a3b8;
-  }
-  .faq-icon.open { background: #f0fdfa; border-color: #0d9488; color: #0d9488; }
-  .faq-ans {
-    font-size: 14px; color: #64748b;
-    line-height: 1.8; padding-bottom: 22px;
-  }
-
-  /* ─── FOOTER CTA ─── */
-  .fcta {
-    position: relative; overflow: hidden;
-    padding: 100px 32px; text-align: center;
-    background: #f0fdfa;
-  }
-  .fcta-glow {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    width: 700px; height: 350px;
-    background: radial-gradient(ellipse, rgba(139,92,246,0.15) 0%, rgba(236,72,153,0.1) 40%, transparent 70%);
-    filter: blur(20px);
-    pointer-events: none;
-  }
-  .fcta-inner { position: relative; z-index: 1; }
-  .fcta-h2 {
-    font-family: var(--font-dm-serif), serif;
-    font-size: clamp(32px, 4vw, 54px);
-    font-weight: 400; letter-spacing: -0.02em;
-    line-height: 1.1; margin-bottom: 18px;
-    color: #0f172a;
-  }
-  .fcta-h2 em { 
-    background: linear-gradient(135deg, #0d9488, #8b5cf6, #ec4899);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-style: normal;
-  }
-  .fcta-sub {
-    font-size: 16px; color: #64748b;
-    max-width: 480px; margin: 0 auto 38px; line-height: 1.7;
-  }
-
-  /* ─── FOOTER ─── */
-  .footer {
-    border-top: 1px solid #f1f5f9;
-    padding: 48px 32px 28px;
-  }
-  .footer-inner {
-    max-width: 1200px; margin: 0 auto;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 20px;
-  }
-  .footer-logo { font-size: 16px; font-weight: 800; color: #0f172a; text-decoration: none; }
-  .footer-logo span { color: #0d9488; }
-  .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
-  .footer-link {
-    color: #64748b; font-size: 13px;
-    text-decoration: none; transition: color 0.2s; font-weight: 500;
-  }
-  .footer-link:hover { color: #0d9488; }
-  .footer-copy {
-    max-width: 1200px; margin: 24px auto 0;
-    padding-top: 20px; border-top: 1px solid #f1f5f9;
-    font-size: 12px; color: #94a3b8; text-align: center;
-  }
-
-  /* ─── RESPONSIVE ─── */
-  @media (max-width: 1100px) {
-    .pricing-grid { grid-template-columns: repeat(2,1fr); max-width: 800px; }
-    .hero-inner { grid-template-columns: 1fr; }
-    .features-grid { grid-template-columns: repeat(2,1fr); }
-    .steps-grid { grid-template-columns: 1fr; }
-    .steps-grid::before { display: none; }
-    .testi-grid { grid-template-columns: 1fr; }
-    .stats-inner { grid-template-columns: 1fr; }
-    .stat-box { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .stat-box:last-child { border-bottom: none; }
-    .nav-links { display: none; }
-  }
-  @media (max-width: 600px) {
-    .features-grid { grid-template-columns: 1fr; }
-    .footer-inner { flex-direction: column; text-align: center; }
-    .footer-links { justify-content: center; }
-  }
-`;
-
-// FEATURES are now imported from ../lib/featuresData
+const STATS = [
+  { value: '10,000+', label: 'Medical professionals' },
+  { value: '4.9 / 5', label: 'Average rating' },
+  { value: '99.9%', label: 'Platform uptime' },
+];
 
 const STEPS = [
-  { num: '01', title: 'Register', desc: 'Create your secure profile on our elite infrastructure.' },
-  { num: '02', title: 'Subscribe', desc: 'Choose a premium plan that fits your residency timeline.' },
-  { num: '03', title: 'Simulate', desc: 'Take timed mock exams, analyze weak areas, and secure your success.' },
+  { num: '01', title: 'Register', desc: 'Create your secure profile — no credit card required to start.' },
+  { num: '02', title: 'Subscribe', desc: 'Choose a plan that fits your residency timeline.' },
+  { num: '03', title: 'Simulate', desc: 'Take timed mock exams, analyze weak areas, and track every gain.' },
 ];
 
 const PLANS = [
@@ -490,306 +52,438 @@ const PLANS = [
     name: 'Standard',
     price: 'Rs. 1,999',
     period: '/ 1 month',
-    features: ['1 Month Access', 'Basic Analytics', 'Mock Exams'],
-    cta: 'Get Started',
+    features: ['1 month access', 'Basic analytics', 'Mock exams'],
+    cta: 'Get started',
     featured: false,
   },
   {
     name: 'Elite Pro',
-    badge: '✦ Best Value',
+    badge: 'Best value',
     price: 'Rs. 4,999',
     period: '/ 3 months',
-    features: ['3 Months Access', 'Smart Heatmaps', 'Forensic Security', 'VIP Support'],
-    cta: 'Instant Access',
+    features: ['3 months access', 'Smart heatmaps', 'Forensic security', 'VIP support'],
+    cta: 'Instant access',
     featured: true,
   },
   {
     name: 'Advanced',
     price: 'Rs. 8,999',
     period: '/ 6 months',
-    features: ['6 Months Access', 'Premium Analytics', 'Priority Sync', 'Extended Bank'],
-    cta: 'Go Advanced',
+    features: ['6 months access', 'Premium analytics', 'Priority sync', 'Extended bank'],
+    cta: 'Go advanced',
     featured: false,
   },
   {
     name: 'Platinum',
     price: 'Rs. 14,999',
     period: '/ 1 year',
-    features: ['1 Year Access', 'Ultimate Prep Kit', 'Direct Support', 'Full Analytics'],
-    cta: 'Go Platinum',
+    features: ['1 year access', 'Ultimate prep kit', 'Direct support', 'Full analytics'],
+    cta: 'Go platinum',
     featured: false,
   },
 ];
 
 const TESTIMONIALS = [
-  { quote: 'The analytics helped me identify my weak areas in Anatomy within days. A game-changer for Part 1.', name: 'Dr. Ahmed', role: 'Resident' },
-  { quote: 'The interface is identical to the actual exam. It removed all my fear of the CBT environment.', name: 'Dr. Sara', role: 'FCPS Candidate' },
-  { quote: 'Most secure and updated question bank I\'ve used. The watermark feature shows how serious they are.', name: 'Dr. Zohaib', role: 'Medical Officer' },
+  {
+    quote: 'The analytics helped me identify my weak areas in Anatomy within days. A game-changer for Part 1.',
+    name: 'Dr. Ahmed',
+    role: 'Resident',
+  },
+  {
+    quote: 'The interface is identical to the actual exam. It removed all my fear of the CBT environment.',
+    name: 'Dr. Sara',
+    role: 'FCPS Candidate',
+  },
+  {
+    quote: "Most secure and updated question bank I've used. The watermark feature shows how serious they are.",
+    name: 'Dr. Zohaib',
+    role: 'Medical Officer',
+  },
 ];
 
 const FAQS = [
-  { q: 'Is the interface same as the real exam?', a: 'Yes, we have replicated the official CBT environment for 100% familiarity.' },
+  { q: 'Is the interface same as the real exam?', a: 'Yes — we have replicated the official CBT environment for 100% familiarity.' },
   { q: 'How do I activate my account?', a: 'Simply share your payment proof via WhatsApp for instant premium activation.' },
   { q: 'Can I track my progress?', a: 'Absolutely. Our Smart Analytics provide detailed heatmaps of your performance across all subjects.' },
 ];
 
+function Tag({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
+      <span className="h-1.5 w-1.5 rounded-full bg-teal-400 shadow-[0_0_8px_2px_rgba(45,212,191,0.6)]" />
+      {children}
+    </div>
+  );
+}
+
 export default function Home() {
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <div className={`lp ${plusJakarta.variable} ${dmSerif.variable}`}>
+    <div className="min-h-screen bg-[#09090b] text-zinc-100 antialiased selection:bg-teal-400/20 selection:text-teal-200">
+      {/* Ambient background glows, fixed so they don't repaint on scroll */}
+      <div className="pointer-events-none fixed inset-0 z-0">
+        <div className="absolute left-1/2 top-[-10%] h-[560px] w-[900px] -translate-x-1/2 rounded-full bg-teal-500/10 blur-[120px]" />
+        <div className="absolute right-[-10%] top-[20%] h-[420px] w-[420px] rounded-full bg-violet-500/10 blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] h-[420px] w-[420px] rounded-full bg-pink-500/[0.06] blur-[120px]" />
+      </div>
 
-        {/* ── NAVBAR ── */}
-        <nav className="nav">
-          <div className="nav-inner">
-            <Link href="/" className="nav-logo">FCPS <span>Simulator</span></Link>
-            <ul className="nav-links">
-              <li><a href="#features">Features</a></li>
-              <li><a href="#hiw">How It Works</a></li>
-              <li><a href="#testimonials">Success Stories</a></li>
-              <li><a href="#pricing">Pricing</a></li>
-              <li><Link href="/login" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Login / Sign Up</Link></li>
-            </ul>
-            <Link href="/login?type=admin" className="btn-cta">Member Login</Link>
+      <div className="relative z-10">
+        {/* ── HEADER ── */}
+        <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#09090b]/70 backdrop-blur-xl">
+          <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
+            <Link href="/" className="flex items-center gap-2 text-[15px] font-bold tracking-tight text-white">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-teal-400 to-blue-500 text-[13px] font-black text-zinc-950">
+                F
+              </span>
+              FCPS <span className="text-teal-400">Simulator</span>
+            </Link>
+
+            <nav className="hidden items-center gap-8 md:flex">
+              {NAV_LINKS.map((l) => (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  className="text-[13.5px] font-medium text-zinc-400 transition-colors hover:text-white"
+                >
+                  {l.label}
+                </a>
+              ))}
+            </nav>
+
+            <div className="hidden items-center gap-3 md:flex">
+              <Link
+                href="/login"
+                className="text-[13.5px] font-medium text-zinc-400 transition-colors hover:text-white"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/register"
+                className="rounded-lg bg-gradient-to-r from-teal-400 to-blue-500 px-4 py-2 text-[13px] font-bold text-zinc-950 transition-transform duration-200 hover:-translate-y-0.5"
+              >
+                Start free demo
+              </Link>
+            </div>
+
+            <MobileNav />
           </div>
-        </nav>
+        </header>
 
         {/* ── HERO ── */}
-        <section className="hero">
-          <div className="hero-bg-grad" />
-          <div className="hero-grid-bg" />
-          <div className="hero-inner">
+        <section className="relative overflow-hidden px-5 pb-20 pt-20 sm:px-8 sm:pt-28">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.15]"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)',
+              backgroundSize: '48px 48px',
+              maskImage: 'radial-gradient(ellipse 60% 50% at 50% 0%, black 40%, transparent 100%)',
+            }}
+          />
+
+          <div className="relative mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-2">
             <div>
-              <div className="tag-pill">
-                <span className="tag-dot" />
-                Elite CBT Infrastructure
-              </div>
-              <h1 className="hero-h1">
-                Master the FCPS Part 1 with <em>Elite CBT</em> Simulation
+              <Tag>Elite CBT infrastructure</Tag>
+              <h1 className="mt-6 text-[40px] font-bold leading-[1.05] tracking-tight text-white sm:text-[52px]">
+                Master the FCPS Part 1 with{' '}
+                <span className="bg-gradient-to-r from-teal-300 via-blue-300 to-violet-300 bg-clip-text text-transparent">
+                  elite CBT simulation
+                </span>
               </h1>
-              <p className="hero-sub">
-                Engineered for perfection. Secured for integrity. Experience the most advanced medical exam platform designed to guarantee your residency success.
+              <p className="mt-5 max-w-md text-[15.5px] leading-relaxed text-zinc-400">
+                Engineered for perfection, secured for integrity. Practice on the most advanced medical exam
+                platform built to guarantee your residency success.
               </p>
-              <div className="hero-btns">
-                <Link href="/register" className="btn-primary">Start Free Demo</Link>
-                <a href="#pricing" className="btn-ghost">View Elite Plans</a>
+
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/register"
+                  className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-400 to-blue-500 px-6 py-3 text-[14px] font-bold text-zinc-950 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_32px_-8px_rgba(45,212,191,0.5)]"
+                >
+                  Start free demo
+                  <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-0.5" />
+                </Link>
+                <a
+                  href="#pricing"
+                  className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-[14px] font-semibold text-zinc-200 backdrop-blur-md transition-all duration-300 hover:border-white/20 hover:bg-white/10"
+                >
+                  View elite plans
+                </a>
               </div>
-              <div className="hero-trust">
-                <span>✓ No credit card required</span>
-                <span className="trust-sep">·</span>
-                <span>✓ Instant activation</span>
-                <span className="trust-sep">·</span>
-                <span>✓ 100% secure platform</span>
+
+              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12.5px] text-zinc-500">
+                <span className="flex items-center gap-1.5"><Check size={13} className="text-teal-400" /> No credit card required</span>
+                <span className="flex items-center gap-1.5"><Check size={13} className="text-teal-400" /> Instant activation</span>
+                <span className="flex items-center gap-1.5"><Check size={13} className="text-teal-400" /> 100% secure platform</span>
               </div>
             </div>
 
-            {/* Mockup */}
-            <div className="mockup-wrap">
-              <div className="mockup-glow" />
-              <div className="mockup-card">
-                <div className="mock-bar">
-                  <div className="mock-dot" style={{ background: '#ff5f57' }} />
-                  <div className="mock-dot" style={{ background: '#febc2e' }} />
-                  <div className="mock-dot" style={{ background: '#28c840' }} />
-                  <span className="mock-title">FCPS Part 1 — Mock Exam #14</span>
+            {/* Product mockup — the signature element: a live-styled preview
+                of the actual exam interface, tied to the "hospital-grade UI"
+                feature below rather than a generic illustration. */}
+            <Reveal delay={0.1} className="relative">
+              <div className="absolute inset-0 -z-10 rounded-[28px] bg-gradient-to-br from-teal-500/20 via-violet-500/10 to-transparent blur-2xl" />
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/40 backdrop-blur-xl transition-colors duration-300 hover:border-white/20">
+                <div className="mb-4 flex items-center gap-1.5 border-b border-white/10 pb-3">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+                  <span className="ml-auto text-[11px] text-zinc-500">FCPS Part 1 — Mock Exam #14</span>
                 </div>
-                <div className="mock-q-wrap">
-                  <div className="mock-qlabel">Question 23 / 100 &nbsp;·&nbsp; Anatomy</div>
-                  <div className="mock-qtext">
+
+                <div className="mb-3.5 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                  <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.1em] text-teal-400">
+                    Question 23 / 100 · Anatomy
+                  </div>
+                  <p className="mb-3.5 text-[13px] leading-relaxed text-zinc-200">
                     Which nerve passes through the carpal tunnel alongside the flexor tendons?
-                  </div>
-                  <div className="mock-opts">
-                    <div className="mock-opt">A. Ulnar Nerve</div>
-                    <div className="mock-opt sel">B. Median Nerve ✓</div>
-                    <div className="mock-opt">C. Radial Nerve</div>
-                    <div className="mock-opt">D. Axillary Nerve</div>
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] text-zinc-400">A. Ulnar Nerve</div>
+                    <div className="rounded-lg border border-teal-400/30 bg-teal-400/10 px-3 py-2 text-[11px] font-semibold text-teal-300">B. Median Nerve ✓</div>
+                    <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] text-zinc-400">C. Radial Nerve</div>
+                    <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] text-zinc-400">D. Axillary Nerve</div>
                   </div>
                 </div>
-                <div className="mock-stats">
-                  <div className="mock-stat">
-                    <div className="mock-stat-val">78%</div>
-                    <div className="mock-stat-lbl">Accuracy</div>
-                  </div>
-                  <div className="mock-stat">
-                    <div className="mock-stat-val">2:14</div>
-                    <div className="mock-stat-lbl">Time Left</div>
-                  </div>
-                  <div className="mock-stat">
-                    <div className="mock-stat-val">#12</div>
-                    <div className="mock-stat-lbl">Global Rank</div>
-                  </div>
+
+                <div className="grid grid-cols-3 gap-2.5">
+                  {[
+                    { v: '78%', l: 'Accuracy' },
+                    { v: '2:14', l: 'Time left' },
+                    { v: '#12', l: 'Global rank' },
+                  ].map((s) => (
+                    <div key={s.l} className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-2 py-2.5 text-center">
+                      <div className="text-[14px] font-bold text-teal-300">{s.v}</div>
+                      <div className="text-[9.5px] uppercase tracking-wide text-zinc-500">{s.l}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
 
         {/* ── STATS ── */}
-        <div className="stats-strip">
-          <div className="stats-inner">
-            <div className="stat-box">
-              <div className="stat-val">10,000+</div>
-              <div className="stat-lbl">Medical Professionals</div>
+        <Reveal>
+          <section className="border-y border-white/[0.06] bg-white/[0.02]">
+            <div className="mx-auto grid max-w-5xl divide-y divide-white/[0.06] px-5 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:px-8">
+              {STATS.map((s) => (
+                <div key={s.label} className="px-2 py-8 text-center">
+                  <div className="text-[28px] font-bold text-white">{s.value}</div>
+                  <div className="mt-1 text-[13px] text-zinc-500">{s.label}</div>
+                </div>
+              ))}
             </div>
-            <div className="stat-box">
-              <div className="stat-val">4.9 / 5</div>
-              <div className="stat-lbl">Average Rating</div>
-            </div>
-            <div className="stat-box">
-              <div className="stat-val">99.9%</div>
-              <div className="stat-lbl">Platform Uptime</div>
-            </div>
-          </div>
-        </div>
+          </section>
+        </Reveal>
 
         {/* ── FEATURES ── */}
-        <section className="section" id="features">
-          <div className="section-inner">
-            <div className="section-head">
-              <div className="tag-pill">Platform Features</div>
-              <h2 className="section-h2">Built for Medical Excellence</h2>
-              <p className="section-sub">Every feature engineered to replicate the real exam environment and maximize your preparation.</p>
-            </div>
-            <div className="features-grid">
-              {FEATURES.map((f, i) => {
-                return (
-                  <Link href={`/feature/${f.id}`} key={i} className="feat-link">
-                    <div className="feat-card">
-                      <div className="feat-icon" style={{ color: f.color, background: f.bg, border: `1px solid ${f.border}` }}>{f.icon}</div>
-                      <div className="feat-title">{f.title}</div>
-                      <div className="feat-desc">{f.shortDesc}</div>
+        <section id="features" className="mx-auto max-w-6xl px-5 py-24 sm:px-8">
+          <Reveal className="mx-auto max-w-xl text-center">
+            <Tag>Platform features</Tag>
+            <h2 className="mt-5 text-[32px] font-bold tracking-tight text-white sm:text-[38px]">
+              Built for medical excellence
+            </h2>
+            <p className="mt-3 text-[15px] text-zinc-400">
+              Every feature engineered to replicate the real exam environment and maximize your preparation.
+            </p>
+          </Reveal>
+
+          <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((f, i) => {
+              const Icon = ICONS[f.id] ?? Sparkles;
+              return (
+                <Reveal key={f.id} delay={i * 0.06}>
+                  <Link
+                    href={`/feature/${f.id}`}
+                    className="group block h-full rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.05]"
+                  >
+                    <div
+                      className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl border"
+                      style={{ color: f.color, backgroundColor: `${f.color}1a`, borderColor: `${f.color}33` }}
+                    >
+                      <Icon size={20} />
                     </div>
+                    <h3 className="mb-1.5 text-[15px] font-semibold text-white">{f.title}</h3>
+                    <p className="text-[13.5px] leading-relaxed text-zinc-400">{f.shortDesc}</p>
                   </Link>
-                );
-              })}
-            </div>
+                </Reveal>
+              );
+            })}
           </div>
         </section>
 
         {/* ── HOW IT WORKS ── */}
-        <section className="section hiw-bg" id="hiw">
-          <div className="section-inner">
-            <div className="section-head">
-              <div className="tag-pill">Process</div>
-              <h2 className="section-h2">Start in 3 Simple Steps</h2>
-              <p className="section-sub">From registration to full simulation in minutes.</p>
-            </div>
-            <div className="steps-grid">
+        <section id="hiw" className="border-y border-white/[0.06] bg-white/[0.02] py-24">
+          <div className="mx-auto max-w-5xl px-5 sm:px-8">
+            <Reveal className="mx-auto max-w-xl text-center">
+              <Tag>Process</Tag>
+              <h2 className="mt-5 text-[32px] font-bold tracking-tight text-white sm:text-[38px]">
+                Start in 3 simple steps
+              </h2>
+              <p className="mt-3 text-[15px] text-zinc-400">From registration to full simulation in minutes.</p>
+            </Reveal>
+
+            <div className="relative mt-14 grid gap-8 sm:grid-cols-3">
+              <div className="absolute left-0 right-0 top-6 hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent sm:block" />
               {STEPS.map((s, i) => (
-                <div className="step-card" key={i}>
-                  <div className="step-num">{s.num}</div>
-                  <div className="step-title">{s.title}</div>
-                  <div className="step-desc">{s.desc}</div>
-                </div>
+                <Reveal key={s.num} delay={i * 0.1} className="relative text-center">
+                  <div className="relative mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-[#09090b] text-[13px] font-bold text-teal-300">
+                    {s.num}
+                  </div>
+                  <h3 className="mb-2 text-[16px] font-semibold text-white">{s.title}</h3>
+                  <p className="mx-auto max-w-[240px] text-[13.5px] leading-relaxed text-zinc-400">{s.desc}</p>
+                </Reveal>
               ))}
             </div>
           </div>
         </section>
 
         {/* ── PRICING ── */}
-        <section className="section" id="pricing">
-          <div className="section-inner">
-            <div className="section-head">
-              <div className="tag-pill">Pricing</div>
-              <h2 className="section-h2">Choose Your Elite Plan</h2>
-              <p className="section-sub">Transparent pricing. No hidden fees. Instant access after payment.</p>
-            </div>
-            <div className="pricing-grid">
-              {PLANS.map((plan, i) => (
-                <div className={`plan-card ${plan.featured ? 'featured' : ''}`} key={i}>
-                  {plan.badge && <div className="plan-badge">{plan.badge}</div>}
-                  <div className="plan-name">{plan.name}</div>
-                  <div className="plan-price">{plan.price}</div>
-                  <div className="plan-period">{plan.period}</div>
-                  <ul className="plan-feats">
-                    {plan.features.map((f, j) => (
-                      <li key={j}><span className="check">✓</span>{f}</li>
+        <section id="pricing" className="mx-auto max-w-6xl px-5 py-24 sm:px-8">
+          <Reveal className="mx-auto max-w-xl text-center">
+            <Tag>Pricing</Tag>
+            <h2 className="mt-5 text-[32px] font-bold tracking-tight text-white sm:text-[38px]">
+              Choose your elite plan
+            </h2>
+            <p className="mt-3 text-[15px] text-zinc-400">Transparent pricing. No hidden fees. Instant access after payment.</p>
+          </Reveal>
+
+          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {PLANS.map((plan, i) => (
+              <Reveal key={plan.name} delay={i * 0.07}>
+                <div
+                  className={`relative flex h-full flex-col rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1 ${
+                    plan.featured
+                      ? 'border-teal-400/40 bg-gradient-to-b from-teal-400/[0.08] to-transparent shadow-[0_0_40px_-12px_rgba(45,212,191,0.35)]'
+                      : 'border-white/10 bg-white/[0.03] hover:border-white/20'
+                  }`}
+                >
+                  {plan.badge && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-gradient-to-r from-teal-400 to-blue-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-zinc-950">
+                      {plan.badge}
+                    </span>
+                  )}
+                  <div className="mb-1 text-[13px] font-semibold text-zinc-300">{plan.name}</div>
+                  <div className="mb-0.5 text-[26px] font-bold text-white">{plan.price}</div>
+                  <div className="mb-5 text-[12px] text-zinc-500">{plan.period}</div>
+                  <ul className="mb-6 flex flex-1 flex-col gap-2.5">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-[13px] text-zinc-400">
+                        <Check size={14} className="mt-0.5 shrink-0 text-teal-400" />
+                        {f}
+                      </li>
                     ))}
                   </ul>
-                  <Link href="/subscription-expired" className={`btn-plan ${plan.featured ? 'btn-plan-feat' : 'btn-plan-std'}`} style={{ textDecoration: 'none', textAlign: 'center' }}>
+                  <Link
+                    href="/subscription-expired"
+                    className={`rounded-xl px-4 py-2.5 text-center text-[13.5px] font-bold transition-all duration-300 ${
+                      plan.featured
+                        ? 'bg-gradient-to-r from-teal-400 to-blue-500 text-zinc-950 hover:shadow-[0_8px_24px_-8px_rgba(45,212,191,0.5)]'
+                        : 'border border-white/10 bg-white/5 text-zinc-200 hover:border-white/20 hover:bg-white/10'
+                    }`}
+                  >
                     {plan.cta}
                   </Link>
                 </div>
-              ))}
-            </div>
+              </Reveal>
+            ))}
           </div>
         </section>
 
         {/* ── TESTIMONIALS ── */}
-        <section className="section testi-bg" id="testimonials">
-          <div className="section-inner">
-            <div className="section-head">
-              <div className="tag-pill">Success Stories</div>
-              <h2 className="section-h2">Trusted by Medical Professionals</h2>
-              <p className="section-sub">Real results from real FCPS candidates across Pakistan.</p>
-            </div>
-            <div className="testi-grid">
+        <section id="testimonials" className="border-y border-white/[0.06] bg-white/[0.02] py-24">
+          <div className="mx-auto max-w-6xl px-5 sm:px-8">
+            <Reveal className="mx-auto max-w-xl text-center">
+              <Tag>Success stories</Tag>
+              <h2 className="mt-5 text-[32px] font-bold tracking-tight text-white sm:text-[38px]">
+                Trusted by medical professionals
+              </h2>
+              <p className="mt-3 text-[15px] text-zinc-400">Real results from real FCPS candidates across Pakistan.</p>
+            </Reveal>
+
+            <div className="mt-14 grid gap-5 sm:grid-cols-3">
               {TESTIMONIALS.map((t, i) => (
-                <div className="testi-card" key={i}>
-                  <div className="testi-mark">&quot;</div>
-                  <p className="testi-text">{t.quote}</p>
-                  <div className="testi-author">
-                    <div className="author-av">{t.name.replace('Dr. ', '')[0]}</div>
-                    <div>
-                      <div className="author-name">{t.name}</div>
-                      <div className="author-role">{t.role}</div>
+                <Reveal key={t.name} delay={i * 0.08}>
+                  <div className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+                    <div className="mb-3 font-serif text-3xl leading-none text-teal-400/60">&ldquo;</div>
+                    <p className="mb-5 flex-1 text-[13.5px] leading-relaxed text-zinc-300">{t.quote}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-teal-400/30 to-blue-500/30 text-[13px] font-bold text-teal-300">
+                        {t.name.replace('Dr. ', '')[0]}
+                      </div>
+                      <div>
+                        <div className="text-[13px] font-semibold text-white">{t.name}</div>
+                        <div className="text-[11.5px] text-zinc-500">{t.role}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
         </section>
 
         {/* ── FAQ ── */}
-        <section className="section" id="faq">
-          <div className="section-inner">
-            <div className="section-head">
-              <div className="tag-pill">FAQ</div>
-              <h2 className="section-h2">Common Questions</h2>
-              <p className="section-sub">Everything you need to know before getting started.</p>
-            </div>
+        <section id="faq" className="mx-auto max-w-6xl px-5 py-24 sm:px-8">
+          <Reveal className="mx-auto max-w-xl text-center">
+            <Tag>FAQ</Tag>
+            <h2 className="mt-5 text-[32px] font-bold tracking-tight text-white sm:text-[38px]">Common questions</h2>
+            <p className="mt-3 text-[15px] text-zinc-400">Everything you need to know before getting started.</p>
+          </Reveal>
+          <div className="mt-14">
             <FaqAccordion faqs={FAQS} />
           </div>
         </section>
 
-        {/* ── FOOTER CTA ── */}
-        <section className="fcta">
-          <div className="fcta-glow" />
-          <div className="fcta-inner">
-            <div className="tag-pill" style={{ margin: '0 auto 20px' }}>Get Started Today</div>
-            <h2 className="fcta-h2">
-              Ready to Secure Your <em>Residency?</em>
+        {/* ── FINAL CTA ── */}
+        <Reveal>
+          <section className="relative mx-auto max-w-5xl px-5 py-24 text-center sm:px-8">
+            <div className="pointer-events-none absolute inset-0 -z-10 mx-auto h-72 w-72 -translate-y-1/2 rounded-full bg-teal-500/10 blur-[100px]" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+            <Tag>Get started today</Tag>
+            <h2 className="mx-auto mt-6 max-w-lg text-[32px] font-bold leading-tight tracking-tight text-white sm:text-[42px]">
+              Ready to secure your{' '}
+              <span className="bg-gradient-to-r from-teal-300 via-blue-300 to-violet-300 bg-clip-text text-transparent">
+                residency?
+              </span>
             </h2>
-            <p className="fcta-sub">
+            <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-zinc-400">
               Join thousands of medical professionals already preparing smarter with the FCPS Part 1 Simulator.
             </p>
-            <Link href="/register" className="btn-primary" style={{ fontSize: '16px', padding: '16px 44px' }}>
-              Get Instant Access
+            <Link
+              href="/register"
+              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-400 to-blue-500 px-8 py-3.5 text-[15px] font-bold text-zinc-950 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_32px_-8px_rgba(45,212,191,0.5)]"
+            >
+              Get instant access
+              <ArrowRight size={17} />
             </Link>
-          </div>
-        </section>
+          </section>
+        </Reveal>
 
         {/* ── FOOTER ── */}
-        <footer className="footer">
-          <div className="footer-inner">
-            <Link href="/" className="footer-logo">FCPS <span>Simulator</span></Link>
-            <div className="footer-links">
-              <a href="#features" className="footer-link">Features</a>
-              <a href="#pricing" className="footer-link">Pricing</a>
-              <a href="#testimonials" className="footer-link">Success Stories</a>
-              <a href="#faq" className="footer-link">FAQ</a>
-              <a href="https://wa.me/923324737436" className="footer-link">WhatsApp Support</a>
-              <a href="#" className="footer-link">Facebook Community</a>
-              <a href="#" className="footer-link">Instagram</a>
+        <footer className="border-t border-white/[0.06] px-5 py-10 sm:px-8">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-5">
+            <Link href="/" className="text-[14px] font-bold text-white">
+              FCPS <span className="text-teal-400">Simulator</span>
+            </Link>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+              {NAV_LINKS.map((l) => (
+                <a key={l.href} href={l.href} className="text-[12.5px] font-medium text-zinc-500 transition-colors hover:text-zinc-200">
+                  {l.label}
+                </a>
+              ))}
+              <a
+                href="https://wa.me/923324737436"
+                className="flex items-center gap-1.5 text-[12.5px] font-medium text-zinc-500 transition-colors hover:text-zinc-200"
+              >
+                <MessageCircle size={13} /> WhatsApp support
+              </a>
             </div>
           </div>
-          <div className="footer-copy">
-            © {new Date().getFullYear()} FCPS Part 1 Simulator — The Elite CBT Infrastructure for Medical Professionals. All rights reserved.
+          <div className="mx-auto mt-8 max-w-6xl border-t border-white/[0.06] pt-6 text-center text-[11.5px] text-zinc-600">
+            © {new Date().getFullYear()} FCPS Part 1 Simulator — the elite CBT infrastructure for medical professionals. All rights reserved.
           </div>
         </footer>
-
       </div>
-    </>
+    </div>
   );
 }
