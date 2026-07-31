@@ -118,7 +118,7 @@ function Tag({ children }: { children: React.ReactNode }) {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white text-slate-900 antialiased selection:bg-teal-100 selection:text-teal-900">
+    <div className="w-full min-h-screen overflow-x-hidden bg-white text-slate-900 antialiased selection:bg-teal-100 selection:text-teal-900">
       {/* Ambient background glows, fixed so they don't repaint on scroll */}
       <div className="pointer-events-none fixed inset-0 z-0">
         <div className="absolute left-1/2 top-[-10%] h-[560px] w-[900px] -translate-x-1/2 rounded-full bg-teal-400/10 blur-[120px]" />
