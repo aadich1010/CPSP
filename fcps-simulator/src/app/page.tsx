@@ -1,21 +1,35 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { DM_Serif_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import { FEATURES } from '../lib/featuresData';
 
-const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+// Preloaded + self-hosted by Next at build time instead of a runtime
+// @import (which was a second, render-blocking font fetch on top of the
+// Inter/Outfit fonts already loaded in layout.tsx).
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-plus-jakarta',
+  display: 'swap',
+});
+const dmSerif = DM_Serif_Display({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-dm-serif',
+  display: 'swap',
+});
 
+const CSS = `
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
 
   .lp {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--font-plus-jakarta), sans-serif;
     background: #ffffff;
     color: #0f172a;
     min-height: 100vh;
     overflow-x: hidden;
-    zoom: 0.75;
   }
 
   /* ─── NAVBAR ─── */
@@ -89,7 +103,7 @@ const CSS = `
   .tag-dot { width: 6px; height: 6px; border-radius: 50%; background: #0d9488; animation: blink 2s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
   .hero-h1 {
-    font-family: 'DM Serif Display', serif;
+    font-family: var(--font-dm-serif), serif;
     font-size: clamp(32px, 4vw, 52px);
     line-height: 1.05; font-weight: 400;
     letter-spacing: -0.02em; margin-bottom: 20px;
@@ -197,7 +211,7 @@ const CSS = `
   .stat-box { padding: 10px; border-right: 1px solid rgba(255,255,255,0.05); }
   .stat-box:last-child { border-right: none; }
   .stat-val {
-    font-family: 'DM Serif Display', serif;
+    font-family: var(--font-dm-serif), serif;
     font-size: 38px; font-weight: 400;
     color: #0d9488; line-height: 1; margin-bottom: 4px;
   }
@@ -208,7 +222,7 @@ const CSS = `
   .section-inner { max-width: 1200px; margin: 0 auto; }
   .section-head { text-align: center; margin-bottom: 40px; }
   .section-h2 {
-    font-family: 'DM Serif Display', serif;
+    font-family: var(--font-dm-serif), serif;
     font-size: clamp(26px, 3vw, 38px);
     font-weight: 400; line-height: 1.1;
     letter-spacing: -0.01em; margin-bottom: 10px;
@@ -270,7 +284,7 @@ const CSS = `
   }
   .step-card:hover { border-color: #0d9488; background: #ffffff; transform: translateY(-3px); }
   .step-num {
-    font-family: 'DM Serif Display', serif; font-size: 50px; font-weight: 400;
+    font-family: var(--font-dm-serif), serif; font-size: 50px; font-weight: 400;
     background: linear-gradient(135deg, #8b5cf6, #ec4899, #f59e0b);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text; line-height: 1; margin-bottom: 18px;
@@ -306,7 +320,7 @@ const CSS = `
   }
   .plan-name { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
   .plan-price {
-    font-family: 'DM Serif Display', serif; font-size: 40px; font-weight: 400;
+    font-family: var(--font-dm-serif), serif; font-size: 40px; font-weight: 400;
     color: #0d9488; line-height: 1; margin: 18px 0 4px;
   }
   .plan-period { font-size: 13px; color: #94a3b8; margin-bottom: 28px; }
@@ -348,7 +362,7 @@ const CSS = `
   }
   .testi-card:hover { border-color: #0d9488; background: #ffffff; box-shadow: 0 10px 30px rgba(13,148,136,0.1); }
   .testi-mark {
-    font-family: 'DM Serif Display', serif; font-size: 40px;
+    font-family: var(--font-dm-serif), serif; font-size: 40px;
     color: #ccfbf1; line-height: 1; margin-bottom: 10px;
   }
   .testi-text { font-size: 14px; color: #475569; line-height: 1.75; margin-bottom: 22px; }
@@ -403,7 +417,7 @@ const CSS = `
   }
   .fcta-inner { position: relative; z-index: 1; }
   .fcta-h2 {
-    font-family: 'DM Serif Display', serif;
+    font-family: var(--font-dm-serif), serif;
     font-size: clamp(32px, 4vw, 54px);
     font-weight: 400; letter-spacing: -0.02em;
     line-height: 1.1; margin-bottom: 18px;
@@ -526,7 +540,7 @@ export default function Home() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <div className="lp">
+      <div className={`lp ${plusJakarta.variable} ${dmSerif.variable}`}>
 
         {/* ── NAVBAR ── */}
         <nav className="nav">
