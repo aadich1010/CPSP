@@ -168,7 +168,7 @@ export default function SubscriptionExpiredPage() {
             alt="Scan this QR code to send payment"
             style={{ 
               width: '100%',
-              maxWidth: 300,
+              maxWidth: 240,
               height: 'auto',
               borderRadius: 16,
               boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)'
