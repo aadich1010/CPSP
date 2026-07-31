@@ -129,7 +129,7 @@ export default function Home() {
       <div className="relative z-10">
         {/* ── HEADER ── */}
         <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-xl">
-          <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
+          <div className="relative mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:px-8">
             <Link href="/" className="flex items-center gap-2 text-[15px] font-bold tracking-tight text-slate-900">
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-blue-500 text-[13px] font-black text-white">
                 F
@@ -180,7 +180,7 @@ export default function Home() {
             }}
           />
 
-          <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
+          <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center text-center">
             <div>
               <div className="flex justify-center">
                 <Tag>Elite CBT infrastructure</Tag>
@@ -265,7 +265,7 @@ export default function Home() {
         {/* ── STATS ── */}
         <Reveal>
           <section className="border-y border-slate-100 bg-slate-50/60">
-            <div className="mx-auto grid max-w-5xl divide-y divide-slate-200 px-5 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:px-8">
+            <div className="mx-auto grid w-full max-w-5xl divide-y divide-slate-200 px-5 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:px-8">
               {STATS.map((s) => (
                 <div key={s.label} className="px-2 py-8 text-center">
                   <div className="text-[28px] font-bold text-slate-900">{s.value}</div>
@@ -277,7 +277,7 @@ export default function Home() {
         </Reveal>
 
         {/* ── FEATURES ── */}
-        <section id="features" className="mx-auto max-w-6xl px-5 py-24 sm:px-8">
+        <section id="features" className="mx-auto w-full max-w-6xl px-5 py-24 sm:px-8">
           <Reveal className="mx-auto max-w-xl text-center">
             <Tag>Platform features</Tag>
             <h2 className="mt-5 text-[32px] font-bold tracking-tight text-slate-900 sm:text-[38px]">
@@ -314,7 +314,7 @@ export default function Home() {
 
         {/* ── HOW IT WORKS ── */}
         <section id="hiw" className="border-y border-slate-100 bg-slate-50/60 py-24">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
+          <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
             <Reveal className="mx-auto max-w-xl text-center">
               <Tag>Process</Tag>
               <h2 className="mt-5 text-[32px] font-bold tracking-tight text-slate-900 sm:text-[38px]">
@@ -339,7 +339,7 @@ export default function Home() {
         </section>
 
         {/* ── PRICING ── */}
-        <section id="pricing" className="mx-auto max-w-6xl px-5 py-24 sm:px-8">
+        <section id="pricing" className="mx-auto w-full max-w-6xl px-5 py-24 sm:px-8">
           <Reveal className="mx-auto max-w-xl text-center">
             <Tag>Pricing</Tag>
             <h2 className="mt-5 text-[32px] font-bold tracking-tight text-slate-900 sm:text-[38px]">
@@ -392,7 +392,7 @@ export default function Home() {
 
         {/* ── TESTIMONIALS ── */}
         <section id="testimonials" className="border-y border-slate-100 bg-slate-50/60 py-24">
-          <div className="mx-auto max-w-6xl px-5 sm:px-8">
+          <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
             <Reveal className="mx-auto max-w-xl text-center">
               <Tag>Success stories</Tag>
               <h2 className="mt-5 text-[32px] font-bold tracking-tight text-slate-900 sm:text-[38px]">
@@ -424,7 +424,7 @@ export default function Home() {
         </section>
 
         {/* ── FAQ ── */}
-        <section id="faq" className="mx-auto max-w-6xl px-5 py-24 sm:px-8">
+        <section id="faq" className="mx-auto w-full max-w-6xl px-5 py-24 sm:px-8">
           <Reveal className="mx-auto max-w-xl text-center">
             <Tag>FAQ</Tag>
             <h2 className="mt-5 text-[32px] font-bold tracking-tight text-slate-900 sm:text-[38px]">Common questions</h2>
@@ -437,7 +437,7 @@ export default function Home() {
 
         {/* ── FINAL CTA ── */}
         <Reveal>
-          <section className="relative mx-auto max-w-5xl px-5 py-24 text-center sm:px-8">
+          <section className="relative mx-auto w-full max-w-5xl px-5 py-24 text-center sm:px-8">
             <div className="pointer-events-none absolute inset-0 -z-10 mx-auto h-72 w-72 -translate-y-1/2 rounded-full bg-teal-200/40 blur-[100px]" style={{ left: '50%', transform: 'translateX(-50%)' }} />
             <Tag>Get started today</Tag>
             <h2 className="mx-auto mt-6 max-w-lg text-[32px] font-bold leading-tight tracking-tight text-slate-900 sm:text-[42px]">
@@ -461,7 +461,7 @@ export default function Home() {
 
         {/* ── FOOTER ── */}
         <footer className="border-t border-slate-100 px-5 py-10 sm:px-8">
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-5">
+          <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-5">
             <Link href="/" className="text-[14px] font-bold text-slate-900">
               FCPS <span className="text-teal-600">Simulator</span>
             </Link>
@@ -479,7 +479,7 @@ export default function Home() {
               </a>
             </div>
           </div>
-          <div className="mx-auto mt-8 max-w-6xl border-t border-slate-100 pt-6 text-center text-[11.5px] text-slate-400">
+          <div className="mx-auto mt-8 w-full max-w-6xl border-t border-slate-100 pt-6 text-center text-[11.5px] text-slate-400">
             © {new Date().getFullYear()} FCPS Part 1 Simulator — the elite CBT infrastructure for medical professionals. All rights reserved.
           </div>
         </footer>
