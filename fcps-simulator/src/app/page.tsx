@@ -180,21 +180,23 @@ export default function Home() {
             }}
           />
 
-          <div className="relative mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-2">
+          <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
             <div>
-              <Tag>Elite CBT infrastructure</Tag>
+              <div className="flex justify-center">
+                <Tag>Elite CBT infrastructure</Tag>
+              </div>
               <h1 className="mt-6 text-[40px] font-bold leading-[1.05] tracking-tight text-slate-900 sm:text-[52px]">
                 Master the FCPS Part 1 with{' '}
                 <span className="bg-gradient-to-r from-teal-600 via-blue-600 to-violet-600 bg-clip-text text-transparent">
                   elite CBT simulation
                 </span>
               </h1>
-              <p className="mt-5 max-w-md text-[15.5px] leading-relaxed text-slate-600">
+              <p className="mx-auto mt-5 max-w-md text-[15.5px] leading-relaxed text-slate-600">
                 Engineered for perfection, secured for integrity. Practice on the most advanced medical exam
                 platform built to guarantee your residency success.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <Link
                   href="/register"
                   className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-500 to-blue-500 px-6 py-3 text-[14px] font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_32px_-8px_rgba(13,148,136,0.4)]"
@@ -210,19 +212,17 @@ export default function Home() {
                 </a>
               </div>
 
-              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12.5px] text-slate-500">
+              <div className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[12.5px] text-slate-500">
                 <span className="flex items-center gap-1.5"><Check size={13} className="text-teal-500" /> No credit card required</span>
                 <span className="flex items-center gap-1.5"><Check size={13} className="text-teal-500" /> Instant activation</span>
                 <span className="flex items-center gap-1.5"><Check size={13} className="text-teal-500" /> 100% secure platform</span>
               </div>
             </div>
 
-            {/* Product mockup — the signature element: a live-styled preview
-                of the actual exam interface, tied to the "hospital-grade UI"
-                feature below rather than a generic illustration. */}
-            <Reveal delay={0.1} className="relative">
+            {/* Product mockup — centered below the hero copy */}
+            <Reveal delay={0.1} className="relative mt-14 w-full max-w-lg">
               <div className="absolute inset-0 -z-10 rounded-[28px] bg-gradient-to-br from-teal-200/40 via-violet-200/30 to-transparent blur-2xl" />
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl shadow-slate-200/60 transition-colors duration-300 hover:border-teal-200">
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-2xl shadow-slate-200/60 transition-colors duration-300 hover:border-teal-200">
                 <div className="mb-4 flex items-center gap-1.5 border-b border-slate-100 pb-3">
                   <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
                   <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
