@@ -180,8 +180,8 @@ export default function Home() {
             }}
           />
 
-          <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center text-center">
-            <div>
+          <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-2 text-center">
+            <div className="flex w-full flex-col items-center">
               <div className="flex justify-center">
                 <Tag>Elite CBT infrastructure</Tag>
               </div>
@@ -220,7 +220,7 @@ export default function Home() {
             </div>
 
             {/* Product mockup — centered below the hero copy */}
-            <Reveal delay={0.1} className="relative mt-14 w-full max-w-lg">
+            <Reveal delay={0.1} className="relative mx-auto mt-14 max-w-lg">
               <div className="absolute inset-0 -z-10 rounded-[28px] bg-gradient-to-br from-teal-200/40 via-violet-200/30 to-transparent blur-2xl" />
               <div className="rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-2xl shadow-slate-200/60 transition-colors duration-300 hover:border-teal-200">
                 <div className="mb-4 flex items-center gap-1.5 border-b border-slate-100 pb-3">
