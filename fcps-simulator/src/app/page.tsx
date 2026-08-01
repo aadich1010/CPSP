@@ -120,10 +120,10 @@ export default function Home() {
   return (
     <div className="w-full min-h-screen overflow-x-hidden bg-white text-slate-900 antialiased selection:bg-teal-100 selection:text-teal-900">
       {/* Ambient background glows, fixed so they don't repaint on scroll */}
-      <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute left-1/2 top-[-10%] h-[560px] w-[900px] -translate-x-1/2 rounded-full bg-teal-400/10 blur-[120px]" />
-        <div className="absolute right-[-10%] top-[20%] h-[420px] w-[420px] rounded-full bg-violet-400/10 blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-5%] h-[420px] w-[420px] rounded-full bg-pink-400/[0.06] blur-[120px]" />
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute left-1/2 top-[-10%] h-[560px] w-[900px] max-w-[100vw] -translate-x-1/2 rounded-full bg-teal-400/10 blur-[120px]" />
+        <div className="absolute right-0 top-[20%] h-[420px] w-[420px] max-w-[60vw] rounded-full bg-violet-400/10 blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-0 h-[420px] w-[420px] max-w-[60vw] rounded-full bg-pink-400/[0.06] blur-[120px]" />
       </div>
 
       <div className="relative z-10">
