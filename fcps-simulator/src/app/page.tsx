@@ -109,8 +109,8 @@ const FAQS = [
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-teal-700">
-      <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />
+    <div className="inline-flex items-center gap-2 rounded-full border border-teal-200/70 bg-gradient-to-r from-teal-50 to-white px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-teal-700 shadow-sm shadow-teal-100/50">
+      <span className="h-1.5 w-1.5 rounded-full bg-teal-500 shadow-[0_0_8px_2px_rgba(20,184,166,0.5)]" />
       {children}
     </div>
   );
@@ -128,10 +128,10 @@ export default function Home() {
 
       <div className="relative z-10">
         {/* ── HEADER ── */}
-        <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-xl">
+        <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/70 shadow-[0_1px_0_rgba(15,23,42,0.02),0_8px_24px_-16px_rgba(15,23,42,0.15)] backdrop-blur-xl">
           <div className="relative mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:px-8">
             <Link href="/" className="flex items-center gap-2 text-[15px] font-bold tracking-tight text-slate-900">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-blue-500 text-[13px] font-black text-white">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-blue-500 text-[13px] font-black text-white shadow-md shadow-teal-500/30">
                 F
               </span>
               FCPS <span className="text-teal-600">Simulator</span>
@@ -295,10 +295,11 @@ export default function Home() {
                 <Reveal key={f.id} delay={i * 0.06}>
                   <Link
                     href={`/feature/${f.id}`}
-                    className="group block h-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-md"
+                    className="group relative block h-full overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-300 hover:-translate-y-1.5 hover:border-teal-200 hover:shadow-[0_20px_40px_-16px_rgba(13,148,136,0.25)]"
                   >
+                    <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-teal-400/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     <div
-                      className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl border"
+                      className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl border transition-transform duration-300 group-hover:scale-110"
                       style={{ color: f.color, backgroundColor: `${f.color}14`, borderColor: `${f.color}33` }}
                     >
                       <Icon size={20} />
@@ -352,10 +353,10 @@ export default function Home() {
             {PLANS.map((plan, i) => (
               <Reveal key={plan.name} delay={i * 0.07}>
                 <div
-                  className={`relative flex h-full flex-col rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1 ${
+                  className={`relative flex h-full flex-col rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1.5 ${
                     plan.featured
-                      ? 'border-teal-300 bg-gradient-to-b from-teal-50 to-white shadow-lg shadow-teal-100'
-                      : 'border-slate-200 bg-white shadow-sm hover:border-teal-200'
+                      ? 'border-teal-300 bg-gradient-to-b from-teal-50 to-white shadow-[0_20px_50px_-20px_rgba(13,148,136,0.4)] ring-1 ring-teal-200/50 lg:scale-[1.04]'
+                      : 'border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] hover:border-teal-200 hover:shadow-[0_20px_40px_-16px_rgba(13,148,136,0.2)]'
                   }`}
                 >
                   {plan.badge && (
@@ -404,7 +405,7 @@ export default function Home() {
             <div className="mt-14 grid gap-5 sm:grid-cols-3">
               {TESTIMONIALS.map((t, i) => (
                 <Reveal key={t.name} delay={i * 0.08}>
-                  <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <div className="flex h-full flex-col rounded-2xl border border-slate-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_-20px_rgba(15,23,42,0.2)]">
                     <div className="mb-3 font-serif text-3xl leading-none text-teal-300">&ldquo;</div>
                     <p className="mb-5 flex-1 text-[13.5px] leading-relaxed text-slate-700">{t.quote}</p>
                     <div className="flex items-center gap-3">
