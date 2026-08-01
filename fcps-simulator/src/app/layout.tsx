@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Outfit } from 'next/font/google'
+import { Inter, Outfit, Playfair_Display } from 'next/font/google'
 import './globals.css'
 
 const inter = Inter({
@@ -13,6 +13,13 @@ const outfit = Outfit({
   subsets: ['latin'],
   weight: ['500', '600', '700', '800', '900'],
   variable: '--font-outfit',
+  display: 'swap',
+})
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['500', '600', '700', '800'],
+  variable: '--font-playfair',
   display: 'swap',
 })
 
@@ -46,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
+    <html lang="en" className={`${inter.variable} ${outfit.variable} ${playfair.variable}`}>
       <body
         className="gradient-bg min-h-screen"
         style={{ fontFamily: 'var(--font-inter), var(--font-outfit), system-ui, sans-serif' }}

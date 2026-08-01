@@ -49,7 +49,7 @@ export default function MobileNav() {
             <Link
               href="/register"
               onClick={() => setOpen(false)}
-              className="mt-1 rounded-lg bg-gradient-to-r from-[#b89244] to-[#b89244] px-3 py-2.5 text-center text-sm font-semibold text-white"
+              className="mt-1 rounded-lg bg-gradient-to-r from-[#7b1e2b] to-[#7b1e2b] px-3 py-2.5 text-center text-sm font-semibold text-white"
             >
               Start free demo
             </Link>
