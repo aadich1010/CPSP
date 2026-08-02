@@ -14,16 +14,16 @@ export default function FaqAccordion({ faqs }: { faqs: Faq[] }) {
         return (
           <div
             key={i}
-            className={`overflow-hidden rounded-2xl border bg-slate-900/60 backdrop-blur-xl transition-all duration-300 ${
+            className={`overflow-hidden rounded-2xl border bg-white backdrop-blur-xl shadow-sm transition-all duration-300 ${
               isOpen
-                ? 'border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)]'
-                : 'border-slate-800 hover:border-slate-700'
+                ? 'border-emerald-500 shadow-[0_0_16px_rgba(16,185,129,0.12)]'
+                : 'border-slate-200 hover:border-slate-300'
             }`}
           >
             <button
               onClick={() => setOpenFaq(isOpen ? null : i)}
               aria-expanded={isOpen}
-              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-[15px] font-medium text-slate-100"
+              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-[15px] font-medium text-slate-800"
             >
               {faq.q}
               <Plus
@@ -39,7 +39,7 @@ export default function FaqAccordion({ faqs }: { faqs: Faq[] }) {
               }`}
             >
               <div className="overflow-hidden">
-                <p className="border-t border-slate-800 px-5 py-4 text-[14px] leading-relaxed text-slate-400">
+                <p className="border-t border-slate-100 px-5 py-4 text-[14px] leading-relaxed text-slate-600">
                   {faq.a}
                 </p>
               </div>
