@@ -81,8 +81,8 @@ export default function SubscriptionExpiredPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f8fafc]">
-        <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
+      <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB]">
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
       </div>
     )
   }
@@ -91,7 +91,7 @@ export default function SubscriptionExpiredPage() {
 
   return (
     <div className="min-h-screen" style={{ 
-      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+      background: '#F9FAFB',
       padding: '20px 16px',
       display: 'flex',
       flexDirection: 'column',
@@ -110,10 +110,10 @@ export default function SubscriptionExpiredPage() {
           display: 'inline-flex', 
           alignItems: 'center', 
           gap: 6, 
-          background: 'rgba(13, 148, 136, 0.1)', 
+          background: 'rgba(16,185,129,0.1)', 
           padding: '6px 12px', 
           borderRadius: 100,
-          color: '#0d9488',
+          color: '#10B981',
           fontSize: '0.75rem',
           fontWeight: 700,
           marginBottom: 10
@@ -146,7 +146,7 @@ export default function SubscriptionExpiredPage() {
           style={{ 
             padding: '28px 24px',
             textAlign: 'center',
-            border: '2px solid rgba(13, 148, 136, 0.3)',
+            border: '2px solid rgba(16,185,129,0.35)',
             background: 'white',
             width: '100%',
             display: 'flex',
@@ -179,7 +179,7 @@ export default function SubscriptionExpiredPage() {
             <div style={{ marginTop: 4, textAlign: 'center' }}>
               <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0f172a' }}>{bank.account_name}</div>
               {bank.extra_info && (
-                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#0d9488', marginTop: 2 }}>{bank.extra_info}</div>
+                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#10B981', marginTop: 2 }}>{bank.extra_info}</div>
               )}
             </div>
           )}
@@ -298,7 +298,7 @@ function EditModal({ data, onClose, onSave }: EditModalProps) {
           <div>
             <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Account Number</label>
             <input 
-              className="input"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-slate-800 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)]"
               value={formData.account_number}
               onChange={e => setFormData({ ...formData, account_number: e.target.value })}
             />
@@ -306,7 +306,7 @@ function EditModal({ data, onClose, onSave }: EditModalProps) {
           <div>
             <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Account Name</label>
             <input 
-              className="input"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-slate-800 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)]"
               value={formData.account_name}
               onChange={e => setFormData({ ...formData, account_name: e.target.value })}
             />
@@ -316,7 +316,7 @@ function EditModal({ data, onClose, onSave }: EditModalProps) {
               {formData.provider === 'bank' ? 'Bank Name' : 'Extra Info'}
             </label>
             <input 
-              className="input"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-slate-800 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)]"
               value={formData.extra_info || ''}
               onChange={e => setFormData({ ...formData, extra_info: e.target.value })}
             />
@@ -324,10 +324,10 @@ function EditModal({ data, onClose, onSave }: EditModalProps) {
         </div>
 
         <div style={{ marginTop: 32, display: 'flex', gap: 12 }}>
-          <button onClick={() => onSave(formData)} className="btn btn-primary" style={{ flex: 1 }}>
+          <button onClick={() => onSave(formData)} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-2.5 font-bold text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all hover:scale-[1.02]" style={{ flex: 1 }}>
             <Save size={18} style={{ marginRight: 8 }} /> Save Changes
           </button>
-          <button onClick={onClose} className="btn btn-ghost" style={{ flex: 1 }}>
+          <button onClick={onClose} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 font-semibold text-slate-600 transition-all hover:border-emerald-400 hover:text-slate-900" style={{ flex: 1 }}>
             Cancel
           </button>
         </div>
