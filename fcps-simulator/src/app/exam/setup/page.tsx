@@ -100,11 +100,7 @@ export default function ExamSetupPage() {
                     type="button"
                     onClick={() => setSubject(s)}
                     className={`rounded-xl border px-3 py-2.5 text-left text-xs font-semibold transition-all ${
-                      s === 'Mixed (All Subjects)'
-                        ? subject === s
-                          ? 'col-span-2 border-emerald-500 bg-emerald-50 text-emerald-700 shadow-[0_0_0_2px_rgba(16,185,129,0.2)] sm:col-span-3 lg:col-span-4'
-                          : 'col-span-2 border-slate-200 bg-slate-50 text-slate-600 hover:border-emerald-300 hover:bg-emerald-50/50 sm:col-span-3 lg:col-span-4'
-                        : subject === s
+                      subject === s
                         ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-[0_0_0_2px_rgba(16,185,129,0.2)]'
                         : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-emerald-300 hover:bg-emerald-50/50'
                     }`}
