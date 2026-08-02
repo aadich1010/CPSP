@@ -805,3 +805,12 @@ tr:hover td {
     overflow: visible !important;
   }
 }
+
+/* ── centering fix ── added to ensure full-width page centering */
+html {
+  overflow-x: clip;           /* clamp overflow without breaking position:sticky */
+  scrollbar-gutter: stable;  /* prevent layout jump when scrollbar appears/disappears */
+}
+body > div {
+  width: 100%;               /* prevent root div shrink-wrapping on flex/grid parents */
+}
