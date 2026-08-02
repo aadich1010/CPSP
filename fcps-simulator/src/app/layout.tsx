@@ -23,9 +23,6 @@ const playfair = Playfair_Display({
   display: 'swap',
 })
 
-// NOTE: robots was 'noindex, nofollow' (staging default). Flipped to allow
-// indexing for public launch. Revert to 'noindex, nofollow' if this is
-// still meant to be a private/invite-only deployment.
 export const metadata: Metadata = {
   title: 'FCPS Part 1 CBT Simulator | Secure Medical Exam Platform',
   description:
@@ -42,22 +39,23 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'FCPS Part 1 CBT Simulator',
-    description:
-      'Practice FCPS Part 1 with real-pattern MCQs across all major subjects.',
+    description: 'Practice FCPS Part 1 with real-pattern MCQs across all major subjects.',
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} ${playfair.variable}`}>
-      <body
-        className="gradient-bg min-h-screen"
-        style={{ fontFamily: 'var(--font-inter), var(--font-outfit), system-ui, sans-serif' }}
-      >
+    <html
+      lang="en"
+      className={`${inter.variable} ${outfit.variable} ${playfair.variable}`}
+      suppressHydrationWarning
+    >
+      {/*
+        body is display:block (never flex/grid) — globals.css enforces this.
+        gradient-bg is redefined in globals.css to bg:#030712, no flex.
+        w-full prevents any upstream shrink-wrap.
+      */}
+      <body className="gradient-bg w-full min-h-screen">
         {children}
       </body>
     </html>
