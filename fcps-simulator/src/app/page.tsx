@@ -273,7 +273,7 @@ function SectionHead({
 function CbtTerminal() {
   const bars = [82, 55, 91, 68, 77, 43, 88]
   return (
-    <div className="relative min-h-[340px] rounded-2xl border border-slate-200 bg-white p-5 shadow-xl sm:p-6">
+    <div className="relative h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-xl sm:p-6">
       {/* terminal top bar */}
       <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">
@@ -418,7 +418,7 @@ export default function Home() {
           style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.07), transparent 70%)' }} />
 
         <div className="relative z-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-12">
+          <div className="grid grid-cols-1 items-stretch gap-14 lg:grid-cols-12">
 
             {/* LEFT */}
             <div className="min-w-0 space-y-7 text-center lg:col-span-7 lg:text-left">
@@ -478,11 +478,11 @@ export default function Home() {
 
             {/* RIGHT: CBT terminal */}
             <motion.div
-              className="min-w-0 lg:col-span-5"
+              className="min-w-0 lg:col-span-5 flex flex-col"
               initial={{ opacity: 0, x: 36 }} animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.75, delay: 0.2 }}>
               {/* Quick Gateway card */}
-              <GlassCard className="mb-4 p-5">
+              <GlassCard className="mb-4 p-5 flex-1 flex flex-col">
                 <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
                   <h3 className="font-bold text-slate-900">Quick Gateway</h3>
                   <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400">
@@ -509,7 +509,7 @@ export default function Home() {
                 </div>
               </GlassCard>
 
-              <CbtTerminal />
+              <div className="flex-1"><CbtTerminal /></div>
             </motion.div>
           </div>
         </div>
