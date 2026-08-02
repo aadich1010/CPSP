@@ -15,7 +15,7 @@ export default function FeaturePage() {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0f172a', color: 'white' }}>
         <h2>Feature not found</h2>
-        <Link href="/" style={{ color: '#0d9488', marginTop: '20px' }}>Return Home</Link>
+        <Link href="/" style={{ color: '#10B981', marginTop: '20px' }}>Return Home</Link>
       </div>
     );
   }
@@ -50,7 +50,7 @@ export default function FeaturePage() {
           color: '#64748b', textDecoration: 'none', fontSize: '15px', fontWeight: 600,
           marginBottom: '50px', transition: 'color 0.2s'
         }}
-        onMouseOver={(e) => e.currentTarget.style.color = '#0d9488'}
+        onMouseOver={(e) => e.currentTarget.style.color = '#10B981'}
         onMouseOut={(e) => e.currentTarget.style.color = '#64748b'}
         >
           <span>←</span> Back to All Features
@@ -75,7 +75,7 @@ export default function FeaturePage() {
               display: 'inline-flex', alignItems: 'center', gap: '7px',
               background: 'rgba(13,148,136,0.06)',
               border: '1px solid rgba(13,148,136,0.2)',
-              color: '#0d9488',
+              color: '#10B981',
               padding: '6px 16px',
               borderRadius: '30px',
               fontSize: '11px',
@@ -122,7 +122,7 @@ export default function FeaturePage() {
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {feature.benefits.map((benefit, index) => (
               <li key={index} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', fontSize: '15px', color: '#475569' }}>
-                <span style={{ color: '#0d9488', fontSize: '16px', fontWeight: 'bold', marginTop: '2px' }}>✓</span>
+                <span style={{ color: '#10B981', fontSize: '16px', fontWeight: 'bold', marginTop: '2px' }}>✓</span>
                 <span style={{ lineHeight: 1.6 }}>{benefit}</span>
               </li>
             ))}
@@ -136,7 +136,7 @@ export default function FeaturePage() {
           </h2>
           <Link href="/register" style={{
             display: 'inline-block',
-            background: `linear-gradient(135deg, #0d9488, #3b82f6)`,
+            background: `linear-gradient(135deg, #10B981, #3b82f6)`,
             color: '#ffffff', padding: '16px 48px',
             borderRadius: '12px', fontSize: '16px', fontWeight: 800,
             textDecoration: 'none', transition: 'all 0.2s',
