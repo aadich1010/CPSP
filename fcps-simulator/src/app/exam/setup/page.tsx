@@ -62,7 +62,7 @@ export default function ExamSetupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center px-4 py-10"
+    <div className="h-screen bg-[#F9FAFB] flex items-center justify-center px-4 py-4 overflow-hidden"
       style={{
         backgroundImage: 'radial-gradient(rgba(148,163,184,0.35) 1px, transparent 1px)',
         backgroundSize: '20px 20px',
@@ -70,8 +70,8 @@ export default function ExamSetupPage() {
       <div className="w-full max-w-2xl">
 
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Configure Your Exam</h1>
+        <div className="mb-4 text-center">
+          <h1 className="text-xl font-black text-slate-900 tracking-tight">Configure Your Exam</h1>
           <p className="mt-1 text-sm text-slate-500">Choose subject and number of questions</p>
         </div>
 
@@ -85,21 +85,21 @@ export default function ExamSetupPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
 
             {/* ── SUBJECT GRID ── */}
             <div>
-              <label className="mb-3 block text-sm font-bold text-slate-700">
+              <label className="mb-2 block text-sm font-bold text-slate-700">
                 Subject
                 <span className="ml-2 text-xs font-normal text-slate-400">— select one</span>
               </label>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-4">
                 {SUBJECTS.map((s) => (
                   <button
                     key={s}
                     type="button"
                     onClick={() => setSubject(s)}
-                    className={`rounded-xl border px-3 py-2.5 text-left text-xs font-semibold transition-all ${
+                    className={`rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-all ${
                       subject === s
                         ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-[0_0_0_2px_rgba(16,185,129,0.2)]'
                         : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-emerald-300 hover:bg-emerald-50/50'
@@ -112,7 +112,7 @@ export default function ExamSetupPage() {
             </div>
 
             {/* ── DIVIDER ── */}
-            <div className="h-px bg-slate-100" />
+            <div className="h-px bg-slate-100 my-1" />
 
             {/* ── COUNT & MODE side by side ── */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -127,7 +127,7 @@ export default function ExamSetupPage() {
                     id="count"
                     value={count}
                     onChange={e => setCount(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 pr-10 text-sm text-slate-800 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)] cursor-pointer"
+                    className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 pr-10 text-sm text-slate-800 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)] cursor-pointer"
                   >
                     {!isPremium ? (
                       <option value="10">10 Questions (Demo Limit)</option>
@@ -154,7 +154,7 @@ export default function ExamSetupPage() {
                     id="mode"
                     value={mode}
                     onChange={e => setMode(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 pr-10 text-sm text-slate-800 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)] cursor-pointer"
+                    className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 pr-10 text-sm text-slate-800 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)] cursor-pointer"
                   >
                     <option value="exam">Exam Mode (no instant feedback)</option>
                     <option value="practice">Practice Mode (instant feedback)</option>
@@ -167,7 +167,7 @@ export default function ExamSetupPage() {
             {/* ── SUBMIT ── */}
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 py-3.5 font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(16,185,129,0.55)]"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 py-3 font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(16,185,129,0.55)]"
             >
               <Play size={16} fill="white" />
               Begin Exam
@@ -175,7 +175,7 @@ export default function ExamSetupPage() {
           </form>
         </div>
 
-        <div className="mt-5 text-center">
+        <div className="mt-3 text-center">
           <Link href="/dashboard" className="text-sm text-slate-400 transition hover:text-slate-600">
             ← Back to Dashboard
           </Link>
