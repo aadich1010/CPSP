@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { login } from '@/app/auth/actions'
+import { ArrowRight, Loader2, Mail, Lock, ShieldCheck } from 'lucide-react'
 
 function LoginForm() {
   const searchParams = useSearchParams()
@@ -26,48 +27,59 @@ function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-[420px] animate-fade-in relative z-10">
-      {/* Logo Section */}
-      <div className="text-center mb-10">
-        <div className="w-16 h-16 bg-gradient-to-br from-teal-600 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal-500/20">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+    <div className="relative z-10 w-full max-w-[440px]">
+
+      {/* Logo */}
+      <div className="mb-8 text-center">
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-[0_0_30px_rgba(16,185,129,0.35)]">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
             {isAdmin ? (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3zm0 2c-2.67 0-8 1.335-8 4v2h16v-2c0-2.665-5.33-4-8-4z" />
+              <path strokeLinecap="round" strokeLinejoin="round"
+                d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3zm0 2c-2.67 0-8 1.335-8 4v2h16v-2c0-2.665-5.33-4-8-4z" />
             ) : (
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             )}
           </svg>
         </div>
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">
+        <h1 className="text-3xl font-black tracking-tight text-slate-900">
           {isAdmin ? 'Member Portal' : 'Welcome Back'}
         </h1>
-        <p className="text-slate-500 font-medium">
+        <p className="mt-2 text-slate-500">
           {isAdmin ? 'Sign in to access admin controls' : 'Sign in to your portal'}
         </p>
       </div>
 
       {/* Card */}
-      <div className="glass p-8 md:p-10">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-lg md:p-10">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <input type="hidden" name="type" value={type || 'student'} />
-          
-          <div className="form-group mb-0">
-            <label className="label uppercase text-[10px] tracking-widest font-bold text-slate-500 mb-2" htmlFor="email">Email Address</label>
+
+          {/* Email */}
+          <div>
+            <label htmlFor="email"
+              className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+              <Mail size={11} className="text-emerald-500" /> Email Address
+            </label>
             <input
               id="email"
               name="email"
               type="email"
               required
               autoComplete="email"
-              className="input focus:border-teal-500"
-              placeholder={isAdmin ? "admin@example.com" : "doctor@example.com"}
+              placeholder={isAdmin ? 'admin@example.com' : 'doctor@example.com'}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-slate-800 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)]"
             />
           </div>
 
-          <div className="form-group mb-0">
-            <div className="flex items-center justify-between mb-2">
-              <label className="label uppercase text-[10px] tracking-widest font-bold text-slate-500" htmlFor="password">Password</label>
-              <Link href="/forgot-password" className="text-[11px] font-bold text-teal-600 hover:text-teal-500 transition-colors">
+          {/* Password */}
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <label htmlFor="password"
+                className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                <Lock size={11} className="text-emerald-500" /> Password
+              </label>
+              <Link href="/forgot-password"
+                className="text-[11px] font-bold text-emerald-600 transition-colors hover:text-emerald-500">
                 Forgot password?
               </Link>
             </div>
@@ -77,49 +89,49 @@ function LoginForm() {
               type="password"
               required
               autoComplete="current-password"
-              className="input focus:border-teal-500"
               placeholder="••••••••"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-slate-800 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)]"
             />
           </div>
 
+          {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-600 text-sm flex items-center gap-3">
-              <span className="text-lg">⚠️</span>
+            <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+              <span className="mt-0.5 shrink-0">⚠️</span>
               {error}
             </div>
           )}
 
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
-            className="btn btn-primary btn-full btn-lg group"
+            className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 py-3.5 font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(16,185,129,0.55)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
           >
             {loading ? (
-              <>
-                <span className="spinner !w-4 !h-4" />
-                <span>Signing in...</span>
-              </>
+              <><Loader2 size={18} className="animate-spin" /> Signing in...</>
             ) : (
-              <>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" />
-                </svg>
-                <span>{isAdmin ? 'Access Member Portal' : 'Access Portal'}</span>
-              </>
+              <>{isAdmin ? 'Access Member Portal' : 'Access Portal'} <ArrowRight size={18} /></>
             )}
           </button>
         </form>
 
         {!isAdmin && (
           <>
-            <div className="relative py-8">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
-              <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-bold text-slate-400"><span className="bg-white px-4">Secure Login</span></div>
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-100" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="flex items-center gap-1.5 bg-white px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  <ShieldCheck size={10} className="text-emerald-400" /> Secure Login
+                </span>
+              </div>
             </div>
 
             <p className="text-center text-sm text-slate-500">
               Don&apos;t have an account?{' '}
-              <Link href="/register" className="text-teal-600 font-bold hover:text-teal-500 transition-colors">
+              <Link href="/register" className="font-bold text-emerald-600 transition-colors hover:text-emerald-500">
                 Register Here
               </Link>
             </p>
@@ -127,7 +139,7 @@ function LoginForm() {
         )}
       </div>
 
-      <p className="text-center mt-8 text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold">
+      <p className="mt-6 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
         {isAdmin ? '🔒 Admin authentication required' : '🔒 Subscription-based access · Admin-verified'}
       </p>
     </div>
@@ -136,8 +148,23 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen gradient-bg flex items-center justify-center px-4 py-12 relative">
-      <Suspense fallback={<div className="text-teal-600 font-bold">Loading...</div>}>
+    <div className="relative min-h-screen overflow-x-clip bg-[#F9FAFB] flex items-center justify-center px-4 py-16">
+      {/* background grid */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-40"
+        aria-hidden
+        style={{
+          backgroundImage: 'radial-gradient(rgba(148,163,184,0.4) 1px, transparent 1px)',
+          backgroundSize: '20px 20px',
+        }}
+      />
+      {/* ambient glow */}
+      <div
+        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-[350px] w-[500px] rounded-full blur-3xl opacity-[0.06]"
+        aria-hidden
+        style={{ background: 'radial-gradient(circle, #10B981, transparent)' }}
+      />
+      <Suspense fallback={<div className="font-bold text-emerald-600">Loading...</div>}>
         <LoginForm />
       </Suspense>
     </div>
