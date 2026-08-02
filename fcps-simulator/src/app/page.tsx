@@ -224,15 +224,17 @@ function GlassCard({
 }) {
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl border bg-slate-900/60 backdrop-blur-xl transition-all duration-300 ${
+      className={`group relative rounded-2xl border bg-slate-900/60 backdrop-blur-xl transition-all duration-300 ${
         featured
           ? 'border-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.3)]'
           : 'border-slate-800 hover:border-emerald-500/50 hover:shadow-[0_0_25px_rgba(16,185,129,0.18)]'
       } ${className}`}
       style={style}
     >
-      {featured && <div className="border-beam absolute inset-0 rounded-2xl" aria-hidden />}
-      {children}
+      {featured && (
+        <div className="border-beam pointer-events-none absolute inset-0 rounded-2xl" style={{ zIndex: 0 }} aria-hidden />
+      )}
+      <div className="relative" style={{ zIndex: 1 }}>{children}</div>
     </div>
   )
 }
