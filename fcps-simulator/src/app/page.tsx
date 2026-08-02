@@ -1,229 +1,355 @@
-'use client';
+'use client'
 
-import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
+import { motion, useInView, useMotionValue, useSpring } from 'framer-motion'
 import {
   BarChart3, ShieldCheck, Building2, Sparkles, RefreshCw, Crown,
   ArrowRight, Check, MessageCircle, GraduationCap, FileText, Award,
-  BookOpen, Menu, X, ChevronDown, Zap, Activity, Lock, Cpu,
-} from 'lucide-react';
-import { FEATURES } from '../lib/featuresData';
-import FaqAccordion from '../components/FaqAccordion';
-import MobileNav from '../components/MobileNav';
-
-/* ─── TOKENS ─────────────────────────────────────────────────── */
-const C = {
-  cyan:     '#06B6D4',
-  emerald:  '#10B981',
-  blue:     '#3B82F6',
-  bg:       '#030712',
-  surface:  '#0B0F1A',
-  glass:    'rgba(255,255,255,0.04)',
-  border:   'rgba(255,255,255,0.08)',
-  borderHi: 'rgba(6,182,212,0.4)',
-} as const;
+  BookOpen, ChevronDown, Zap, Activity, Lock, Star,
+  TrendingUp, Clock, Users, Cpu, Shield, Wifi,
+} from 'lucide-react'
+import { FEATURES } from '../lib/featuresData'
+import FaqAccordion from '../components/FaqAccordion'
+import MobileNav from '../components/MobileNav'
 
 /* ─── DATA ───────────────────────────────────────────────────── */
 const NAV_LINKS = [
-  { href: '#features',     label: 'Features'      },
-  { href: '#hiw',          label: 'How it works'  },
-  { href: '#testimonials', label: 'Testimonials'  },
-  { href: '#pricing',      label: 'Pricing'       },
-];
+  { href: '#features',     label: 'Features'     },
+  { href: '#hiw',          label: 'How it works' },
+  { href: '#testimonials', label: 'Testimonials' },
+  { href: '#pricing',      label: 'Pricing'      },
+]
 
 const GATEWAY = [
-  { icon: GraduationCap, title: 'FCPS-I Mock Exams', desc: 'Timed CBT simulations',   href: '/register'           },
-  { icon: FileText,       title: 'Question Bank',     desc: 'Real-pattern MCQs',        href: '/register'           },
-  { icon: Award,          title: 'Latest Results',    desc: 'Track your progress',      href: '/dashboard'          },
-  { icon: BarChart3,      title: 'Analytics',         desc: 'Subject-wise heatmaps',    href: '/dashboard/analysis' },
-];
+  { icon: GraduationCap, title: 'FCPS-I Mock Exams', desc: 'Timed CBT simulations',   href: '/register',           color: 'emerald' },
+  { icon: FileText,       title: 'Question Bank',     desc: 'Real-pattern MCQs',        href: '/register',           color: 'cyan'    },
+  { icon: Award,          title: 'Latest Results',    desc: 'Track your progress',      href: '/dashboard',          color: 'blue'    },
+  { icon: BarChart3,      title: 'Analytics',         desc: 'Subject-wise heatmaps',    href: '/dashboard/analysis', color: 'emerald' },
+]
 
 const STATS = [
-  { value: 10000, suffix: '+', label: 'Medical professionals', icon: Activity },
-  { value: 4.9,   suffix: '/5', label: 'Average rating',       icon: Sparkles },
-  { value: 99.9,  suffix: '%',  label: 'Platform uptime',      icon: Zap      },
-  { value: 24,    suffix: '/7', label: 'VIP support',          icon: Lock     },
-];
+  { value: 10000, display: '10,000+', label: 'Medical professionals', icon: Users     },
+  { value: 4.9,   display: '4.9/5',   label: 'Average rating',        icon: Star      },
+  { value: 99.9,  display: '99.9%',   label: 'Platform uptime',       icon: Zap       },
+  { value: 24,    display: '24/7',    label: 'VIP support',           icon: Clock     },
+]
 
 const STEPS = [
-  { num: 'I',   title: 'Register',  desc: 'Create your secure profile — no credit card required to start.',                  color: C.cyan    },
-  { num: 'II',  title: 'Subscribe', desc: 'Choose a plan that fits your residency timeline.',                                color: C.emerald },
-  { num: 'III', title: 'Simulate',  desc: 'Take timed mock exams, analyze weak areas, and track every gain.',               color: C.blue    },
-];
+  { num: 'I',   title: 'Register',  desc: 'Create your secure profile — no credit card required to start.', icon: Users,     color: '#10B981' },
+  { num: 'II',  title: 'Subscribe', desc: 'Choose a plan that fits your residency timeline.',               icon: Shield,    color: '#06B6D4' },
+  { num: 'III', title: 'Simulate',  desc: 'Take timed mock exams, analyze weak areas, and track every gain.', icon: Cpu,    color: '#3B82F6' },
+]
 
 const PLANS = [
-  { name: 'Standard', price: 'Rs. 1,999', period: '/ 1 month',  features: ['1 month access', 'Basic analytics', 'Mock exams'],                               cta: 'Get started',   featured: false },
-  { name: 'Elite Pro', badge: 'Best value', price: 'Rs. 4,999', period: '/ 3 months', features: ['3 months access', 'Smart heatmaps', 'Forensic security', 'VIP support'], cta: 'Instant access', featured: true  },
-  { name: 'Advanced', price: 'Rs. 8,999', period: '/ 6 months', features: ['6 months access', 'Premium analytics', 'Priority sync', 'Extended bank'],         cta: 'Go advanced',   featured: false },
-  { name: 'Platinum', price: 'Rs. 14,999', period: '/ 1 year',  features: ['1 year access', 'Ultimate prep kit', 'Direct support', 'Full analytics'],          cta: 'Go platinum',   featured: false },
-];
+  {
+    name: 'Standard',
+    price: 'Rs. 1,999',
+    period: '/ 1 month',
+    features: ['1 month access', 'Basic analytics', 'Mock exams'],
+    cta: 'Get started',
+    featured: false,
+    badge: null,
+  },
+  {
+    name: 'Elite Pro',
+    price: 'Rs. 4,999',
+    period: '/ 3 months',
+    features: ['3 months access', 'Smart heatmaps', 'Forensic security', 'VIP support'],
+    cta: 'Instant access',
+    featured: true,
+    badge: 'Best value',
+  },
+  {
+    name: 'Advanced',
+    price: 'Rs. 8,999',
+    period: '/ 6 months',
+    features: ['6 months access', 'Premium analytics', 'Priority sync', 'Extended bank'],
+    cta: 'Go advanced',
+    featured: false,
+    badge: null,
+  },
+  {
+    name: 'Platinum',
+    price: 'Rs. 14,999',
+    period: '/ 1 year',
+    features: ['1 year access', 'Ultimate prep kit', 'Direct support', 'Full analytics'],
+    cta: 'Go platinum',
+    featured: false,
+    badge: null,
+  },
+]
 
 const TESTIMONIALS = [
-  { quote: 'The analytics helped me identify my weak areas in Anatomy within days. A game-changer for Part 1.', name: 'Dr. Ahmed', role: 'Resident'        },
-  { quote: 'The interface is identical to the actual exam. It removed all my fear of the CBT environment.',      name: 'Dr. Sara',  role: 'FCPS Candidate'  },
-  { quote: "Most secure and updated question bank I've used. The watermark feature shows how serious they are.", name: 'Dr. Zohaib',role: 'Medical Officer'  },
-];
+  { quote: 'The analytics helped me identify my weak areas in Anatomy within days. A game-changer for Part 1.', name: 'Dr. Ahmed', role: 'Resident'       },
+  { quote: 'The interface is identical to the actual exam. It removed all my fear of the CBT environment.',      name: 'Dr. Sara',  role: 'FCPS Candidate' },
+  { quote: "Most secure and updated question bank I've used. The watermark feature shows how serious they are.", name: 'Dr. Zohaib',role: 'Medical Officer' },
+]
 
 const FAQS = [
-  { q: 'Is the interface same as the real exam?',  a: 'Yes — we have replicated the official CBT environment for 100% familiarity.'                                           },
-  { q: 'How do I activate my account?',            a: 'Simply share your payment proof via WhatsApp for instant premium activation.'                                          },
-  { q: 'Can I track my progress?',                 a: 'Absolutely. Our Smart Analytics provide detailed heatmaps of your performance across all subjects.'                    },
-];
+  { q: 'Is the interface same as the real exam?',  a: 'Yes — we have replicated the official CBT environment for 100% familiarity.'                                        },
+  { q: 'How do I activate my account?',            a: 'Simply share your payment proof via WhatsApp for instant premium activation.'                                       },
+  { q: 'Can I track my progress?',                 a: 'Absolutely. Our Smart Analytics provide detailed heatmaps of your performance across all subjects.'                 },
+]
 
-const ICON_MAP: Record<string, typeof BarChart3> = {
-  'smart-analytics':         BarChart3,
-  'forensic-security':       ShieldCheck,
-  'hospital-grade-ui':       Building2,
-  'ai-powered-organization': Sparkles,
+const FEATURE_ICONS: Record<string, React.ElementType> = {
+  'smart-analytics':           BarChart3,
+  'forensic-security':         ShieldCheck,
+  'hospital-grade-ui':         Building2,
+  'ai-powered-organization':   Sparkles,
   'real-time-synchronization': RefreshCw,
-  'vvip-support':            Crown,
-};
+  'vvip-support':              Crown,
+}
+
+const FEATURE_COLORS = ['#10B981', '#06B6D4', '#3B82F6', '#A78BFA', '#F472B6', '#FB923C']
 
 /* ─── ANIMATION VARIANTS ──────────────────────────────────────── */
 const fadeUp = {
-  hidden:  { opacity: 0, y: 32 },
-  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } }),
-};
-
-const fadeIn = {
-  hidden:  { opacity: 0 },
-  visible: (i = 0) => ({ opacity: 1, transition: { duration: 0.5, delay: i * 0.06 } }),
-};
-
-/* ─── REUSABLE: scroll-triggered section wrapper ─────────────── */
-function Reveal({ children, className = '', delay = 0, style }: { children: React.ReactNode; className?: string; delay?: number; style?: React.CSSProperties }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
-  return (
-    <motion.div ref={ref} className={className} style={style} initial="hidden" animate={inView ? 'visible' : 'hidden'} custom={delay} variants={fadeUp}>
-      {children}
-    </motion.div>
-  );
+  hidden:  { opacity: 0, y: 28 },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.55,
+      delay: i * 0.09,
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+    },
+  }),
 }
 
-/* ─── ANIMATED COUNTER ───────────────────────────────────────── */
-function Counter({ target, suffix }: { target: number; suffix: string }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true });
-  const motionVal = useMotionValue(0);
-  const spring = useSpring(motionVal, { stiffness: 60, damping: 18 });
-  const [display, setDisplay] = useState('0');
+/* ─── PRIMITIVES ──────────────────────────────────────────────── */
 
-  useEffect(() => {
-    if (inView) motionVal.set(target);
-  }, [inView, target, motionVal]);
-
-  useEffect(() => {
-    return spring.on('change', (v) => {
-      setDisplay(target < 10 ? v.toFixed(1) : Math.round(v).toLocaleString());
-    });
-  }, [spring, target]);
-
-  return <span ref={ref}>{display}{suffix}</span>;
-}
-
-/* ─── GRID BACKGROUND (CSS-only, no canvas dep) ──────────────── */
-function GridBackground() {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      {/* grid lines */}
-      <div
-        className="absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(6,182,212,1) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,1) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }}
-      />
-      {/* radial glow orbs */}
-      <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[600px] w-[800px] rounded-full opacity-[0.08]"
-        style={{ background: 'radial-gradient(ellipse, #06B6D4, transparent 70%)' }} />
-      <div className="absolute top-1/3 -left-40 h-[500px] w-[500px] rounded-full opacity-[0.06]"
-        style={{ background: 'radial-gradient(ellipse, #10B981, transparent 70%)' }} />
-      <div className="absolute top-1/3 -right-40 h-[500px] w-[500px] rounded-full opacity-[0.06]"
-        style={{ background: 'radial-gradient(ellipse, #3B82F6, transparent 70%)' }} />
-    </div>
-  );
-}
-
-/* ─── GLOW CARD (hover tilt + border glow) ────────────────────── */
-function GlowCard({ children, className = '', glowColor = C.cyan, featured = false }: {
-  children: React.ReactNode; className?: string; glowColor?: string; featured?: boolean;
+/** Scroll-triggered reveal wrapper */
+function Reveal({
+  children,
+  className = '',
+  style,
+  delay = 0,
+}: {
+  children: React.ReactNode
+  className?: string
+  style?: React.CSSProperties
+  delay?: number
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotX = useTransform(y, [-0.5, 0.5], ['8deg', '-8deg']);
-  const rotY = useTransform(x, [-0.5, 0.5], ['-8deg', '8deg']);
-
-  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    x.set((e.clientX - rect.left) / rect.width - 0.5);
-    y.set((e.clientY - rect.top)  / rect.height - 0.5);
-  };
-  const reset = () => { x.set(0); y.set(0); };
-
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-72px' })
   return (
     <motion.div
       ref={ref}
-      onMouseMove={handleMove}
-      onMouseLeave={reset}
-      style={{
-        rotateX: rotX,
-        rotateY: rotY,
-        transformStyle: 'preserve-3d',
-        perspective: 800,
-        background: featured
-          ? `linear-gradient(135deg, rgba(6,182,212,0.08), rgba(16,185,129,0.06))`
-          : C.glass,
-        borderColor: featured ? glowColor : C.border,
-        boxShadow: featured ? `0 0 0 1px ${glowColor}40, 0 0 40px ${glowColor}20` : 'none',
-      } as React.CSSProperties}
-      whileHover={{ scale: 1.02 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-      className={`relative overflow-hidden rounded-2xl border backdrop-blur-xl ${className}`}
+      className={className}
+      style={style}
+      initial="hidden"
+      animate={inView ? 'visible' : 'hidden'}
+      custom={delay}
+      variants={fadeUp}
     >
-      {featured && (
-        /* animated border beam */
-        <motion.div
-          className="absolute inset-0 rounded-2xl pointer-events-none"
-          style={{ background: `conic-gradient(from 0deg at 50% 50%, transparent 270deg, ${glowColor}, transparent)` }}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-        />
-      )}
-      <div className="relative z-10">{children}</div>
-    </motion.div>
-  );
-}
-
-/* ─── EYEBROW ─────────────────────────────────────────────────── */
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em]"
-      style={{ color: C.cyan, borderColor: `${C.cyan}30`, background: `${C.cyan}08` }}>
       {children}
-    </span>
-  );
+    </motion.div>
+  )
 }
 
-/* ─── SECTION HEADING ─────────────────────────────────────────── */
-function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: React.ReactNode; sub?: string }) {
+/** Animated counting number */
+function Counter({ target, display }: { target: number; display: string }) {
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true })
+  const motionVal = useMotionValue(0)
+  const spring = useSpring(motionVal, { stiffness: 55, damping: 16 })
+  const [shown, setShown] = useState('0')
+
+  useEffect(() => {
+    if (inView) motionVal.set(target)
+  }, [inView, target, motionVal])
+
+  useEffect(() => {
+    return spring.on('change', (v) => {
+      if (target < 10) setShown(v.toFixed(1))
+      else setShown(Math.round(v).toLocaleString())
+    })
+  }, [spring, target])
+
+  // Once spring settles, lock to the display string (handles "+" / "%" suffixes)
+  useEffect(() => {
+    if (inView) {
+      const t = setTimeout(() => setShown(display), 2200)
+      return () => clearTimeout(t)
+    }
+  }, [inView, display])
+
+  return <span ref={ref}>{shown}</span>
+}
+
+/** Glowing CTA button */
+function GlowBtn({
+  href,
+  children,
+  size = 'md',
+  variant = 'primary',
+  className = '',
+}: {
+  href: string
+  children: React.ReactNode
+  size?: 'sm' | 'md' | 'lg'
+  variant?: 'primary' | 'ghost'
+  className?: string
+}) {
+  const pad = size === 'lg' ? 'px-10 py-4 text-base' : size === 'sm' ? 'px-4 py-2 text-sm' : 'px-7 py-3 text-sm'
+  if (variant === 'ghost')
+    return (
+      <Link href={href}
+        className={`inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900/60 font-semibold text-slate-200 backdrop-blur-sm transition-all hover:border-emerald-500/50 hover:text-white ${pad} ${className}`}>
+        {children}
+      </Link>
+    )
+  return (
+    <Link href={href}
+      className={`inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:scale-[1.03] hover:shadow-[0_0_35px_rgba(16,185,129,0.65)] ${pad} ${className}`}>
+      {children}
+    </Link>
+  )
+}
+
+/** Glass card with hover glow */
+function GlassCard({
+  children,
+  className = '',
+  style,
+  glow = '#10B981',
+  featured = false,
+}: {
+  children: React.ReactNode
+  className?: string
+  style?: React.CSSProperties
+  glow?: string
+  featured?: boolean
+}) {
+  return (
+    <div
+      className={`group relative overflow-hidden rounded-2xl border bg-slate-900/60 backdrop-blur-xl transition-all duration-300 ${
+        featured
+          ? 'border-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.3)]'
+          : 'border-slate-800 hover:border-emerald-500/50 hover:shadow-[0_0_25px_rgba(16,185,129,0.18)]'
+      } ${className}`}
+      style={style}
+    >
+      {featured && <div className="border-beam absolute inset-0 rounded-2xl" aria-hidden />}
+      {children}
+    </div>
+  )
+}
+
+/** Section heading: eyebrow + h2 + rule */
+function SectionHead({
+  eyebrow,
+  title,
+  sub,
+}: {
+  eyebrow: string
+  title: React.ReactNode
+  sub?: string
+}) {
   return (
     <div className="mx-auto max-w-2xl text-center">
-      <Reveal><Eyebrow>{eyebrow}</Eyebrow></Reveal>
-      <Reveal delay={1} className="mt-4">
-        <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">{title}</h2>
+      <Reveal>
+        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/8 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
+          {eyebrow}
+        </span>
+      </Reveal>
+      <Reveal delay={1} className="mt-5">
+        <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+          {title}
+        </h2>
       </Reveal>
       <Reveal delay={2}>
-        <div className="mx-auto mt-4 h-px w-20 rounded-full"
-          style={{ background: `linear-gradient(90deg, transparent, ${C.cyan}, transparent)` }} />
-        {sub && <p className="mt-4 text-slate-400 leading-relaxed">{sub}</p>}
+        <div className="mx-auto mt-4 h-px w-20 rounded-full bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
+        {sub && <p className="mt-4 leading-relaxed text-slate-400">{sub}</p>}
       </Reveal>
     </div>
-  );
+  )
+}
+
+/** Hero: CBT terminal preview card */
+function CbtTerminal() {
+  const bars = [82, 55, 91, 68, 77, 43, 88]
+  return (
+    <div className="relative min-h-[340px] rounded-2xl border border-slate-700/60 bg-slate-900/80 p-5 shadow-2xl backdrop-blur-xl sm:p-6">
+      {/* terminal top bar */}
+      <div className="mb-4 flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
+          <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
+          <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/70" />
+        </div>
+        <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-400">
+          CBT LIVE
+        </span>
+        <span className="text-[10px] text-slate-500">Session #4821</span>
+      </div>
+
+      {/* score row */}
+      <div className="mb-4 grid grid-cols-3 gap-2">
+        {[
+          { label: 'Score', val: '74%',  color: 'text-emerald-400' },
+          { label: 'Q Left', val: '36',  color: 'text-cyan-400'    },
+          { label: 'Time',   val: '18m', color: 'text-blue-400'    },
+        ].map((s) => (
+          <div key={s.label} className="rounded-xl border border-slate-800 bg-slate-800/60 p-2.5 text-center">
+            <div className={`text-xl font-black ${s.color}`}>{s.val}</div>
+            <div className="mt-0.5 text-[9px] uppercase tracking-wider text-slate-500">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* mini bar chart */}
+      <div className="mb-4">
+        <div className="mb-1.5 text-[10px] uppercase tracking-wider text-slate-500">Subject accuracy</div>
+        <div className="flex items-end gap-1.5 h-12">
+          {bars.map((h, i) => (
+            <motion.div
+              key={i}
+              className="flex-1 rounded-sm"
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              transition={{ delay: 0.4 + i * 0.07, duration: 0.5, ease: 'backOut' }}
+              style={{
+                transformOrigin: 'bottom',
+                height: `${h}%`,
+                background: h > 75
+                  ? 'linear-gradient(to top, #10B981, #34d399)'
+                  : h > 55
+                  ? 'linear-gradient(to top, #06B6D4, #67e8f9)'
+                  : 'linear-gradient(to top, #3B82F6, #93c5fd)',
+              } as React.CSSProperties}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* ECG pulse line */}
+      <div className="mb-3">
+        <div className="mb-1 text-[10px] uppercase tracking-wider text-slate-500">Exam vitals</div>
+        <svg viewBox="0 0 200 36" className="h-9 w-full" fill="none">
+          <polyline
+            className="ecg-line"
+            points="0,18 20,18 30,5 40,30 50,18 65,18 75,2 85,34 95,18 115,18 125,8 135,28 145,18 200,18"
+            stroke="#10B981"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
+
+      {/* diagnostic tags */}
+      <div className="flex flex-wrap gap-1.5">
+        {['Anatomy 82%', 'Physiology 68%', 'Pharmacology 91%', 'Pathology 55%'].map((tag) => (
+          <span key={tag}
+            className="rounded-full border border-slate-700 bg-slate-800/80 px-2 py-0.5 text-[9px] font-medium text-slate-300">
+            {tag}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -231,177 +357,175 @@ function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: React.Re
 ═══════════════════════════════════════════════════════════════ */
 export default function Home() {
   return (
-    <div className="w-full min-h-screen overflow-x-clip font-sans text-white" style={{ backgroundColor: C.bg }}>
+    <main className="w-full min-h-screen flex flex-col items-center overflow-x-clip bg-[#030712] text-slate-100 selection:bg-emerald-500 selection:text-black">
 
       {/* ── ANNOUNCEMENT BAR ── */}
-      <div className="relative w-full flex justify-center overflow-hidden" style={{ background: `linear-gradient(90deg, ${C.bg}, ${C.surface}, ${C.bg})` }}>
-        <div className="w-full max-w-7xl mx-auto px-4 py-2 text-center text-xs font-medium tracking-wide"
-          style={{ color: C.cyan }}>
+      <div className="w-full flex justify-center border-b border-slate-800/60 bg-slate-900/40">
+        <div className="w-full max-w-7xl px-4 py-2 text-center text-xs font-medium tracking-wide text-slate-400 sm:px-6 lg:px-8">
           Admissions open for Fall 2026 · FCPS Part 1 preparation now live
-          <Link href="/register" className="ml-2 underline underline-offset-2 hover:opacity-80">Get started →</Link>
+          <Link href="/register" className="ml-2 text-emerald-400 underline underline-offset-2 hover:text-emerald-300">
+            Get started →
+          </Link>
         </div>
-        <div className="absolute bottom-0 inset-x-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${C.cyan}40, transparent)` }} />
       </div>
 
       {/* ── NAVBAR ── */}
-      <nav className="sticky top-0 z-50 w-full flex justify-center backdrop-blur-xl"
-        style={{ backgroundColor: 'rgba(3,7,18,0.85)', borderBottom: `1px solid ${C.border}` }}>
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-18 items-center justify-between py-3">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative flex h-11 w-11 items-center justify-center rounded-xl text-lg font-bold text-white"
-                style={{ background: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})`, boxShadow: `0 0 20px ${C.cyan}50` }}>
+      <nav className="sticky top-0 z-50 w-full flex justify-center border-b border-slate-800/70 bg-slate-950/80 backdrop-blur-xl">
+        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between gap-4">
+            <Link href="/" className="group flex items-center gap-3 shrink-0">
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-lg font-black text-slate-950 shadow-[0_0_18px_rgba(16,185,129,0.45)] transition-all group-hover:shadow-[0_0_28px_rgba(16,185,129,0.7)]">
                 F
-                <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ boxShadow: `0 0 30px ${C.cyan}80` }} />
               </div>
               <div>
-                <span className="block text-lg font-bold tracking-tight text-white">FCPS Simulator</span>
-                <span className="block text-[10px] uppercase tracking-[0.2em]" style={{ color: C.cyan }}>Physicians &amp; Surgeons Prep</span>
+                <span className="block text-base font-bold tracking-tight text-white">FCPS Simulator</span>
+                <span className="block text-[9px] uppercase tracking-[0.2em] text-emerald-400">Physicians &amp; Surgeons Prep</span>
               </div>
             </Link>
 
-            <div className="hidden items-center space-x-8 text-sm font-medium text-slate-400 md:flex">
+            <div className="hidden items-center gap-7 text-sm font-medium text-slate-400 md:flex">
               {NAV_LINKS.map((l) => (
-                <a key={l.href} href={l.href} className="transition-colors hover:text-white relative group">
+                <a key={l.href} href={l.href} className="relative transition-colors hover:text-white group">
                   {l.label}
-                  <span className="absolute -bottom-0.5 left-0 h-px w-0 group-hover:w-full transition-all duration-300"
-                    style={{ background: C.cyan }} />
+                  <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full" />
                 </a>
               ))}
             </div>
 
             <div className="hidden items-center gap-3 md:flex">
-              <Link href="/login" className="text-sm font-semibold text-slate-300 transition hover:text-white">Log in</Link>
-              <Link href="/register"
-                className="rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all hover:scale-105"
-                style={{ background: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})`, boxShadow: `0 0 20px ${C.cyan}40` }}>
-                Register Online
+              <Link href="/login" className="text-sm font-semibold text-slate-400 transition hover:text-white">
+                Log in
               </Link>
+              <GlowBtn href="/register" size="sm">Register Online</GlowBtn>
             </div>
+
             <MobileNav />
           </div>
         </div>
       </nav>
 
       {/* ── HERO ── */}
-      <header className="relative w-full flex justify-center overflow-hidden py-24 lg:py-36">
-        <GridBackground />
+      <header className="relative w-full flex justify-center overflow-hidden py-20 lg:py-28">
+        {/* background grid */}
+        <div className="cyber-grid pointer-events-none absolute inset-0 opacity-60" aria-hidden />
 
-        {/* floating diagnostic pulse lines */}
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          {[20, 45, 70].map((top) => (
-            <motion.div key={top} className="absolute w-full h-px opacity-[0.07]"
-              style={{ top: `${top}%`, background: `linear-gradient(90deg, transparent, ${C.cyan}, transparent)` }}
-              animate={{ scaleX: [0.3, 1, 0.3], opacity: [0.04, 0.12, 0.04] }}
-              transition={{ duration: 5 + top * 0.05, repeat: Infinity, ease: 'easeInOut' }} />
-          ))}
-        </div>
+        {/* glow orbs */}
+        <div className="float-orb pointer-events-none absolute -top-32 left-1/4 h-[500px] w-[500px] rounded-full" aria-hidden
+          style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.12), transparent 70%)' }} />
+        <div className="float-orb float-orb-delay pointer-events-none absolute -bottom-24 right-1/4 h-[400px] w-[400px] rounded-full" aria-hidden
+          style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.10), transparent 70%)' }} />
 
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-12">
 
-            {/* LEFT: headline */}
-            <div className="lg:col-span-7 space-y-7 text-center lg:text-left">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-                <span className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium tracking-wide backdrop-blur-sm"
-                  style={{ borderColor: `${C.cyan}30`, background: `${C.cyan}08`, color: C.cyan }}>
+            {/* LEFT */}
+            <div className="min-w-0 space-y-7 text-center lg:col-span-7 lg:text-left">
+              <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
+                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/8 px-4 py-1.5 text-xs font-medium tracking-wide backdrop-blur-sm text-emerald-400">
                   <BookOpen size={12} /> Premier CBT Exam Preparation Platform
                 </span>
               </motion.div>
 
               <motion.h1
-                initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }}
-                className="text-4xl font-black leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
+                initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, delay: 0.1 }}
+                className="text-4xl font-black leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.6rem]">
                 Shaping the Future of{' '}
-                <span className="relative">
-                  <span className="relative z-10 bg-clip-text text-transparent"
-                    style={{ backgroundImage: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})` }}>
-                    Medical Excellence
-                  </span>
-                  <motion.span className="absolute -inset-1 rounded-lg blur-2xl opacity-30 z-0"
-                    style={{ background: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})` }}
-                    animate={{ opacity: [0.2, 0.4, 0.2] }} transition={{ duration: 3, repeat: Infinity }} />
+                <span className="relative inline-block">
+                  <span className="glow-text">Medical Excellence</span>
+                  <motion.span
+                    className="pointer-events-none absolute -inset-1 -z-10 rounded-lg blur-2xl"
+                    style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.25), rgba(6,182,212,0.2))' }}
+                    animate={{ opacity: [0.4, 0.8, 0.4] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                    aria-hidden
+                  />
                 </span>
               </motion.h1>
 
-              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
+              <motion.p
+                initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
                 className="mx-auto max-w-xl text-lg leading-relaxed text-slate-400 lg:mx-0">
                 Access comprehensive digital mock exams, analyze your performance, and track your specialist medical training progress with scholarly precision.
               </motion.p>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
-                className="flex flex-col justify-center gap-4 sm:flex-row lg:justify-start">
-                <Link href="/register"
-                  className="group relative inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-sm font-bold text-white transition-all hover:scale-105"
-                  style={{ background: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})`, boxShadow: `0 0 30px ${C.cyan}50` }}>
-                  <span>Start Free Demo</span>
-                  <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-                  <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ boxShadow: `0 0 50px ${C.cyan}60` }} />
-                </Link>
-                <a href="#hiw"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:scale-105"
-                  style={{ borderColor: C.border, background: C.glass }}>
+              <motion.div
+                initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
+                <GlowBtn href="/register" size="lg">
+                  Start Free Demo <ArrowRight size={16} />
+                </GlowBtn>
+                <GlowBtn href="#hiw" size="lg" variant="ghost">
                   How to Apply <ChevronDown size={15} />
-                </a>
+                </GlowBtn>
+              </motion.div>
+
+              {/* trust chips */}
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55, duration: 0.5 }}
+                className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+                {['10,000+ Doctors', '99.9% Uptime', 'No card required'].map((t) => (
+                  <span key={t} className="flex items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1 text-xs text-slate-400">
+                    <Check size={10} className="text-emerald-400" /> {t}
+                  </span>
+                ))}
               </motion.div>
             </div>
 
-            {/* RIGHT: Quick Gateway card */}
-            <motion.div className="lg:col-span-5 min-w-0"
-              initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
-              <GlowCard featured glowColor={C.cyan} className="p-7">
-                <div className="mb-6 flex items-center justify-between border-b pb-4"
-                  style={{ borderColor: C.border }}>
-                  <h3 className="text-lg font-bold text-white">Quick Gateway</h3>
-                  <span className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
-                    style={{ color: C.emerald, background: `${C.emerald}15`, border: `1px solid ${C.emerald}30` }}>
-                    <span className="h-1.5 w-1.5 animate-pulse rounded-full" style={{ background: C.emerald }} />
+            {/* RIGHT: CBT terminal */}
+            <motion.div
+              className="min-w-0 lg:col-span-5"
+              initial={{ opacity: 0, x: 36 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.75, delay: 0.2 }}>
+              {/* Quick Gateway card */}
+              <GlassCard className="mb-4 p-5">
+                <div className="mb-4 flex items-center justify-between border-b border-slate-800 pb-3">
+                  <h3 className="font-bold text-white">Quick Gateway</h3>
+                  <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                     Live
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {GATEWAY.map((g, i) => {
-                    const Icon = g.icon;
+                <div className="grid grid-cols-2 gap-2.5">
+                  {GATEWAY.map((g) => {
+                    const Icon = g.icon
+                    const accent = g.color === 'cyan' ? '#06B6D4' : g.color === 'blue' ? '#3B82F6' : '#10B981'
                     return (
-                      <motion.div key={g.title} custom={i} variants={fadeIn} initial="hidden" animate="visible">
-                        <Link href={g.href}
-                          className="group flex flex-col rounded-xl border p-4 transition-all hover:scale-[1.03]"
-                          style={{ borderColor: C.border, background: C.glass }}>
-                          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg"
-                            style={{ background: `${C.cyan}15`, color: C.cyan }}>
-                            <Icon size={18} className="transition-transform group-hover:scale-110" />
-                          </div>
-                          <h4 className="text-sm font-semibold text-white">{g.title}</h4>
-                          <p className="mt-0.5 text-xs text-slate-500">{g.desc}</p>
-                        </Link>
-                      </motion.div>
-                    );
+                      <Link key={g.title} href={g.href}
+                        className="group flex flex-col rounded-xl border border-slate-800 bg-slate-800/40 p-3.5 transition-all hover:border-emerald-500/40 hover:bg-slate-800/70">
+                        <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg"
+                          style={{ background: `${accent}18`, color: accent }}>
+                          <Icon size={16} className="transition-transform group-hover:scale-110" />
+                        </div>
+                        <h4 className="text-xs font-semibold text-white">{g.title}</h4>
+                        <p className="mt-0.5 text-[10px] text-slate-500">{g.desc}</p>
+                      </Link>
+                    )
                   })}
                 </div>
-              </GlowCard>
+              </GlassCard>
+
+              <CbtTerminal />
             </motion.div>
           </div>
         </div>
       </header>
 
       {/* ── STATS ── */}
-      <section className="w-full flex justify-center relative">
-        <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${C.bg}, ${C.surface})` }} />
-        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-2 gap-px lg:grid-cols-4"
-            style={{ background: C.border }}>
-            {STATS.map(({ value, suffix, label, icon: Icon }, i) => (
-              <Reveal key={label} delay={i} className="flex flex-col items-center gap-2 px-6 py-10 text-center"
-                style={{ background: C.surface }}>
-                <div className="mb-1 flex h-10 w-10 items-center justify-center rounded-xl"
-                  style={{ background: `${C.cyan}12`, color: C.cyan }}>
-                  <Icon size={20} />
+      <section className="w-full flex justify-center border-y border-slate-800/60 bg-slate-900/30">
+        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 divide-x divide-y divide-slate-800/60 lg:grid-cols-4 lg:divide-y-0">
+            {STATS.map(({ value, display, label, icon: Icon }, i) => (
+              <Reveal key={label} delay={i}
+                className="flex flex-col items-center gap-2 px-6 py-10 text-center">
+                <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-xl border border-slate-800 bg-slate-800/60">
+                  <Icon size={17} className="text-emerald-400" />
                 </div>
                 <div className="text-3xl font-black text-white lg:text-4xl"
-                  style={{ textShadow: `0 0 20px ${C.cyan}60` }}>
-                  <Counter target={value} suffix={suffix} />
+                  style={{ textShadow: '0 0 20px rgba(16,185,129,0.5)' }}>
+                  <Counter target={value} display={display} />
                 </div>
                 <div className="text-sm text-slate-500">{label}</div>
               </Reveal>
@@ -411,134 +535,131 @@ export default function Home() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="features" className="relative w-full flex justify-center py-28 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full opacity-[0.04]"
-            style={{ background: `radial-gradient(circle, ${C.emerald}, transparent)` }} />
-        </div>
-        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="features" className="w-full flex justify-center py-24 md:py-32">
+        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHead
             eyebrow="Platform Features"
-            title={<>Built for <span className="bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})` }}>medical excellence</span></>}
+            title={<>Built for <span className="glow-text">medical excellence</span></>}
             sub="Every feature engineered to replicate the real exam environment and maximize your preparation."
           />
-          {/* bento grid */}
-          <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-16 grid w-full grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f, i) => {
-              const Icon = ICON_MAP[f.id] ?? Sparkles;
-              const accent = [C.cyan, C.emerald, C.blue, '#A78BFA', '#F472B6', '#FB923C'][i % 6];
+              const Icon = FEATURE_ICONS[f.id] ?? Sparkles
+              const accent = FEATURE_COLORS[i % FEATURE_COLORS.length]
               return (
-                <Reveal key={f.id} delay={i % 3} className={i === 0 ? 'sm:col-span-2 lg:col-span-1' : ''}>
+                <Reveal key={f.id} delay={i % 3}>
                   <Link href={`/feature/${f.id}`}>
-                    <GlowCard glowColor={accent} className="h-full p-6 cursor-pointer">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl mb-5 transition-transform duration-300"
+                    <GlassCard glow={accent} className="h-full p-6 cursor-pointer">
+                      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
                         style={{ background: `${accent}15`, color: accent }}>
                         <Icon size={22} />
                       </div>
                       <h3 className="mb-2 text-lg font-bold text-white">{f.title}</h3>
                       <p className="text-sm leading-relaxed text-slate-400">{f.shortDesc}</p>
-                      <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold"
-                        style={{ color: accent }}>
+                      <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold" style={{ color: accent }}>
                         Learn more <ArrowRight size={12} />
                       </div>
-                    </GlowCard>
+                    </GlassCard>
                   </Link>
                 </Reveal>
-              );
+              )
             })}
           </div>
         </div>
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section id="hiw" className="relative w-full flex justify-center py-28 overflow-hidden"
-        style={{ background: `linear-gradient(180deg, ${C.bg} 0%, ${C.surface} 50%, ${C.bg} 100%)` }}>
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="absolute inset-x-0 top-0 h-px"
-            style={{ background: `linear-gradient(90deg, transparent, ${C.cyan}30, transparent)` }} />
-          <div className="absolute inset-x-0 bottom-0 h-px"
-            style={{ background: `linear-gradient(90deg, transparent, ${C.cyan}30, transparent)` }} />
-        </div>
-        <div className="relative w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="hiw" className="relative w-full flex justify-center overflow-hidden py-24 md:py-32">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" aria-hidden />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-slate-900/20 to-transparent" aria-hidden />
+
+        <div className="relative w-full max-w-5xl px-4 sm:px-6 lg:px-8">
           <SectionHead eyebrow="Process" title="Start in three simple steps" />
-          <div className="mt-20 grid gap-8 sm:grid-cols-3">
-            {STEPS.map((s, i) => (
-              <Reveal key={s.num} delay={i}>
-                <div className="relative text-center group">
-                  {/* connector line */}
-                  {i < STEPS.length - 1 && (
-                    <div className="hidden sm:block absolute top-10 left-[60%] right-[-40%] h-px"
-                      style={{ background: `linear-gradient(90deg, ${s.color}40, transparent)` }} />
-                  )}
-                  <div className="mx-auto mb-6 relative flex h-20 w-20 items-center justify-center rounded-full border-2 text-2xl font-black transition-all duration-300 group-hover:scale-110"
-                    style={{
-                      borderColor: s.color,
-                      color: s.color,
-                      background: `${s.color}10`,
-                      boxShadow: `0 0 30px ${s.color}30`,
-                    }}>
-                    {s.num}
-                    <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                      style={{ boxShadow: `0 0 40px ${s.color}60` }} />
+
+          <div className="mt-20 grid w-full gap-8 sm:grid-cols-3">
+            {STEPS.map((s, i) => {
+              const Icon = s.icon
+              return (
+                <Reveal key={s.num} delay={i}>
+                  <div className="group relative text-center">
+                    {i < STEPS.length - 1 && (
+                      <div className="absolute left-[60%] right-[-40%] top-10 hidden h-px sm:block"
+                        style={{ background: `linear-gradient(90deg, ${s.color}40, transparent)` }} />
+                    )}
+                    <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border-2 text-2xl font-black transition-all duration-300 group-hover:scale-110"
+                      style={{
+                        borderColor: s.color,
+                        color: s.color,
+                        background: `${s.color}10`,
+                        boxShadow: `0 0 30px ${s.color}25`,
+                      }}>
+                      {s.num}
+                      <div className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                        style={{ boxShadow: `0 0 40px ${s.color}50` }} />
+                    </div>
+                    <h3 className="mb-3 text-xl font-bold text-white">{s.title}</h3>
+                    <p className="mx-auto max-w-[240px] text-sm leading-relaxed text-slate-400">{s.desc}</p>
                   </div>
-                  <h3 className="mb-3 text-xl font-bold text-white">{s.title}</h3>
-                  <p className="mx-auto max-w-[240px] text-sm leading-relaxed text-slate-400">{s.desc}</p>
-                </div>
-              </Reveal>
-            ))}
+                </Reveal>
+              )
+            })}
           </div>
         </div>
       </section>
 
       {/* ── PRICING ── */}
-      <section id="pricing" className="relative w-full flex justify-center py-28 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="absolute top-0 right-1/4 h-[400px] w-[400px] rounded-full opacity-[0.05]"
-            style={{ background: `radial-gradient(circle, ${C.blue}, transparent)` }} />
-        </div>
-        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="pricing" className="relative w-full flex justify-center overflow-hidden py-24 md:py-32">
+        <div className="float-orb pointer-events-none absolute top-0 right-1/4 h-[450px] w-[450px] rounded-full" aria-hidden
+          style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.06), transparent 70%)' }} />
+
+        <div className="relative w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHead
             eyebrow="Pricing"
             title="Choose your plan"
             sub="Transparent pricing. No hidden fees. Instant access after payment."
           />
-          <div className="mt-16 pt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+
+          <div className="mt-16 grid w-full grid-cols-1 gap-5 pt-4 sm:grid-cols-2 lg:grid-cols-4">
             {PLANS.map((plan, i) => (
               <Reveal key={plan.name} delay={i}>
-                <GlowCard featured={plan.featured} glowColor={C.emerald} className="h-full flex flex-col p-6">
-                  {plan.featured && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20">
-                      <span className="whitespace-nowrap rounded-full px-4 py-1 text-[10px] font-bold uppercase tracking-wider text-white"
-                        style={{ background: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})`, boxShadow: `0 0 20px ${C.emerald}60` }}>
+                <GlassCard featured={plan.featured} className="flex h-full flex-col p-6">
+                  {plan.badge && (
+                    <div className="absolute -top-3.5 left-1/2 z-20 -translate-x-1/2">
+                      <span className="whitespace-nowrap rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-950 shadow-[0_0_15px_rgba(16,185,129,0.6)]">
                         {plan.badge}
                       </span>
                     </div>
                   )}
-                  <div className="mb-2 text-sm font-semibold text-slate-400">{plan.name}</div>
-                  <div className="mb-0.5 text-2xl font-black text-white"
-                    style={plan.featured ? { background: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {}}>
+
+                  <div className="mb-1 text-sm font-semibold text-slate-400">{plan.name}</div>
+                  <div className={`mb-0.5 text-2xl font-black ${plan.featured ? 'glow-text' : 'text-white'}`}>
                     {plan.price}
                   </div>
                   <div className="mb-6 text-xs text-slate-500">{plan.period}</div>
+
                   <ul className="mb-6 flex flex-1 flex-col gap-3">
                     {plan.features.map((f) => (
                       <li key={f} className="flex items-center gap-2.5 text-sm text-slate-300">
-                        <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full"
-                          style={{ background: plan.featured ? `${C.emerald}20` : `${C.cyan}15` }}>
-                          <Check size={10} style={{ color: plan.featured ? C.emerald : C.cyan }} />
+                        <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${plan.featured ? 'bg-emerald-500/20' : 'bg-slate-800'}`}>
+                          <Check size={9} className={plan.featured ? 'text-emerald-400' : 'text-slate-400'} />
                         </div>
                         {f}
                       </li>
                     ))}
                   </ul>
-                  <Link href="/subscription-expired"
-                    className="mt-auto block rounded-xl px-4 py-2.5 text-center text-sm font-bold text-white transition-all hover:scale-105"
-                    style={plan.featured
-                      ? { background: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})`, boxShadow: `0 0 20px ${C.emerald}40` }
-                      : { background: C.glass, border: `1px solid ${C.border}` }}>
-                    {plan.cta}
-                  </Link>
-                </GlowCard>
+
+                  {plan.featured ? (
+                    <GlowBtn href="/subscription-expired">
+                      {plan.cta} <ArrowRight size={14} />
+                    </GlowBtn>
+                  ) : (
+                    <Link href="/subscription-expired"
+                      className="block rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-2.5 text-center text-sm font-semibold text-slate-200 transition-all hover:border-emerald-500/40 hover:bg-slate-800 hover:text-white">
+                      {plan.cta}
+                    </Link>
+                  )}
+                </GlassCard>
               </Reveal>
             ))}
           </div>
@@ -546,22 +667,21 @@ export default function Home() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section id="testimonials" className="relative w-full flex justify-center py-28 overflow-hidden"
-        style={{ background: `linear-gradient(180deg, ${C.bg}, ${C.surface} 50%, ${C.bg})` }}>
-        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHead eyebrow="Testimonials" title={<>Trusted by <span className="bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})` }}>medical professionals</span></>} />
-          <div className="mt-16 grid gap-6 sm:grid-cols-3">
+      <section id="testimonials" className="relative w-full flex justify-center py-24 md:py-32">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-700/50 to-transparent" aria-hidden />
+        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <SectionHead
+            eyebrow="Testimonials"
+            title={<>Trusted by <span className="glow-text">medical professionals</span></>}
+          />
+          <div className="mt-16 grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {TESTIMONIALS.map((t, i) => (
               <Reveal key={t.name} delay={i}>
-                <GlowCard className="flex h-full flex-col p-7" glowColor={C.cyan}>
-                  <div className="mb-4 text-5xl leading-none font-black"
-                    style={{ background: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                    &ldquo;
-                  </div>
+                <GlassCard className="flex h-full flex-col p-7">
+                  <div className="mb-4 text-5xl font-black leading-none glow-text">&ldquo;</div>
                   <p className="mb-6 flex-1 text-[15px] italic leading-relaxed text-slate-300">{t.quote}</p>
-                  <div className="flex items-center gap-3 border-t pt-5" style={{ borderColor: C.border }}>
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-                      style={{ background: `linear-gradient(135deg, ${C.cyan}80, ${C.emerald}80)` }}>
+                  <div className="flex items-center gap-3 border-t border-slate-800 pt-5">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500/60 to-cyan-500/60 text-sm font-black text-white">
                       {t.name.replace('Dr. ', '')[0]}
                     </div>
                     <div>
@@ -569,7 +689,7 @@ export default function Home() {
                       <div className="text-xs text-slate-500">{t.role}</div>
                     </div>
                   </div>
-                </GlowCard>
+                </GlassCard>
               </Reveal>
             ))}
           </div>
@@ -577,32 +697,30 @@ export default function Home() {
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" className="relative w-full flex justify-center py-28">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="faq" className="w-full flex justify-center py-24 md:py-32">
+        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHead eyebrow="FAQ" title="Common questions" />
-          <div className="mt-14 mx-auto max-w-2xl">
+          <div className="mt-14 w-full flex justify-center">
             <FaqAccordion faqs={FAQS} />
           </div>
         </div>
       </section>
 
       {/* ── CTA ── */}
-      <section className="relative w-full flex justify-center py-28 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at center, ${C.cyan}08 0%, transparent 70%)` }} />
-          <div className="absolute inset-x-0 top-0 h-px"
-            style={{ background: `linear-gradient(90deg, transparent, ${C.cyan}50, transparent)` }} />
-          <div className="absolute inset-x-0 bottom-0 h-px"
-            style={{ background: `linear-gradient(90deg, transparent, ${C.emerald}50, transparent)` }} />
+      <section className="relative w-full flex justify-center overflow-hidden py-28 md:py-36">
+        <div className="cyber-grid pointer-events-none absolute inset-0 opacity-40" aria-hidden />
+        <div className="float-orb pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
+          <div className="h-[600px] w-[600px] rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.07), transparent 70%)' }} />
         </div>
-        <div className="relative w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" aria-hidden />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" aria-hidden />
+
+        <div className="relative z-10 w-full max-w-3xl px-4 text-center sm:px-6 lg:px-8">
           <Reveal>
             <h2 className="text-3xl font-black leading-tight tracking-tight text-white sm:text-5xl">
               Ready to secure your{' '}
-              <span className="bg-clip-text text-transparent"
-                style={{ backgroundImage: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})` }}>
-                residency?
-              </span>
+              <span className="glow-text">residency?</span>
             </h2>
           </Reveal>
           <Reveal delay={1}>
@@ -610,24 +728,24 @@ export default function Home() {
               Join thousands of medical professionals already preparing smarter with the FCPS Part 1 Simulator.
             </p>
           </Reveal>
-          <Reveal delay={2}>
-            <Link href="/register"
-              className="mt-10 inline-flex items-center gap-3 rounded-2xl px-10 py-4 text-base font-bold text-white transition-all hover:scale-105"
-              style={{ background: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})`, boxShadow: `0 0 40px ${C.cyan}50` }}>
-              Get instant access <ArrowRight size={18} />
-            </Link>
+          <Reveal delay={2} className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <GlowBtn href="/register" size="lg">
+              Get instant access <ArrowRight size={17} />
+            </GlowBtn>
+            <GlowBtn href="/register" size="lg" variant="ghost">
+              Start Free Demo
+            </GlowBtn>
           </Reveal>
         </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="relative w-full flex justify-center" style={{ borderTop: `1px solid ${C.border}` }}>
-        <div className="w-full max-w-7xl mx-auto px-4 py-14 sm:px-6 lg:px-8">
+      <footer className="w-full flex justify-center border-t border-slate-800/60 bg-slate-950/60">
+        <div className="w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-start justify-between gap-10">
             <div className="min-w-0 max-w-xs">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl text-lg font-bold text-white"
-                  style={{ background: `linear-gradient(135deg, ${C.cyan}, ${C.emerald})`, boxShadow: `0 0 15px ${C.cyan}40` }}>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-lg font-black text-slate-950 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
                   F
                 </div>
                 <span className="text-lg font-bold text-white">FCPS Simulator</span>
@@ -636,32 +754,34 @@ export default function Home() {
                 The scholarly CBT platform for medical professionals preparing for FCPS Part 1.
               </p>
             </div>
+
             <div className="flex flex-wrap gap-x-14 gap-y-8">
               <div className="min-w-0">
-                <h4 className="mb-4 text-xs font-bold uppercase tracking-wider" style={{ color: C.cyan }}>Platform</h4>
+                <h4 className="mb-4 text-xs font-bold uppercase tracking-wider text-emerald-400">Platform</h4>
                 <div className="flex flex-col gap-2.5 text-sm text-slate-400">
                   {NAV_LINKS.map((l) => (
-                    <a key={l.href} href={l.href} className="transition-colors hover:text-white">{l.label}</a>
+                    <a key={l.href} href={l.href} className="transition-colors hover:text-emerald-400">{l.label}</a>
                   ))}
                 </div>
               </div>
               <div className="min-w-0">
-                <h4 className="mb-4 text-xs font-bold uppercase tracking-wider" style={{ color: C.cyan }}>Account</h4>
+                <h4 className="mb-4 text-xs font-bold uppercase tracking-wider text-emerald-400">Account</h4>
                 <div className="flex flex-col gap-2.5 text-sm text-slate-400">
                   <Link href="/login" className="transition-colors hover:text-white">Log in</Link>
                   <Link href="/register" className="transition-colors hover:text-white">Register</Link>
-                  <a href="https://wa.me/923324737436" className="flex items-center gap-2 transition-colors hover:text-white">
-                    <MessageCircle size={13} style={{ color: C.emerald }} /> WhatsApp support
+                  <a href="https://wa.me/923324737436" className="flex items-center gap-1.5 transition-colors hover:text-emerald-400">
+                    <MessageCircle size={13} className="text-emerald-500" /> WhatsApp support
                   </a>
                 </div>
               </div>
             </div>
           </div>
-          <div className="mt-12 border-t pt-6 text-center text-xs text-slate-600" style={{ borderColor: C.border }}>
+
+          <div className="mt-12 border-t border-slate-800/60 pt-6 text-center text-xs text-slate-600">
             © {new Date().getFullYear()} FCPS Part 1 Simulator. All rights reserved.
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </main>
+  )
 }
