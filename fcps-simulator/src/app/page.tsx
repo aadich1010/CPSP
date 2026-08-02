@@ -71,7 +71,7 @@ const serif = { fontFamily: 'var(--font-playfair), Georgia, serif' };
 
 export default function Home() {
   return (
-    <div className="min-h-screen font-sans text-[#2a2320]" style={{ backgroundColor: CREAM }}>
+    <div className="w-full min-h-screen font-sans text-[#2a2320]" style={{ backgroundColor: CREAM }}>
       {/* TOP RULE BAR */}
       <div className="px-4 py-2 text-center text-xs font-medium tracking-wide text-white" style={{ backgroundColor: NAVY }}>
         Admissions open for Fall 2026 · FCPS Part 1 preparation now live
