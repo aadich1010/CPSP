@@ -49,13 +49,13 @@ export default async function AdminLayout({
               style={{
                 width: 34,
                 height: 34,
-                background: 'linear-gradient(135deg, var(--teal-600), var(--teal-400))',
+                background: 'linear-gradient(135deg, #10B981, #06B6D4)',
                 borderRadius: 10,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                boxShadow: '0 4px 10px rgba(13, 148, 136, 0.2)'
+                boxShadow: '0 4px 10px rgba(16,185,129,0.2)'
               }}
             >
               <span style={{ fontSize: '1rem' }}>⚙️</span>
@@ -64,7 +64,7 @@ export default async function AdminLayout({
               <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0f172a' }}>
                 Admin Panel
               </div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--teal-600)', fontWeight: 700 }}>
+              <div style={{ fontSize: '0.7rem', color: '#10B981', fontWeight: 700 }}>
                 FCPS Simulator
               </div>
             </div>
