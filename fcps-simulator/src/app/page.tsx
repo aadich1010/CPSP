@@ -92,11 +92,11 @@ const fadeIn = {
 };
 
 /* ─── REUSABLE: scroll-triggered section wrapper ─────────────── */
-function Reveal({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+function Reveal({ children, className = '', delay = 0, style }: { children: React.ReactNode; className?: string; delay?: number; style?: React.CSSProperties }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   return (
-    <motion.div ref={ref} className={className} initial="hidden" animate={inView ? 'visible' : 'hidden'} custom={delay} variants={fadeUp}>
+    <motion.div ref={ref} className={className} style={style} initial="hidden" animate={inView ? 'visible' : 'hidden'} custom={delay} variants={fadeUp}>
       {children}
     </motion.div>
   );
