@@ -256,13 +256,13 @@ function SectionHead({
           {eyebrow}
         </span>
       </Reveal>
-      <Reveal delay={1} className="mt-5">
+      <Reveal delay={1} className="mt-4">
         <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
           {title}
         </h2>
       </Reveal>
       <Reveal delay={2}>
-        <div className="mx-auto mt-4 h-px w-20 rounded-full bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
+        <div className="mx-auto mt-3 h-px w-20 rounded-full bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
         {sub && <p className="mt-4 leading-relaxed text-slate-500">{sub}</p>}
       </Reveal>
     </div>
@@ -529,7 +529,7 @@ export default function Home() {
           <div className="grid grid-cols-2 divide-x divide-y divide-slate-100 lg:grid-cols-4 lg:divide-y-0">
             {STATS.map(({ value, display, label, icon: Icon }, i) => (
               <Reveal key={label} delay={i}
-                className="flex flex-col items-center gap-2 px-6 py-10 text-center">
+                className="flex flex-col items-center gap-1.5 px-6 py-7 text-center">
                 <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white shadow-sm">
                   <Icon size={17} className="text-emerald-400" />
                 </div>
@@ -545,14 +545,14 @@ export default function Home() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="features" className="w-full flex justify-center py-24 md:py-32 bg-white">
+      <section id="features" className="w-full flex justify-center py-14 md:py-16 bg-white">
         <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHead
             eyebrow="Platform Features"
             title={<>Built for <span className="glow-text">medical excellence</span></>}
             sub="Every feature engineered to replicate the real exam environment and maximize your preparation."
           />
-          <div className="mt-16 grid w-full grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid w-full grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f, i) => {
               const Icon = FEATURE_ICONS[f.id] ?? Sparkles
               const accent = FEATURE_COLORS[i % FEATURE_COLORS.length]
@@ -579,7 +579,7 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section id="hiw" className="relative w-full flex justify-center overflow-hidden py-24 md:py-32 bg-slate-50">
+      <section id="hiw" className="relative w-full flex justify-center overflow-hidden py-14 md:py-16 bg-slate-50">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" aria-hidden />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" aria-hidden />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-slate-50/80 to-transparent" aria-hidden />
@@ -587,7 +587,7 @@ export default function Home() {
         <div className="relative w-full max-w-5xl px-4 sm:px-6 lg:px-8">
           <SectionHead eyebrow="Process" title="Start in three simple steps" />
 
-          <div className="mt-20 grid w-full gap-8 sm:grid-cols-3">
+          <div className="mt-10 grid w-full gap-7 sm:grid-cols-3">
             {STEPS.map((s, i) => {
               const Icon = s.icon
               return (
@@ -597,7 +597,7 @@ export default function Home() {
                       <div className="absolute left-[60%] right-[-40%] top-10 hidden h-px sm:block"
                         style={{ background: `linear-gradient(90deg, ${s.color}40, transparent)` }} />
                     )}
-                    <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border-2 text-2xl font-black transition-all duration-300 group-hover:scale-110"
+                    <div className="relative mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border-2 text-xl font-black transition-all duration-300 group-hover:scale-110"
                       style={{
                         borderColor: s.color,
                         color: s.color,
@@ -619,7 +619,7 @@ export default function Home() {
       </section>
 
       {/* ── PRICING ── */}
-      <section id="pricing" className="relative w-full flex justify-center overflow-hidden py-24 md:py-32 bg-white">
+      <section id="pricing" className="relative w-full flex justify-center overflow-hidden py-14 md:py-16 bg-white">
         <div className="float-orb pointer-events-none absolute top-0 right-1/4 h-[450px] w-[450px] rounded-full" aria-hidden
           style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.06), transparent 70%)' }} />
 
@@ -630,7 +630,7 @@ export default function Home() {
             sub="Transparent pricing. No hidden fees. Instant access after payment."
           />
 
-          <div className="mt-16 grid w-full grid-cols-1 gap-5 pt-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid w-full grid-cols-1 gap-5 pt-3 sm:grid-cols-2 lg:grid-cols-4">
             {PLANS.map((plan, i) => (
               <Reveal key={plan.name} delay={i}>
                 <GlassCard featured={plan.featured} className="flex h-full flex-col p-6">
@@ -677,14 +677,14 @@ export default function Home() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section id="testimonials" className="relative w-full flex justify-center py-24 md:py-32 bg-slate-50">
+      <section id="testimonials" className="relative w-full flex justify-center py-14 md:py-16 bg-slate-50">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" aria-hidden />
         <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHead
             eyebrow="Testimonials"
             title={<>Trusted by <span className="glow-text">medical professionals</span></>}
           />
-          <div className="mt-16 grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid w-full grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {TESTIMONIALS.map((t, i) => (
               <Reveal key={t.name} delay={i}>
                 <GlassCard className="flex h-full flex-col p-7">
@@ -707,17 +707,17 @@ export default function Home() {
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" className="w-full flex justify-center py-24 md:py-32 bg-white">
+      <section id="faq" className="w-full flex justify-center py-14 md:py-16 bg-white">
         <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHead eyebrow="FAQ" title="Common questions" />
-          <div className="mt-14 w-full flex justify-center">
+          <div className="mt-9 w-full flex justify-center">
             <FaqAccordion faqs={FAQS} />
           </div>
         </div>
       </section>
 
       {/* ── CTA ── */}
-      <section className="relative w-full flex justify-center overflow-hidden py-28 md:py-36">
+      <section className="relative w-full flex justify-center overflow-hidden py-16 md:py-20">
         <div className="cyber-grid pointer-events-none absolute inset-0 opacity-40" aria-hidden />
         <div className="float-orb pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
           <div className="h-[600px] w-[600px] rounded-full"
@@ -738,7 +738,7 @@ export default function Home() {
               Join thousands of medical professionals already preparing smarter with the FCPS Part 1 Simulator.
             </p>
           </Reveal>
-          <Reveal delay={2} className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <Reveal delay={2} className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <GlowBtn href="/register" size="lg">
               Get instant access <ArrowRight size={17} />
             </GlowBtn>
@@ -751,7 +751,7 @@ export default function Home() {
 
       {/* ── FOOTER ── */}
       <footer className="w-full flex justify-center border-t border-slate-200 bg-slate-50">
-        <div className="w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-start justify-between gap-10">
             <div className="min-w-0 max-w-xs">
               <div className="flex items-center gap-3">
@@ -787,7 +787,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-12 border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
+          <div className="mt-8 border-t border-slate-200 pt-5 text-center text-xs text-slate-400">
             © {new Date().getFullYear()} FCPS Part 1 Simulator. All rights reserved.
           </div>
         </div>
