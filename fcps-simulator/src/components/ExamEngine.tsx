@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import PremiumResultScreen from './PremiumResultScreen'
 import { logger } from '@/lib/logger'
 
-interface Question {
+export interface Question {
   id: string
   question_text: string
   option_a: string
@@ -40,6 +40,63 @@ function getOptionText(q: Question, label: string): string | null {
   return map[label] ?? null
 }
 
+const OPTION_FIELDS = ['option_a', 'option_b', 'option_c', 'option_d', 'option_e'] as const
+
+function shuffle<T>(input: T[]): T[] {
+  const arr = [...input]
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
+}
+
+/** A question whose options have been re-ordered for display, plus the two
+ *  lookup tables needed to move between what the student SEES and what the
+ *  database actually stores.
+ *
+ *  The answer key in `questions.correct_answer` is a letter (A-E) tied to the
+ *  original column order, and grading happens server-side against that letter.
+ *  So shuffling has to be purely presentational: the student picks display
+ *  letter "B", we translate it back to whatever original letter that text came
+ *  from before submitting, and translate the revealed key forward again so the
+ *  review screen highlights the right row. Reordering without this mapping is
+ *  exactly how a shuffle silently marks every answer wrong. */
+export interface ShuffledQuestion {
+  display:    Question
+  toOriginal: Record<string, string>
+  toDisplay:  Record<string, string>
+}
+
+export function shuffleOptions(q: Question): ShuffledQuestion {
+  const present = OPTION_LABELS.filter((l) => {
+    const t = getOptionText(q, l)
+    return t !== null && t.trim() !== ''
+  })
+  const order = shuffle(present)
+
+  const display: Question = { ...q }
+  OPTION_FIELDS.forEach((field, i) => {
+    const src = order[i]
+    ;(display as unknown as Record<string, string | null>)[field] =
+      src ? getOptionText(q, src) : null
+  })
+
+  const toOriginal: Record<string, string> = {}
+  const toDisplay:  Record<string, string> = {}
+  order.forEach((originalLabel, i) => {
+    toOriginal[OPTION_LABELS[i]] = originalLabel
+    toDisplay[originalLabel] = OPTION_LABELS[i]
+  })
+
+  // Practice mode ships the key inline, so translate it up front.
+  if (q.correct_answer && toDisplay[q.correct_answer]) {
+    display.correct_answer = toDisplay[q.correct_answer]
+  }
+
+  return { display, toOriginal, toDisplay }
+}
+
 function formatTime(secs: number): string {
   const h = Math.floor(secs / 3600)
   const m = Math.floor((secs % 3600) / 60)
@@ -48,7 +105,17 @@ function formatTime(secs: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-export default function ExamEngine({ sessionId, questions, subject, mode, userId, timeLimitSeconds, candidateName }: ExamEngineProps) {
+export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName }: ExamEngineProps) {
+  // Shuffled ONCE per mount (lazy initialiser), never on re-render -- otherwise
+  // the options would jump around under the student's cursor every tick of the
+  // timer. Question ORDER is already randomised per attempt server-side by
+  // get_exam_questions(); this adds per-attempt option order on top.
+  const [shuffled] = useState<ShuffledQuestion[]>(() => rawQuestions.map(shuffleOptions))
+  // Memoised: `shuffled` is stable from useState, so `questions` keeps a
+  // stable identity. Rebuilding it each render would re-fire the timer
+  // effect (handleSubmit depends on it) on every single tick.
+  const questions  = useMemo(() => shuffled.map((s) => s.display), [shuffled])
+
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers,      setAnswers]      = useState<Answer[]>(Array(questions.length).fill(null))
   const [submitted,    setSubmitted]    = useState(false)
@@ -77,15 +144,27 @@ export default function ExamEngine({ sessionId, questions, subject, mode, userId
       // Server re-derives elapsed time from exam_sessions.started_at and
       // grades against questions.correct_answer itself. Client-sent answers
       // are the ONLY thing trusted from the browser; score is never trusted.
+      // Translate the student's DISPLAY letters back to the original
+      // column letters the answer key is stored against. Without this the
+      // server would grade shuffled picks against unshuffled keys.
+      const originalAnswers = answers.map((a, i) =>
+        a ? (shuffled[i]?.toOriginal[a] ?? a) : null
+      )
+
       const { data, error } = await supabase.rpc('submit_exam_attempt', {
         p_session_id: sessionId,
-        p_answers: answers,
+        p_answers: originalAnswers,
       })
 
       if (error) throw error
 
-      const graded = data as { score: number; total_questions: number }
-      setResult({ score: graded.score, total: graded.total_questions })
+      // submit_exam_attempt() is `returns table (...)`, so PostgREST hands
+      // back an ARRAY of rows -- reading .score straight off `data` yielded
+      // undefined and silently dropped the authoritative server score,
+      // making the result screen fall back to its local recount.
+      const graded = (Array.isArray(data) ? data[0] : data) as
+        { score: number; total_questions: number } | undefined
+      if (graded) setResult({ score: graded.score, total: graded.total_questions })
 
       if (mode === 'exam') {
         // Safe to reveal correct answers now that grading already happened
@@ -101,7 +180,22 @@ export default function ExamEngine({ sessionId, questions, subject, mode, userId
           setGradedQuestions(questions) // degrade gracefully: show without answer key
         } else {
           const byId = new Map(revealed.map((q: Question) => [q.id, q]))
-          setGradedQuestions(questions.map((q) => byId.get(q.id) ?? q))
+          // Keep OUR shuffled option text, but take the key/explanation from
+          // the reveal -- remapping the key from its original letter to the
+          // display letter the student actually saw.
+          setGradedQuestions(
+            shuffled.map(({ display, toDisplay }) => {
+              const rev = byId.get(display.id)
+              if (!rev) return display
+              return {
+                ...display,
+                correct_answer: rev.correct_answer
+                  ? (toDisplay[rev.correct_answer] ?? rev.correct_answer)
+                  : undefined,
+                explanation: rev.explanation,
+              }
+            })
+          )
         }
       }
 
@@ -114,7 +208,7 @@ export default function ExamEngine({ sessionId, questions, subject, mode, userId
     } finally {
       setSaving(false)
     }
-  }, [answers, sessionId, userId, mode, questions, submitted])
+  }, [answers, sessionId, userId, mode, questions, shuffled, submitted])
 
   useEffect(() => {
     if (submitted) return

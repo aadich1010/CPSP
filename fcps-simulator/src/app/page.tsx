@@ -273,38 +273,38 @@ function SectionHead({
 function CbtTerminal() {
   const bars = [82, 55, 91, 68, 77, 43, 88]
   return (
-    <div className="relative h-full min-h-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-xl sm:p-6">
+    <div className="relative h-full min-h-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
       {/* terminal top bar */}
-      <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
-          <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
-          <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/70" />
+      <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-2.5">
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-red-500/70" />
+          <span className="h-2 w-2 rounded-full bg-yellow-500/70" />
+          <span className="h-2 w-2 rounded-full bg-emerald-500/70" />
         </div>
-        <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-400">
+        <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-emerald-500">
           CBT LIVE
         </span>
-        <span className="text-[10px] text-slate-400">Session #4821</span>
+        <span className="text-[9px] text-slate-400">Session #4821</span>
       </div>
 
       {/* score row */}
-      <div className="mb-4 grid grid-cols-3 gap-2">
+      <div className="mb-3 grid grid-cols-3 gap-1.5">
         {[
           { label: 'Score', val: '74%',  color: 'text-emerald-400' },
           { label: 'Q Left', val: '36',  color: 'text-cyan-400'    },
           { label: 'Time',   val: '18m', color: 'text-blue-400'    },
         ].map((s) => (
-          <div key={s.label} className="rounded-xl border border-slate-100 bg-slate-50 p-2.5 text-center">
-            <div className={`text-xl font-black ${s.color}`}>{s.val}</div>
-            <div className="mt-0.5 text-[9px] uppercase tracking-wider text-slate-400">{s.label}</div>
+          <div key={s.label} className="rounded-lg border border-slate-100 bg-slate-50 p-2 text-center">
+            <div className={`text-base font-black ${s.color}`}>{s.val}</div>
+            <div className="mt-0.5 text-[8px] uppercase tracking-wider text-slate-400">{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* mini bar chart */}
-      <div className="mb-4">
-        <div className="mb-1.5 text-[10px] uppercase tracking-wider text-slate-400">Subject accuracy</div>
-        <div className="flex items-end gap-1.5 h-12">
+      <div className="mb-3">
+        <div className="mb-1 text-[9px] uppercase tracking-wider text-slate-400">Subject accuracy</div>
+        <div className="flex items-end gap-1 h-10">
           {bars.map((h, i) => (
             <motion.div
               key={i}
@@ -407,7 +407,7 @@ export default function Home() {
       </nav>
 
       {/* ── HERO ── */}
-      <header className="relative w-full flex justify-center overflow-hidden py-20 lg:py-28">
+      <header className="relative w-full flex justify-center overflow-hidden py-14 lg:py-20">
         {/* background grid */}
         <div className="cyber-grid pointer-events-none absolute inset-0 opacity-30" aria-hidden />
 
@@ -418,12 +418,12 @@ export default function Home() {
           style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.07), transparent 70%)' }} />
 
         <div className="relative z-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 items-stretch gap-14 lg:grid-cols-12">
+          <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-12 lg:gap-6">
 
             {/* LEFT */}
-            <div className="min-w-0 space-y-7 text-center lg:col-span-7 lg:text-left">
+            <div className="min-w-0 space-y-4 text-center lg:col-span-5 lg:text-left">
               <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
-                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/8 px-4 py-1.5 text-xs font-medium tracking-wide backdrop-blur-sm text-emerald-400">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/8 px-3 py-1 text-[11px] font-medium tracking-wide backdrop-blur-sm text-emerald-500">
                   <BookOpen size={12} /> Premier CBT Exam Preparation Platform
                 </span>
               </motion.div>
@@ -431,7 +431,7 @@ export default function Home() {
               <motion.h1
                 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.65, delay: 0.1 }}
-                className="text-4xl font-black leading-[1.08] tracking-tight text-slate-900 sm:text-5xl lg:text-[3.6rem]">
+                className="text-3xl font-black leading-[1.06] tracking-tight text-slate-900 sm:text-4xl lg:text-[2.6rem]">
                 Shaping the Future of{' '}
                 <span className="relative inline-block">
                   <span className="glow-text">Medical Excellence</span>
@@ -448,7 +448,7 @@ export default function Home() {
               <motion.p
                 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="mx-auto max-w-xl text-lg leading-relaxed text-slate-600 lg:mx-0">
+                className="mx-auto max-w-md text-sm leading-relaxed text-slate-600 lg:mx-0">
                 Access comprehensive digital mock exams, analyze your performance, and track your specialist medical training progress with scholarly precision.
               </motion.p>
 
@@ -456,59 +456,67 @@ export default function Home() {
                 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
                 className="flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
-                <GlowBtn href="/register" size="lg">
-                  Start Free Demo <ArrowRight size={16} />
+                <GlowBtn href="/register" size="md">
+                  Start Free Demo <ArrowRight size={15} />
                 </GlowBtn>
-                <GlowBtn href="#hiw" size="lg" variant="ghost">
-                  How to Apply <ChevronDown size={15} />
+                <GlowBtn href="#hiw" size="md" variant="ghost">
+                  How to Apply <ChevronDown size={14} />
                 </GlowBtn>
               </motion.div>
 
               {/* trust chips */}
               <motion.div
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55, duration: 0.5 }}
-                className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+                className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
                 {['10,000+ Doctors', '99.9% Uptime', 'No card required'].map((t) => (
-                  <span key={t} className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500 shadow-sm">
+                  <span key={t} className="flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-[10px] text-slate-500 shadow-sm">
                     <Check size={10} className="text-emerald-400" /> {t}
                   </span>
                 ))}
               </motion.div>
             </div>
 
-            {/* RIGHT: CBT terminal */}
+            {/* MIDDLE: Quick Gateway -- its own column now, so the hero copy,
+                the gateway and the CBT terminal all share one row. */}
             <motion.div
-              className="min-w-0 lg:col-span-5 flex flex-col"
-              initial={{ opacity: 0, x: 36 }} animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.75, delay: 0.2 }}>
-              {/* Quick Gateway card */}
-              <GlassCard className="mb-4 p-5">
-                <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
-                  <h3 className="font-bold text-slate-900">Quick Gateway</h3>
-                  <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+              className="min-w-0 lg:col-span-3 flex flex-col"
+              initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}>
+              <GlassCard className="flex-1 p-4">
+                <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-2.5">
+                  <h3 className="text-sm font-bold text-slate-900">Quick Gateway</h3>
+                  <span className="flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-500">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                     Live
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
                   {GATEWAY.map((g) => {
                     const Icon = g.icon
                     const accent = g.color === 'cyan' ? '#06B6D4' : g.color === 'blue' ? '#3B82F6' : '#10B981'
                     return (
                       <Link key={g.title} href={g.href}
-                        className="group flex flex-col rounded-xl border border-slate-200 bg-slate-50 p-3.5 transition-all hover:border-emerald-400 hover:bg-emerald-50/50">
-                        <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg"
+                        className="group flex flex-col rounded-lg border border-slate-200 bg-slate-50 p-2.5 transition-all hover:border-emerald-400 hover:bg-emerald-50/50 lg:flex-row lg:items-center lg:gap-2.5">
+                        <div className="mb-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md lg:mb-0"
                           style={{ background: `${accent}18`, color: accent }}>
-                          <Icon size={16} className="transition-transform group-hover:scale-110" />
+                          <Icon size={14} className="transition-transform group-hover:scale-110" />
                         </div>
-                        <h4 className="text-xs font-semibold text-slate-800">{g.title}</h4>
-                        <p className="mt-0.5 text-[10px] text-slate-500">{g.desc}</p>
+                        <div className="min-w-0">
+                          <h4 className="text-[11px] font-semibold leading-tight text-slate-800">{g.title}</h4>
+                          <p className="mt-0.5 text-[9px] leading-tight text-slate-500">{g.desc}</p>
+                        </div>
                       </Link>
                     )
                   })}
                 </div>
               </GlassCard>
+            </motion.div>
 
+            {/* RIGHT: CBT terminal */}
+            <motion.div
+              className="min-w-0 lg:col-span-4 flex flex-col"
+              initial={{ opacity: 0, x: 36 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.75, delay: 0.2 }}>
               <div className="flex-1 min-h-0"><CbtTerminal /></div>
             </motion.div>
           </div>

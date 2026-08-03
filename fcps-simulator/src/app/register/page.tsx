@@ -22,60 +22,60 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-x-clip bg-[#030712] flex items-center justify-center px-4 py-16">
+    <div className="relative h-screen overflow-hidden bg-[#f8fafc] flex items-center justify-center px-4 py-4">
 
       {/* background grid */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-50"
+        className="pointer-events-none absolute inset-0 opacity-60"
         aria-hidden
         style={{
-          backgroundImage: 'radial-gradient(rgba(30,41,59,0.8) 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(rgba(148,163,184,0.35) 1px, transparent 1px)',
           backgroundSize: '20px 20px',
         }}
       />
 
       {/* ambient glow */}
       <div
-        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-[400px] w-[600px] rounded-full blur-3xl opacity-[0.07]"
+        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-[320px] w-[520px] rounded-full blur-3xl opacity-[0.18]"
         aria-hidden
         style={{ background: 'radial-gradient(circle, #10B981, transparent)' }}
       />
 
-      <div className="relative z-10 w-full max-w-[480px]">
+      <div className="relative z-10 w-full max-w-[440px]">
 
         {/* ── LOGO ── */}
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-[0_0_30px_rgba(16,185,129,0.45)]">
-            <UserPlus size={28} className="text-slate-950" strokeWidth={2.5} />
+        <div className="mb-4 text-center">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-[0_6px_20px_rgba(16,185,129,0.35)]">
+            <UserPlus size={22} className="text-white" strokeWidth={2.5} />
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-white">Create Account</h1>
-          <p className="mt-2 text-slate-400">Join the professional FCPS simulator</p>
+          <h1 className="text-2xl font-black tracking-tight text-slate-900">Create Account</h1>
+          <p className="mt-1 text-sm text-slate-500">Join the professional FCPS simulator</p>
         </div>
 
         {/* ── CARD ── */}
-        <div className="rounded-2xl border border-slate-700/70 bg-slate-900/80 p-8 shadow-[0_0_60px_rgba(0,0,0,0.5)] backdrop-blur-xl md:p-10">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.08)] sm:p-6">
 
           {success ? (
             /* ── SUCCESS STATE ── */
-            <div className="text-center py-4">
-              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/15 border border-emerald-500/30">
-                <CheckCircle2 size={32} className="text-emerald-400" />
+            <div className="text-center py-2">
+              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 border border-emerald-200">
+                <CheckCircle2 size={28} className="text-emerald-600" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-3">Account Ready</h3>
-              <p className="text-slate-400 leading-relaxed mb-8">{success}</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Account Ready</h3>
+              <p className="text-sm text-slate-600 leading-relaxed mb-5">{success}</p>
               <Link
                 href="/login"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3.5 font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:shadow-[0_0_35px_rgba(16,185,129,0.65)] hover:scale-[1.02]"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_6px_18px_rgba(16,185,129,0.3)] transition-all hover:shadow-[0_8px_26px_rgba(16,185,129,0.45)]"
               >
                 Go to Login <ArrowRight size={18} />
               </Link>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-3">
 
               {/* ── FULL NAME ── */}
               <div>
-                <label htmlFor="fullName" className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                <label htmlFor="fullName" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                   <User size={11} className="text-emerald-400" /> Full Name
                 </label>
                 <div className="relative">
@@ -85,14 +85,14 @@ export default function RegisterPage() {
                     type="text"
                     required
                     placeholder="e.g. Dr. Muhammad Ali"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-3.5 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all focus:border-emerald-500 focus:bg-slate-800 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)] focus:ring-0"
+                    className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)] focus:ring-0"
                   />
                 </div>
               </div>
 
               {/* ── EMAIL ── */}
               <div>
-                <label htmlFor="email" className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                <label htmlFor="email" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                   <Mail size={11} className="text-emerald-400" /> Email Address
                 </label>
                 <input
@@ -102,13 +102,13 @@ export default function RegisterPage() {
                   required
                   autoComplete="email"
                   placeholder="doctor@example.com"
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-3.5 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all focus:border-emerald-500 focus:bg-slate-800 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
+                  className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
                 />
               </div>
 
               {/* ── PASSWORD ── */}
               <div>
-                <label htmlFor="password" className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                <label htmlFor="password" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                   <Lock size={11} className="text-emerald-400" /> Password
                 </label>
                 <input
@@ -118,23 +118,23 @@ export default function RegisterPage() {
                   required
                   minLength={8}
                   placeholder="Min. 8 characters"
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-3.5 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all focus:border-emerald-500 focus:bg-slate-800 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
+                  className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
                 />
               </div>
 
               {/* ── ERROR ── */}
               {error && (
-                <div className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">
-                  <span className="mt-0.5 shrink-0 text-base">⚠️</span>
+                <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-2.5 text-xs text-red-600">
+                  <span className="mt-px shrink-0 text-sm">⚠️</span>
                   {error}
                 </div>
               )}
 
               {/* ── NOTE BOX ── */}
-              <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
-                <p className="text-[12px] leading-relaxed text-slate-400">
-                  <span className="font-bold text-emerald-400">Note: </span>
-                  Your account is activated instantly with a free demo (10 questions per exam, Anatomy / Physiology / Biochemistry / Pathology). For the full question bank and longer mocks, send payment proof via WhatsApp from your dashboard and the admin will upgrade your account.
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50/70 px-3 py-2">
+                <p className="text-[11px] leading-snug text-slate-600">
+                  <span className="font-bold text-emerald-700">Note: </span>
+                  Instant free demo access (10 questions per exam). For the full bank and longer mocks, send payment proof via WhatsApp from your dashboard.
                 </p>
               </div>
 
@@ -142,7 +142,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 py-3.5 font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(16,185,129,0.65)] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 py-2.5 text-sm font-bold text-white shadow-[0_6px_18px_rgba(16,185,129,0.3)] transition-all hover:shadow-[0_8px_26px_rgba(16,185,129,0.45)] disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -158,21 +158,21 @@ export default function RegisterPage() {
               </button>
 
               {/* ── DIVIDER ── */}
-              <div className="relative py-1">
+              <div className="relative py-0.5">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-800" />
+                  <div className="w-full border-t border-slate-200" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="flex items-center gap-1.5 bg-slate-900/80 px-4 text-[10px] uppercase tracking-widest font-bold text-slate-600">
-                    <ShieldCheck size={10} className="text-emerald-500/60" /> Secure Portal
+                  <span className="flex items-center gap-1.5 bg-white px-3 text-[9px] uppercase tracking-widest font-bold text-slate-400">
+                    <ShieldCheck size={9} className="text-emerald-500" /> Secure Portal
                   </span>
                 </div>
               </div>
 
               {/* ── LOGIN LINK ── */}
-              <p className="text-center text-sm text-slate-500">
+              <p className="text-center text-xs text-slate-500">
                 Already have an account?{' '}
-                <Link href="/login" className="font-bold text-emerald-400 transition-colors hover:text-emerald-300">
+                <Link href="/login" className="font-bold text-emerald-600 transition-colors hover:text-emerald-700">
                   Sign In
                 </Link>
               </p>
@@ -181,7 +181,7 @@ export default function RegisterPage() {
         </div>
 
         {/* bottom trust note */}
-        <p className="mt-6 text-center text-[11px] text-slate-600">
+        <p className="mt-3 text-center text-[10px] text-slate-400">
           Protected by end-to-end encryption · FCPS Part 1 Simulator © {new Date().getFullYear()}
         </p>
       </div>
