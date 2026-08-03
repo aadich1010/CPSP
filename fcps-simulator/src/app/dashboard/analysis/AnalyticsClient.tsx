@@ -31,11 +31,11 @@ const subjectPerformance = [
   { subject: "Microbiology",  correct: 74, total: 100 },
 ];
 
-const difficultyData = [
-  { name: "Easy",   value: 88, color: "#1D9E75" },
-  { name: "Medium", value: 65, color: "#0F6E56" },
-  { name: "Hard",   value: 41, color: "#9FE1CB" },
-];
+const DIFFICULTY_COLORS: Record<string, string> = {
+  Easy:   "#1D9E75",
+  Medium: "#0F6E56",
+  Hard:   "#9FE1CB",
+};
 
 const radarData = subjectPerformance.map(s => ({
   subject: s.subject.slice(0, 5),
@@ -122,17 +122,17 @@ interface StatCardProps {
 const StatCard = ({ label, value, sub, accent }: StatCardProps) => (
   <div style={{
     background: T.white, border: `1px solid ${T.border}`,
-    borderRadius: 12, padding: "20px 24px",
+    borderRadius: 10, padding: "8px 12px",
     borderLeft: `4px solid ${accent || T.teal}`,
-    flex: 1, minWidth: 160,
+    flex: 1, minWidth: 140,
   }}>
-    <div style={{ fontSize: 12, color: T.muted, textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>
+    <div style={{ fontSize: 10, color: T.muted, textTransform: "uppercase", letterSpacing: "0.07em", fontWeight: 600 }}>
       {label}
     </div>
-    <div style={{ fontSize: 32, fontWeight: 700, color: T.text, margin: "6px 0 2px", lineHeight: 1 }}>
+    <div style={{ fontSize: 21, fontWeight: 700, color: T.text, margin: "2px 0 1px", lineHeight: 1 }}>
       {value}
     </div>
-    {sub && <div style={{ fontSize: 12, color: T.muted }}>{sub}</div>}
+    {sub && <div style={{ fontSize: 10, color: T.muted }}>{sub}</div>}
   </div>
 );
 
@@ -146,15 +146,18 @@ interface CardProps {
 const Card = ({ title, children, style }: CardProps) => (
   <div style={{
     background: T.white, border: `1px solid ${T.border}`,
-    borderRadius: 12, padding: "20px 24px", ...style,
+    borderRadius: 10, padding: "8px 12px",
+    display: "flex", flexDirection: "column", minHeight: 0, ...style,
   }}>
     {title && (
-      <div style={{ fontSize: 13, fontWeight: 600, color: T.tealDark, marginBottom: 16,
-        textTransform: "uppercase", letterSpacing: "0.07em" }}>
+      <div style={{ fontSize: 10.5, fontWeight: 600, color: T.tealDark, marginBottom: 4,
+        textTransform: "uppercase", letterSpacing: "0.07em", flexShrink: 0 }}>
         {title}
       </div>
     )}
-    {children}
+    <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+      {children}
+    </div>
   </div>
 );
 
@@ -166,12 +169,12 @@ interface DiffBarProps {
 }
 
 const DiffBar = ({ name, value, color }: DiffBarProps) => (
-  <div style={{ marginBottom: 14 }}>
-    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: T.text, marginBottom: 5 }}>
+  <div style={{ marginBottom: 7 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: T.text, marginBottom: 3 }}>
       <span style={{ fontWeight: 500 }}>{name}</span>
       <span style={{ color: T.muted }}>{value}%</span>
     </div>
-    <div style={{ background: T.tealBg, borderRadius: 99, height: 10, overflow: "hidden" }}>
+    <div style={{ background: T.tealBg, borderRadius: 99, height: 8, overflow: "hidden" }}>
       <div style={{
         width: `${value}%`, height: "100%", borderRadius: 99,
         background: color, transition: "width 0.6s ease",
@@ -189,7 +192,19 @@ export interface QuizAttempt {
   created_at: string;
 }
 
-export default function AnalyticsDashboard({ attempts = [] }: { attempts: QuizAttempt[] }) {
+export interface DifficultyRow {
+  difficulty: string;
+  correct: number;
+  total: number;
+}
+
+export default function AnalyticsDashboard({
+  attempts = [],
+  difficultyRows = [],
+}: {
+  attempts: QuizAttempt[];
+  difficultyRows?: DifficultyRow[];
+}) {
   const [activeTab, setActiveTab] = useState("overview");
 
   // Computed Values
@@ -233,15 +248,34 @@ export default function AnalyticsDashboard({ attempts = [] }: { attempts: QuizAt
     score: s.correct,
   }));
 
+  // Real accuracy per difficulty band, ordered Easy -> Hard so the bars
+  // read as a progression rather than in whatever order Postgres grouped.
+  const DIFF_ORDER = ["Easy", "Medium", "Hard"];
+  const difficultyData = difficultyRows
+    .filter(r => r.total > 0)
+    .map(r => ({
+      name:  r.difficulty,
+      value: Math.round((r.correct / r.total) * 100),
+      count: r.total,
+      color: DIFFICULTY_COLORS[r.difficulty] || "#0F6E56",
+    }))
+    .sort((a, b) => DIFF_ORDER.indexOf(a.name) - DIFF_ORDER.indexOf(b.name));
+
   const tabs = ["overview", "subjects", "difficulty"];
 
   return (
-    <div className="animate-fade-in" style={{ fontFamily: "'DM Sans', 'Segoe UI', sans-serif", color: T.text }}>
+    <div className="animate-fade-in" style={{
+      fontFamily: "'DM Sans', 'Segoe UI', sans-serif", color: T.text,
+      height: "100%", minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden",
+    }}>
 
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 0 28px 0" }}>
+      <div style={{
+        maxWidth: 1180, width: "100%", margin: "0 auto", padding: 0,
+        flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
+      }}>
 
         {/* Stat cards */}
-        <div style={{ display: "flex", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 10, marginBottom: 10, flexShrink: 0 }}>
           <StatCard label="Total Attempts"  value={totalAttempts} sub="All time"        accent={T.teal}      />
           <StatCard label="Average Score"   value={`${avgScore}%`} sub="Last 10 quizzes" accent={T.tealDark}  />
           <StatCard label="Pass Rate"        value={`${passRate}%`} sub="≥60% threshold"  accent="#0B8A62"     />
@@ -249,11 +283,11 @@ export default function AnalyticsDashboard({ attempts = [] }: { attempts: QuizAt
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: 4, marginBottom: 20 }}>
+        <div style={{ display: "flex", gap: 4, marginBottom: 10, flexShrink: 0 }}>
           {tabs.map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{
-              padding: "7px 18px", borderRadius: 8, cursor: "pointer",
-              fontSize: 13, fontWeight: 600,
+              padding: "5px 14px", borderRadius: 8, cursor: "pointer",
+              fontSize: 12, fontWeight: 600,
               background: activeTab === tab ? T.teal : T.white,
               color:      activeTab === tab ? T.white : T.muted,
               border:     activeTab === tab ? "none" : `1px solid ${T.border}`,
@@ -266,31 +300,26 @@ export default function AnalyticsDashboard({ attempts = [] }: { attempts: QuizAt
 
         {/* ── OVERVIEW TAB ── */}
         {activeTab === "overview" && (
-          <>
+          <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", gap: 10 }}>
             {/* Score over time */}
-            <Card title="Score over time" style={{ marginBottom: 20 }}>
-              <ResponsiveContainer width="100%" height={220}>
+            <Card title="Score over time" style={{ flex: 1.25, minHeight: 0 }}>
+              <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={scoreOverTime} margin={{ top: 4, right: 16, left: -16, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={T.border} vertical={false} />
-                  <XAxis dataKey="date" tick={{ fontSize: 11, fill: T.muted }} axisLine={false} tickLine={false} />
-                  <YAxis domain={[40, 100]} tick={{ fontSize: 11, fill: T.muted }} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: T.muted }} axisLine={false} tickLine={false} minTickGap={12} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: T.muted }} axisLine={false} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} />
                   <Line type="monotone" dataKey="score" name="Score" stroke={T.teal}
                     strokeWidth={2.5} dot={{ r: 4, fill: T.teal, strokeWidth: 0 }}
                     activeDot={{ r: 6, fill: T.tealDark }} />
                 </LineChart>
               </ResponsiveContainer>
-              {/* Supabase hint */}
-              <div style={{ marginTop: 8, fontSize: 11, color: T.muted, fontFamily: "monospace",
-                background: T.tealBg, borderRadius: 6, padding: "6px 10px" }}>
-                {`// Supabase: .from('quiz_attempts').select('created_at, score').eq('user_id', userId)`}
-              </div>
             </Card>
 
             {/* Pass rate + accuracy donut row */}
-            <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-              <Card title="Pass vs Fail" style={{ flex: 1, minWidth: 220 }}>
-                <ResponsiveContainer width="100%" height={160}>
+            <div style={{ flex: 1, minHeight: 0, display: "flex", gap: 10 }}>
+              <Card title="Pass vs Fail" style={{ flex: 1, minWidth: 0 }}>
+                <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie data={[{ name: "Pass", value: passRate }, { name: "Fail", value: 100 - passRate }]}
                       cx="50%" cy="50%" innerRadius={45} outerRadius={68} startAngle={90} endAngle={-270}
@@ -301,13 +330,13 @@ export default function AnalyticsDashboard({ attempts = [] }: { attempts: QuizAt
                     <Tooltip formatter={(v) => `${v}%`} />
                   </PieChart>
                 </ResponsiveContainer>
-                <div style={{ textAlign: "center", marginTop: -8, fontSize: 13, color: T.muted }}>
+                <div style={{ textAlign: "center", fontSize: 11, color: T.muted, flexShrink: 0 }}>
                   <span style={{ color: T.teal, fontWeight: 700 }}>{passRate}%</span> passed (≥60%)
                 </div>
               </Card>
 
-              <Card title="Accuracy breakdown" style={{ flex: 1, minWidth: 220 }}>
-                <ResponsiveContainer width="100%" height={160}>
+              <Card title="Accuracy breakdown" style={{ flex: 1, minWidth: 0 }}>
+                <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie data={[{ name: "Correct", value: accuracy }, { name: "Wrong", value: 100 - accuracy }]}
                       cx="50%" cy="50%" innerRadius={45} outerRadius={68} startAngle={90} endAngle={-270}
@@ -318,13 +347,13 @@ export default function AnalyticsDashboard({ attempts = [] }: { attempts: QuizAt
                     <Tooltip formatter={(v) => `${v}%`} />
                   </PieChart>
                 </ResponsiveContainer>
-                <div style={{ textAlign: "center", marginTop: -8, fontSize: 13, color: T.muted }}>
+                <div style={{ textAlign: "center", fontSize: 11, color: T.muted, flexShrink: 0 }}>
                   <span style={{ color: T.tealDark, fontWeight: 700 }}>{accuracy}%</span> correct answers
                 </div>
               </Card>
 
-              <Card title="Radar — all subjects" style={{ flex: 1.5, minWidth: 260 }}>
-                <ResponsiveContainer width="100%" height={180}>
+              <Card title="Radar — all subjects" style={{ flex: 1.5, minWidth: 0 }}>
+                <ResponsiveContainer width="100%" height="100%">
                   <RadarChart data={radarData} margin={{ top: 0, right: 20, left: 20, bottom: 0 }}>
                     <PolarGrid stroke={T.border} />
                     <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: T.muted }} />
@@ -334,13 +363,13 @@ export default function AnalyticsDashboard({ attempts = [] }: { attempts: QuizAt
                 </ResponsiveContainer>
               </Card>
             </div>
-          </>
+          </div>
         )}
 
         {/* ── SUBJECTS TAB ── */}
         {activeTab === "subjects" && (
-          <Card title="Subject-wise performance (% correct)">
-            <ResponsiveContainer width="100%" height={280}>
+          <Card title="Subject-wise performance (% correct)" style={{ flex: 1, minHeight: 0 }}>
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={subjectPerformance} margin={{ top: 4, right: 16, left: -16, bottom: 0 }}
                 barSize={32}>
                 <CartesianGrid strokeDasharray="3 3" stroke={T.border} vertical={false} />
@@ -355,37 +384,35 @@ export default function AnalyticsDashboard({ attempts = [] }: { attempts: QuizAt
               </BarChart>
             </ResponsiveContainer>
             {/* Legend */}
-            <div style={{ display: "flex", gap: 16, marginTop: 12, fontSize: 12, color: T.muted }}>
+            <div style={{ display: "flex", gap: 14, marginTop: 6, fontSize: 11, color: T.muted, flexShrink: 0, flexWrap: "wrap" }}>
               <span><span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: T.teal, marginRight: 5 }} />≥70% Strong</span>
               <span><span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: "#0B8A62", marginRight: 5 }} />60–69% OK</span>
               <span><span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: T.tealLight, marginRight: 5 }} />Below 60% — Needs work</span>
-            </div>
-            <div style={{ marginTop: 10, fontSize: 11, color: T.muted, fontFamily: "monospace",
-              background: T.tealBg, borderRadius: 6, padding: "6px 10px" }}>
-              {`// Supabase: .from('quiz_attempts').select('subject, correct_count, total_questions')`}
             </div>
           </Card>
         )}
 
         {/* ── DIFFICULTY TAB ── */}
         {activeTab === "difficulty" && (
-          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-            <Card title="Accuracy by difficulty level" style={{ flex: 2, minWidth: 300 }}>
-              <div style={{ padding: "8px 0" }}>
-                {difficultyData.map(d => (
-                  <DiffBar key={d.name} name={d.name} value={d.value} color={d.color} />
+          <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ flex: 1, minHeight: 0, display: "flex", gap: 10 }}>
+            <Card title="Accuracy by difficulty level" style={{ flex: 2, minWidth: 0 }}>
+              <div style={{ padding: "4px 0" }}>
+                {difficultyData.length === 0 ? (
+                  <div style={{ fontSize: 12, color: T.muted }}>
+                    No graded attempts yet — complete an exam to see this breakdown.
+                  </div>
+                ) : difficultyData.map(d => (
+                  <DiffBar key={d.name} name={`${d.name} (${d.count} questions)`}
+                    value={d.value} color={d.color} />
                 ))}
-              </div>
-              <div style={{ marginTop: 16, fontSize: 11, color: T.muted, fontFamily: "monospace",
-                background: T.tealBg, borderRadius: 6, padding: "6px 10px" }}>
-                {`// Supabase: .from('quiz_attempts').select('difficulty, correct_count, total_questions')`}
               </div>
             </Card>
 
-            <Card title="Distribution" style={{ flex: 1, minWidth: 220 }}>
-              <ResponsiveContainer width="100%" height={200}>
+            <Card title="Distribution" style={{ flex: 1, minWidth: 0 }}>
+              <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={difficultyData} cx="50%" cy="50%" outerRadius={80}
+                  <Pie data={difficultyData} cx="50%" cy="50%" outerRadius="78%"
                     paddingAngle={4} dataKey="value" nameKey="name" label={({ name, value }) => `${name} ${value}%`}
                     labelLine={false}>
                     {difficultyData.map((d, i) => <Cell key={i} fill={d.color} />)}
@@ -394,12 +421,13 @@ export default function AnalyticsDashboard({ attempts = [] }: { attempts: QuizAt
                 </PieChart>
               </ResponsiveContainer>
             </Card>
+            </div>
 
             {/* Difficulty stat cards */}
-            <div style={{ width: "100%", display: "flex", gap: 16, flexWrap: "wrap" }}>
+            <div style={{ width: "100%", display: "flex", gap: 10, flexShrink: 0 }}>
               {difficultyData.map(d => (
                 <StatCard key={d.name} label={`${d.name} questions`} value={`${d.value}%`}
-                  sub="Accuracy rate" accent={d.color} />
+                  sub={`${d.count} questions answered`} accent={d.color} />
               ))}
             </div>
           </div>

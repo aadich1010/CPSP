@@ -14,16 +14,23 @@ export default async function AnalysisPage() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: true })
 
+  // Real accuracy-by-difficulty. The tab used to render a hard-coded
+  // array to every student; this aggregates their own answers against
+  // each question's difficulty tag.
+  const { data: difficultyRows } = await supabase.rpc('get_difficulty_breakdown')
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ marginBottom: 10, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 12 }}>
         <Link href="/dashboard" className="btn btn-ghost btn-sm">
           ← Back to Dashboard
         </Link>
       </div>
       
       {/* The main Analytics Dashboard component */}
-      <AnalyticsClient attempts={attempts || []} />
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        <AnalyticsClient attempts={attempts || []} difficultyRows={difficultyRows || []} />
+      </div>
     </div>
   )
 }
