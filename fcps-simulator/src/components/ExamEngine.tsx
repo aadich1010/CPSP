@@ -28,6 +28,8 @@ interface ExamEngineProps {
   /** Shown on the result screen's header and included on the printed
    *  report so a printout is identifiable as this candidate's. */
   candidateName?:   string
+  /** Printed on the assessment report so a physical copy is traceable. */
+  candidateEmail?:  string
 }
 
 type Answer = string | null
@@ -105,7 +107,7 @@ function formatTime(secs: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName }: ExamEngineProps) {
+export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail }: ExamEngineProps) {
   // Shuffled ONCE per mount (lazy initialiser), never on re-render -- otherwise
   // the options would jump around under the student's cursor every tick of the
   // timer. Question ORDER is already randomised per attempt server-side by
@@ -129,6 +131,9 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
     mode === 'practice' ? questions : null
   )
   const [result, setResult] = useState<{ score: number; total: number } | null>(null)
+  // Stamped when the server accepts the submission, so the printed report
+  // shows when the attempt was actually sat rather than when it was printed.
+  const [submittedAt, setSubmittedAt] = useState<Date | undefined>(undefined)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const submittingRef = useRef(false) // hard guard against double-submit races
 
@@ -199,6 +204,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
         }
       }
 
+      setSubmittedAt(new Date())
       setSubmitted(true)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)
@@ -265,6 +271,9 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
         total={result.total}
         userId={userId}
         candidateName={candidateName}
+        candidateEmail={candidateEmail}
+        sessionId={sessionId}
+        submittedAt={submittedAt}
       />
     )
   }

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid, PieChart, Pie } from "recharts";
 import { createClient } from "@/lib/supabase/client";
+import PrintableReport from "./PrintableReport";
 
 /* ── Types ─────────────────────────────────────── */
 interface Question {
@@ -22,6 +23,14 @@ interface Props {
   /** Candidate's display name, shown in the header and included when the
    *  report is printed so a printed result is identifiable. */
   candidateName?: string;
+  /** Printed on the assessment report so a physical copy is traceable to
+   *  an account. */
+  candidateEmail?: string;
+  /** Session UUID -- printed as the attempt/test code. A session can only be
+   *  submitted once, so it identifies the attempt uniquely. */
+  sessionId?: string;
+  /** When the attempt was actually submitted. Falls back to render time. */
+  submittedAt?: Date;
 }
 
 /* ── Styles (scoped) ────────────────────────────── */
@@ -42,14 +51,11 @@ const S = `
 .rs-btn.primary:hover{background:linear-gradient(135deg,#0d9488,#14b8a6);box-shadow:0 6px 20px rgba(13,148,136,0.4)}
 .rs-btn.print{background:linear-gradient(135deg,#7c3aed,#ec4899);border-color:transparent;color:white;box-shadow:0 4px 14px rgba(124,58,237,0.3)}
 .rs-btn.print:hover{background:linear-gradient(135deg,#6d28d9,#db2777);box-shadow:0 6px 20px rgba(124,58,237,0.4)}
-@media print{
-  .rs-header .rs-tabs,.rs-header .rs-hbtns{display:none!important}
-  .rs-root{height:auto!important;overflow:visible!important}
-  .rs-body{overflow:visible!important}
-  .rs-dash{height:auto!important;display:grid!important;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;page-break-inside:avoid}
-  .rs-card{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-shadow:none!important;break-inside:avoid}
-  .rs-score-card{grid-column:1/3;grid-row:1}
-}
+/* Printing is handled entirely by PrintableReport, which renders its own
+   A4-sized subtree and hides .rs-root. Reflowing this dashboard for paper
+   was the source of the multi-page output: its charts are measured in JS
+   and its tracks are sized in vh/1fr, none of which survive a paged
+   medium. See PrintableReport.tsx for the reasoning. */
 .rs-body{flex:1;overflow:hidden}
 /* Dashboard grid */
 .rs-dash{height:100%;display:grid;grid-template-columns:240px 1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;padding:8px}
@@ -136,7 +142,7 @@ const RING_R = 52;
 const RING_C = 2*Math.PI*RING_R;
 
 /* ── Component ──────────────────────────────────── */
-export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, userId, candidateName }: Props) {
+export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, userId, candidateName, candidateEmail, sessionId, submittedAt }: Props) {
   const [tab, setTab] = useState<'dash'|'review'>('dash');
   const [filter, setFilter] = useState<'all'|'correct'|'wrong'|'skipped'>('all');
   // Real attempt history (replaces previous hardcoded mock numbers). Each
@@ -242,7 +248,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
   const historyChartData = historyData.map(d => ({ ...d, avg: personalAvg }));
   const dashAspect = (RING_C*(pct/100)).toFixed(1);
 
-  const filteredQs = questions.map((q,i)=>({q,i,a:answers[i]})).filter(({q,i,a})=>{
+  const filteredQs = questions.map((q,i)=>({q,i,a:answers[i]})).filter(({q,a})=>{
     if(filter==='correct') return a===q.correct_answer;
     if(filter==='wrong')   return a && a!==q.correct_answer;
     if(filter==='skipped') return !a;
@@ -255,8 +261,9 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
   // dialog. The @media print rules above then strip the header chrome
   // and let every chart card lay out on the page instead of scrolling.
   function handlePrint() {
-    setTab('dash');
-    setTimeout(() => window.print(), 120);
+    // The printable subtree is always mounted and independent of which tab
+    // is on screen, so there's no tab flip or settle delay to orchestrate.
+    window.print();
   }
 
   if(!mounted) return null;
@@ -264,6 +271,31 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
   return (
     <>
       <style>{S}</style>
+
+      {/* Print-only: display:none on screen, the sole visible subtree on paper. */}
+      <PrintableReport
+        responses={subjectDataReliable
+          ? questions.map((q, i) => (!answers[i] ? 'skipped' : answers[i] === q.correct_answer ? 'correct' : 'wrong') as 'correct'|'wrong'|'skipped')
+          : undefined}
+        candidateName={candidateName}
+        candidateEmail={candidateEmail}
+        subject={subject}
+        mode={mode}
+        sessionId={sessionId}
+        submittedAt={submittedAt}
+        correct={correct}
+        wrong={wrong}
+        skipped={skipped}
+        total={total}
+        pct={pct}
+        pass={pass}
+        accuracy={accuracy}
+        subjectData={subjectData}
+        subjectDataReliable={subjectDataReliable}
+        strongest={strongest}
+        weakest={weakest}
+      />
+
       <div className="rs-root">
 
         {/* Header */}

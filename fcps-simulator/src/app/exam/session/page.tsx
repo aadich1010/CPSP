@@ -18,6 +18,9 @@ export default async function ExamSessionPage({
     .single()
   const isPremium = profile?.role === 'admin' || profile?.subscription_status === 'active'
   const candidateName = profile?.full_name || user.email || 'Candidate'
+  // Printed on the assessment report; comes from the auth record rather
+  // than the profile row so it always matches the account actually signed in.
+  const candidateEmail = user.email ?? undefined
 
   const params  = await searchParams
   const subject = params.subject || 'Mixed (All Subjects)'
@@ -92,6 +95,7 @@ export default async function ExamSessionPage({
       userId={user.id}
       timeLimitSeconds={timeLimitSeconds}
       candidateName={candidateName}
+      candidateEmail={candidateEmail}
     />
   )
 }
