@@ -102,7 +102,7 @@ export default function UserManagementClient({ profiles: initial }: Props) {
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f1f5f9', marginBottom: 4 }}>
+        <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#000000', marginBottom: 4 }}>
           User Management
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
@@ -162,7 +162,7 @@ export default function UserManagementClient({ profiles: initial }: Props) {
                 return (
                   <tr key={p.id}>
                     <td>
-                      <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.875rem' }}>
+                      <div style={{ fontWeight: 600, color: '#000000', fontSize: '0.875rem' }}>
                         {p.full_name}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: '#475569' }}>{p.email}</div>

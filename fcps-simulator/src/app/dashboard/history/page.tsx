@@ -25,20 +25,20 @@ export default async function HistoryPage() {
       </div>
 
       <div className="glass" style={{ flex: 1, overflowY: 'auto', padding: '0' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+        <table className="data-table" style={{ width: '100%' }}>
+          <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: '12px 20px', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Subject</th>
-              <th style={{ textAlign: 'left', padding: '12px 20px', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Date</th>
-              <th style={{ textAlign: 'left', padding: '12px 20px', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Score</th>
-              <th style={{ textAlign: 'left', padding: '12px 20px', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Result</th>
+              <th style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Subject</th>
+              <th style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Date</th>
+              <th style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Score</th>
+              <th style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Result</th>
             </tr>
           </thead>
           <tbody>
             {attempts?.map((a) => {
               const pct = Math.round((a.score / a.total_questions) * 100)
               return (
-                <tr key={a.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                <tr key={a.id}>
                   <td style={{ padding: '16px 20px', fontSize: '0.875rem', fontWeight: 600, color: '#1e293b' }}>{a.subject}</td>
                   <td style={{ padding: '16px 20px', fontSize: '0.875rem', color: '#64748b' }}>{new Date(a.created_at).toLocaleDateString()}</td>
                   <td style={{ padding: '16px 20px', fontSize: '0.875rem', fontWeight: 700, color: '#0f172a' }}>{a.score} / {a.total_questions} ({pct}%)</td>

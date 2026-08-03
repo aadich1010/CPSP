@@ -132,7 +132,7 @@ function Field({ label, value, mono }: { label: string; value: string; mono?: bo
     <div style={{ marginBottom: 8 }}>
       <div style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>{label}</div>
       <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', fontFamily: mono ? 'monospace' : 'inherit' }}>
-        {value || <span style={{ color: '#cbd5e1', fontWeight: 500 }}>Not set</span>}
+        {value || <span style={{ color: '#475569', fontWeight: 500 }}>Not set</span>}
       </div>
     </div>
   )

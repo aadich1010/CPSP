@@ -472,3 +472,64 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ── TABLE ───────────────────────────────────────────────────────
+   .table-wrapper was referenced by the admin screens but never
+   actually defined anywhere, so every table rendered as bare
+   unstyled markup with no borders at all. */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 8px;
+}
+
+.table-wrapper table,
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  /* collapse + a border on every cell gives single-width interior
+     rules instead of doubled-up lines between adjacent cells. */
+  border-spacing: 0;
+  font-size: 0.875rem;
+  color: #000000;
+  background: #ffffff;
+}
+
+.table-wrapper thead th,
+table.data-table thead th {
+  background: #f1f5f9;
+  color: #000000;
+  font-weight: 800;
+  font-size: 0.78rem;
+  text-align: left;
+  padding: 10px 14px;
+  border: 1px solid #000000;
+  white-space: nowrap;
+}
+
+.table-wrapper tbody td,
+table.data-table tbody td {
+  padding: 10px 14px;
+  border: 1px solid #000000;
+  color: #000000;
+  vertical-align: middle;
+}
+
+.table-wrapper tbody tr:nth-child(even),
+table.data-table tbody tr:nth-child(even) { background: #fafafa; }
+
+.table-wrapper tbody tr:hover,
+table.data-table tbody tr:hover { background: #f0fdfa; }
+
+/* Cell contents inherit black rather than any leftover light theme
+   colour, so nothing inside a table can render near-invisible. */
+.table-wrapper td, .table-wrapper th,
+.table-wrapper td div, .table-wrapper td span, .table-wrapper td p,
+table.data-table td, table.data-table th { color: #000000; }
+
+/* Muted secondary lines (emails, timestamps) stay readable rather
+   than washing out to near-white. */
+.table-wrapper td .muted,
+table.data-table td .muted { color: #334155; }

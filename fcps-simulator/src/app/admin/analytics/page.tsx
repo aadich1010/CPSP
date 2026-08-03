@@ -133,20 +133,20 @@ export default async function AnalyticsPage() {
         {revenueByPlan.size === 0 ? (
           <p style={{ color: '#94a3b8', fontSize: '0.82rem' }}>No amounts logged yet.</p>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+          <table className="data-table" style={{ width: '100%', fontSize: '0.85rem' }}>
             <thead>
-              <tr style={{ textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>
-                <th style={{ padding: '8px 6px', color: '#64748b', fontWeight: 700 }}>Plan</th>
-                <th style={{ padding: '8px 6px', color: '#64748b', fontWeight: 700 }}>Activations</th>
-                <th style={{ padding: '8px 6px', color: '#64748b', fontWeight: 700 }}>Revenue</th>
-                <th style={{ padding: '8px 6px', color: '#64748b', fontWeight: 700 }}>Avg / activation</th>
+              <tr style={{ textAlign: 'left' }}>
+                <th style={{ fontWeight: 700 }}>Plan</th>
+                <th style={{ fontWeight: 700 }}>Activations</th>
+                <th style={{ fontWeight: 700 }}>Revenue</th>
+                <th style={{ fontWeight: 700 }}>Avg / activation</th>
               </tr>
             </thead>
             <tbody>
               {Array.from(revenueByPlan.entries())
                 .sort((a, b) => b[1].revenue - a[1].revenue)
                 .map(([days, entry]) => (
-                  <tr key={days} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <tr key={days}>
                     <td style={{ padding: '8px 6px', fontWeight: 700, color: '#1e293b' }}>
                       {PLAN_LABELS[days] || `${days} days`}
                     </td>

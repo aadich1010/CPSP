@@ -33,7 +33,7 @@ export default async function EditQuestionPage({
     <div style={{ maxWidth: 680 }}>
       <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f1f5f9', marginBottom: 4 }}>
+          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#000000', marginBottom: 4 }}>
             Edit Question
           </h1>
           <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
