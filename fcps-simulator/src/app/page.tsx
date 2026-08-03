@@ -192,7 +192,7 @@ function GlowBtn({
   variant?: 'primary' | 'ghost'
   className?: string
 }) {
-  const pad = size === 'lg' ? 'px-10 py-4 text-base' : size === 'sm' ? 'px-4 py-2 text-sm' : 'px-7 py-3 text-sm'
+  const pad = size === 'lg' ? 'px-7 py-2.5 text-sm' : size === 'sm' ? 'px-3.5 py-1.5 text-[12.5px]' : 'px-5 py-2 text-[13px]'
   if (variant === 'ghost')
     return (
       <Link href={href}
@@ -250,20 +250,20 @@ function SectionHead({
   sub?: string
 }) {
   return (
-    <div className="mx-auto max-w-2xl text-center">
+    <div className="mx-auto max-w-xl text-center">
       <Reveal>
-        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
           {eyebrow}
         </span>
       </Reveal>
-      <Reveal delay={1} className="mt-4">
-        <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+      <Reveal delay={1} className="mt-3">
+        <h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl lg:text-[1.75rem]">
           {title}
         </h2>
       </Reveal>
       <Reveal delay={2}>
-        <div className="mx-auto mt-3 h-px w-20 rounded-full bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
-        {sub && <p className="mt-4 leading-relaxed text-slate-500">{sub}</p>}
+        <div className="mx-auto mt-2.5 h-px w-16 rounded-full bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
+        {sub && <p className="mx-auto mt-3 max-w-lg text-[13px] leading-relaxed text-slate-500">{sub}</p>}
       </Reveal>
     </div>
   )
@@ -407,7 +407,7 @@ export default function Home() {
       </nav>
 
       {/* ── HERO ── */}
-      <header className="relative w-full flex justify-center overflow-hidden py-8 lg:py-10">
+      <header className="relative w-full flex justify-center overflow-hidden py-6 lg:py-8">
         {/* background grid */}
         <div className="cyber-grid pointer-events-none absolute inset-0 opacity-30" aria-hidden />
 
@@ -530,14 +530,14 @@ export default function Home() {
             {STATS.map(({ value, display, label, icon: Icon }, i) => (
               <Reveal key={label} delay={i}
                 className="flex flex-col items-center gap-1.5 px-6 py-6 text-center">
-                <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white shadow-sm">
+                <div className="mb-0.5 flex h-8 w-8 items-center justify-center rounded-lg border border-slate-100 bg-white shadow-sm">
                   <Icon size={17} className="text-emerald-400" />
                 </div>
-                <div className="text-3xl font-black text-slate-900 lg:text-4xl"
+                <div className="text-2xl font-black text-slate-900 lg:text-[1.6rem]"
                   style={{ textShadow: '0 0 20px rgba(16,185,129,0.5)' }}>
                   <Counter target={value} display={display} />
                 </div>
-                <div className="text-sm text-slate-500">{label}</div>
+                <div className="text-[11px] text-slate-500">{label}</div>
               </Reveal>
             ))}
           </div>
@@ -545,28 +545,28 @@ export default function Home() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="features" className="w-full flex justify-center py-7 md:py-8 bg-white">
+      <section id="features" className="w-full flex justify-center py-6 bg-white">
         <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHead
             eyebrow="Platform Features"
             title={<>Built for <span className="glow-text">medical excellence</span></>}
             sub="Every feature engineered to replicate the real exam environment and maximize your preparation."
           />
-          <div className="mt-8 grid w-full grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f, i) => {
               const Icon = FEATURE_ICONS[f.id] ?? Sparkles
               const accent = FEATURE_COLORS[i % FEATURE_COLORS.length]
               return (
                 <Reveal key={f.id} delay={i % 3}>
                   <Link href={`/feature/${f.id}`}>
-                    <GlassCard glow={accent} className="h-full p-6 cursor-pointer">
-                      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
+                    <GlassCard glow={accent} className="h-full p-4 cursor-pointer">
+                      <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-lg transition-transform duration-300 group-hover:scale-110"
                         style={{ background: `${accent}15`, color: accent }}>
-                        <Icon size={22} />
+                        <Icon size={17} />
                       </div>
-                      <h3 className="mb-2 text-lg font-bold text-slate-900">{f.title}</h3>
-                      <p className="text-sm leading-relaxed text-slate-500">{f.shortDesc}</p>
-                      <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold" style={{ color: accent }}>
+                      <h3 className="mb-1.5 text-[15px] font-bold text-slate-900">{f.title}</h3>
+                      <p className="text-[12.5px] leading-relaxed text-slate-500">{f.shortDesc}</p>
+                      <div className="mt-3 flex items-center gap-1 text-[11px] font-semibold" style={{ color: accent }}>
                         Learn more <ArrowRight size={12} />
                       </div>
                     </GlassCard>
@@ -579,7 +579,7 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section id="hiw" className="relative w-full flex justify-center overflow-hidden py-7 md:py-8 bg-slate-50">
+      <section id="hiw" className="relative w-full flex justify-center overflow-hidden py-6 bg-slate-50">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" aria-hidden />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" aria-hidden />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-slate-50/80 to-transparent" aria-hidden />
@@ -587,7 +587,7 @@ export default function Home() {
         <div className="relative w-full max-w-5xl px-4 sm:px-6 lg:px-8">
           <SectionHead eyebrow="Process" title="Start in three simple steps" />
 
-          <div className="mt-8 grid w-full gap-6 sm:grid-cols-3">
+          <div className="mt-6 grid w-full gap-5 sm:grid-cols-3">
             {STEPS.map((s, i) => {
               const Icon = s.icon
               return (
@@ -597,7 +597,7 @@ export default function Home() {
                       <div className="absolute left-[60%] right-[-40%] top-10 hidden h-px sm:block"
                         style={{ background: `linear-gradient(90deg, ${s.color}40, transparent)` }} />
                     )}
-                    <div className="relative mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border-2 text-xl font-black transition-all duration-300 group-hover:scale-110"
+                    <div className="relative mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl border-2 text-base font-black transition-all duration-300 group-hover:scale-110"
                       style={{
                         borderColor: s.color,
                         color: s.color,
@@ -608,8 +608,8 @@ export default function Home() {
                       <div className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                         style={{ boxShadow: `0 0 40px ${s.color}50` }} />
                     </div>
-                    <h3 className="mb-3 text-xl font-bold text-slate-900">{s.title}</h3>
-                    <p className="mx-auto max-w-[240px] text-sm leading-relaxed text-slate-500">{s.desc}</p>
+                    <h3 className="mb-1.5 text-[15px] font-bold text-slate-900">{s.title}</h3>
+                    <p className="mx-auto max-w-[210px] text-[12.5px] leading-relaxed text-slate-500">{s.desc}</p>
                   </div>
                 </Reveal>
               )
@@ -619,7 +619,7 @@ export default function Home() {
       </section>
 
       {/* ── PRICING ── */}
-      <section id="pricing" className="relative w-full flex justify-center overflow-hidden py-7 md:py-8 bg-white">
+      <section id="pricing" className="relative w-full flex justify-center overflow-hidden py-6 bg-white">
         <div className="float-orb pointer-events-none absolute top-0 right-1/4 h-[450px] w-[450px] rounded-full" aria-hidden
           style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.06), transparent 70%)' }} />
 
@@ -630,7 +630,7 @@ export default function Home() {
             sub="Transparent pricing. No hidden fees. Instant access after payment."
           />
 
-          <div className="mt-8 grid w-full grid-cols-1 gap-5 pt-2 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-6 grid w-full grid-cols-1 gap-4 pt-2 sm:grid-cols-2 lg:grid-cols-4">
             {PLANS.map((plan, i) => (
               <Reveal key={plan.name} delay={i}>
                 <GlassCard featured={plan.featured} className="flex h-full flex-col p-6">
@@ -642,8 +642,8 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="mb-1 text-sm font-semibold text-slate-500">{plan.name}</div>
-                  <div className={`mb-0.5 text-2xl font-black ${plan.featured ? 'glow-text' : 'text-slate-900'}`}>
+                  <div className="mb-0.5 text-[12px] font-semibold text-slate-500">{plan.name}</div>
+                  <div className={`mb-0.5 text-xl font-black ${plan.featured ? 'glow-text' : 'text-slate-900'}`}>
                     {plan.price}
                   </div>
                   <div className="mb-6 text-xs text-slate-400">{plan.period}</div>
@@ -665,7 +665,7 @@ export default function Home() {
                     </GlowBtn>
                   ) : (
                     <Link href="/subscription-expired"
-                      className="block rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700">
+                      className="block rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center text-[12.5px] font-semibold text-slate-700 transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700">
                       {plan.cta}
                     </Link>
                   )}
@@ -677,26 +677,26 @@ export default function Home() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section id="testimonials" className="relative w-full flex justify-center py-7 md:py-8 bg-slate-50">
+      <section id="testimonials" className="relative w-full flex justify-center py-6 bg-slate-50">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" aria-hidden />
         <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHead
             eyebrow="Testimonials"
             title={<>Trusted by <span className="glow-text">medical professionals</span></>}
           />
-          <div className="mt-8 grid w-full grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {TESTIMONIALS.map((t, i) => (
               <Reveal key={t.name} delay={i}>
-                <GlassCard className="flex h-full flex-col p-7">
-                  <div className="mb-4 text-5xl font-black leading-none glow-text">&ldquo;</div>
-                  <p className="mb-6 flex-1 text-[15px] italic leading-relaxed text-slate-600">{t.quote}</p>
-                  <div className="flex items-center gap-3 border-t border-slate-100 pt-5">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500/60 to-cyan-500/60 text-sm font-black text-white">
+                <GlassCard className="flex h-full flex-col p-5">
+                  <div className="mb-2 text-3xl font-black leading-none glow-text">&ldquo;</div>
+                  <p className="mb-4 flex-1 text-[13px] italic leading-relaxed text-slate-600">{t.quote}</p>
+                  <div className="flex items-center gap-2.5 border-t border-slate-100 pt-3.5">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500/60 to-cyan-500/60 text-xs font-black text-white">
                       {t.name.replace('Dr. ', '')[0]}
                     </div>
                     <div>
-                      <div className="text-sm font-bold text-slate-900">{t.name}</div>
-                      <div className="text-xs text-slate-500">{t.role}</div>
+                      <div className="text-[13px] font-bold text-slate-900">{t.name}</div>
+                      <div className="text-[11px] text-slate-500">{t.role}</div>
                     </div>
                   </div>
                 </GlassCard>
@@ -707,17 +707,17 @@ export default function Home() {
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" className="w-full flex justify-center py-7 md:py-8 bg-white">
+      <section id="faq" className="w-full flex justify-center py-6 bg-white">
         <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHead eyebrow="FAQ" title="Common questions" />
-          <div className="mt-7 w-full flex justify-center">
+          <div className="mt-6 w-full flex justify-center">
             <FaqAccordion faqs={FAQS} />
           </div>
         </div>
       </section>
 
       {/* ── CTA ── */}
-      <section className="relative w-full flex justify-center overflow-hidden py-9 md:py-10">
+      <section className="relative w-full flex justify-center overflow-hidden py-8 md:py-9">
         <div className="cyber-grid pointer-events-none absolute inset-0 opacity-40" aria-hidden />
         <div className="float-orb pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
           <div className="h-[600px] w-[600px] rounded-full"
@@ -728,17 +728,17 @@ export default function Home() {
 
         <div className="relative z-10 w-full max-w-3xl px-4 text-center sm:px-6 lg:px-8">
           <Reveal>
-            <h2 className="text-3xl font-black leading-tight tracking-tight text-slate-900 sm:text-5xl">
+            <h2 className="text-2xl font-black leading-tight tracking-tight text-slate-900 sm:text-[2rem]">
               Ready to secure your{' '}
               <span className="glow-text">residency?</span>
             </h2>
           </Reveal>
           <Reveal delay={1}>
-            <p className="mx-auto mt-5 max-w-md text-slate-600">
+            <p className="mx-auto mt-3 max-w-sm text-[13px] text-slate-600">
               Join thousands of medical professionals already preparing smarter with the FCPS Part 1 Simulator.
             </p>
           </Reveal>
-          <Reveal delay={2} className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <Reveal delay={2} className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <GlowBtn href="/register" size="lg">
               Get instant access <ArrowRight size={17} />
             </GlowBtn>
@@ -752,31 +752,31 @@ export default function Home() {
       {/* ── FOOTER ── */}
       <footer className="w-full flex justify-center border-t border-slate-200 bg-slate-50">
         <div className="w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-start justify-between gap-10">
+          <div className="flex flex-wrap items-start justify-between gap-7">
             <div className="min-w-0 max-w-xs">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-lg font-black text-slate-950 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 text-sm font-black text-slate-950 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
                   F
                 </div>
-                <span className="text-lg font-bold text-slate-900">FCPS Simulator</span>
+                <span className="text-[15px] font-bold text-slate-900">FCPS Simulator</span>
               </div>
-              <p className="mt-4 text-sm leading-relaxed text-slate-600">
+              <p className="mt-2.5 text-[12.5px] leading-relaxed text-slate-600">
                 The scholarly CBT platform for medical professionals preparing for FCPS Part 1.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-x-14 gap-y-8">
+            <div className="flex flex-wrap gap-x-10 gap-y-6">
               <div className="min-w-0">
-                <h4 className="mb-4 text-xs font-bold uppercase tracking-wider text-emerald-700">Platform</h4>
-                <div className="flex flex-col gap-2.5 text-sm text-slate-600">
+                <h4 className="mb-2.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700">Platform</h4>
+                <div className="flex flex-col gap-2 text-[12.5px] text-slate-600">
                   {NAV_LINKS.map((l) => (
                     <a key={l.href} href={l.href} className="transition-colors hover:text-emerald-700">{l.label}</a>
                   ))}
                 </div>
               </div>
               <div className="min-w-0">
-                <h4 className="mb-4 text-xs font-bold uppercase tracking-wider text-emerald-700">Account</h4>
-                <div className="flex flex-col gap-2.5 text-sm text-slate-600">
+                <h4 className="mb-2.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700">Account</h4>
+                <div className="flex flex-col gap-2 text-[12.5px] text-slate-600">
                   <Link href="/login" className="transition-colors hover:text-slate-900">Log in</Link>
                   <Link href="/register" className="transition-colors hover:text-slate-900">Register</Link>
                   <a href="https://wa.me/923324737436" className="flex items-center gap-1.5 transition-colors hover:text-emerald-700">
@@ -787,7 +787,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-8 border-t border-slate-200 pt-5 text-center text-xs text-slate-400">
+          <div className="mt-6 border-t border-slate-200 pt-4 text-center text-[11px] text-slate-400">
             © {new Date().getFullYear()} FCPS Part 1 Simulator. All rights reserved.
           </div>
         </div>

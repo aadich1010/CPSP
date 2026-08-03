@@ -8,7 +8,7 @@ export default function FaqAccordion({ faqs }: { faqs: Faq[] }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-3">
+    <div className="mx-auto flex w-full max-w-xl flex-col gap-2">
       {faqs.map((faq, i) => {
         const isOpen = openFaq === i
         return (
@@ -23,7 +23,7 @@ export default function FaqAccordion({ faqs }: { faqs: Faq[] }) {
             <button
               onClick={() => setOpenFaq(isOpen ? null : i)}
               aria-expanded={isOpen}
-              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-[15px] font-medium text-slate-800"
+              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-[13.5px] font-medium text-slate-800"
             >
               {faq.q}
               <Plus
@@ -39,7 +39,7 @@ export default function FaqAccordion({ faqs }: { faqs: Faq[] }) {
               }`}
             >
               <div className="overflow-hidden">
-                <p className="border-t border-slate-100 px-5 py-4 text-[14px] leading-relaxed text-slate-600">
+                <p className="border-t border-slate-100 px-4 py-3 text-[12.5px] leading-relaxed text-slate-600">
                   {faq.a}
                 </p>
               </div>
