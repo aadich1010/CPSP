@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Play, ChevronDown } from 'lucide-react'
+import Icon from '@/design-system/Icon';
 
 const ALL_SUBJECTS = [
   'Anatomy', 'Physiology', 'Biochemistry', 'Pathology',
@@ -81,7 +82,7 @@ export default function ExamSetupPage() {
           {/* Demo banner */}
           {!isPremium && (
             <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-700 leading-relaxed">
-              🔓 Demo Access — 4 subjects, 10 questions per exam. Ask the admin to upgrade your account for the full question bank and longer mocks.
+              <Icon name="unlocked" /> Demo Access — 4 subjects, 10 questions per exam. Ask the admin to upgrade your account for the full question bank and longer mocks.
             </div>
           )}
 

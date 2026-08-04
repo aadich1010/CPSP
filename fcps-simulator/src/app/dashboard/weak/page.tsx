@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Icon from '@/design-system/Icon';
 
 export default async function WeakSubjectsPage() {
   const supabase = await createClient()
@@ -46,13 +47,13 @@ export default async function WeakSubjectsPage() {
         {/* Left: Weak Subjects List */}
         <div className="glass" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#dc2626', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
-            ⚠️ Areas Needing Improvement
+            <Icon name="warning" /> Areas Needing Improvement
           </h2>
           
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {weakSubjects.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                <div style={{ fontSize: '3rem', marginBottom: 16 }}>🎯</div>
+                <div style={{ fontSize: '3rem', marginBottom: 16 }}><Icon name="accuracy" /></div>
                 <p style={{ color: '#64748b' }}>No weak subjects found! Keep up the great work.</p>
               </div>
             ) : (
@@ -88,7 +89,7 @@ export default async function WeakSubjectsPage() {
         {/* Right: Strong Subjects List */}
         <div className="glass" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#059669', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
-            ✅ Mastered Subjects
+            <Icon name="correct" /> Mastered Subjects
           </h2>
           
           <div style={{ flex: 1, overflowY: 'auto' }}>

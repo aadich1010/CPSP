@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { register } from '@/app/auth/actions'
 import { ArrowRight, Loader2, UserPlus, Mail, Lock, User, ShieldCheck, CheckCircle2 } from 'lucide-react'
+import Icon from '@/design-system/Icon';
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
@@ -125,7 +126,7 @@ export default function RegisterPage() {
               {/* ── ERROR ── */}
               {error && (
                 <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-2.5 text-xs text-red-600">
-                  <span className="mt-px shrink-0 text-sm">⚠️</span>
+                  <span className="mt-px shrink-0 text-sm"><Icon name="warning" /></span>
                   {error}
                 </div>
               )}

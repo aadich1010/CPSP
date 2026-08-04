@@ -5,6 +5,7 @@ import Link from 'next/link'
 import DeleteAllButton from './DeleteAllButton'
 import SubjectDropdown from './SubjectDropdown'
 import BackupRestoreExport from './BackupRestoreExport'
+import Icon from '@/design-system/Icon';
 
 export const dynamic = 'force-dynamic'
 
@@ -70,7 +71,7 @@ export default async function AdminQuestionsPage({
             gap: 6,
             boxShadow: '0 2px 4px rgba(13, 148, 136, 0.05)'
           }}>
-            <span style={{ fontSize: '1rem' }}>📊</span>
+            <span style={{ fontSize: '1rem' }}><Icon name="analytics" /></span>
             <span>{count ?? 0}</span>
             <span style={{ fontSize: '0.7rem', opacity: 0.7, fontWeight: 600 }}>QUESTIONS</span>
           </div>
@@ -121,7 +122,7 @@ export default async function AdminQuestionsPage({
               textDecoration: 'none',
             }}
           >
-            🤖 AI Import
+            <Icon name="ai" /> AI Import
           </Link>
         </div>
       </div>

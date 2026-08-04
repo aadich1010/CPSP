@@ -13,7 +13,7 @@ export interface FeatureDetail {
 export const FEATURES: FeatureDetail[] = [
   {
     id: 'smart-analytics',
-    icon: '📊',
+    icon: 'analytics',
     title: 'Smart Analytics',
     shortDesc: 'Deep-dive into your performance with subject-wise heatmaps and global peer ranking.',
     color: '#0d9488',
@@ -29,7 +29,7 @@ export const FEATURES: FeatureDetail[] = [
   },
   {
     id: 'forensic-security',
-    icon: '🔒',
+    icon: 'locked',
     title: 'Forensic Security',
     shortDesc: 'Dynamic digital watermarking and session monitoring ensure absolute question bank integrity.',
     color: '#8b5cf6',
@@ -45,7 +45,7 @@ export const FEATURES: FeatureDetail[] = [
   },
   {
     id: 'hospital-grade-ui',
-    icon: '🏥',
+    icon: 'medicine',
     title: 'Hospital-Grade UI',
     shortDesc: 'Experience the exact CBT environment used in actual examinations for zero-anxiety on exam day.',
     color: '#ec4899',
@@ -61,7 +61,7 @@ export const FEATURES: FeatureDetail[] = [
   },
   {
     id: 'ai-powered-organization',
-    icon: '⚡',
+    icon: 'bolt',
     title: 'AI-Powered Organization',
     shortDesc: 'Smart subject-detection and high-yield question categorization for targeted study.',
     color: '#eab308',
@@ -77,7 +77,7 @@ export const FEATURES: FeatureDetail[] = [
   },
   {
     id: 'real-time-synchronization',
-    icon: '🔄',
+    icon: 'resume',
     title: 'Real-Time Synchronization',
     shortDesc: 'Zero-lag optimization for a seamless, high-speed testing experience.',
     color: '#3b82f6',
@@ -93,7 +93,7 @@ export const FEATURES: FeatureDetail[] = [
   },
   {
     id: 'vvip-support',
-    icon: '👑',
+    icon: 'premium',
     title: 'VVIP Support',
     shortDesc: 'Dedicated activation assistance and 24/7 technical monitoring for premium users.',
     color: '#f97316',

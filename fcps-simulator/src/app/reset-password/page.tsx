@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updatePassword } from '@/app/auth/actions'
+import Icon from '@/design-system/Icon';
 
 export default function ResetPasswordPage() {
   const router = useRouter()
@@ -82,7 +83,7 @@ export default function ResetPasswordPage() {
 
               {error && (
                 <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-                  <span className="text-lg">⚠️</span>
+                  <span className="text-lg"><Icon name="warning" /></span>
                   {error}
                 </div>
               )}

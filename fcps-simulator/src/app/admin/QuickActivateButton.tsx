@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { quickActivateUser } from './user-actions'
+import Icon from '@/design-system/Icon';
 
 export default function QuickActivateButton({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(false)
@@ -25,7 +26,7 @@ export default function QuickActivateButton({ userId }: { userId: string }) {
       className="btn btn-primary btn-sm"
       style={{ fontSize: '0.75rem', padding: '4px 10px' }}
     >
-      {loading ? '...' : '⚡ Quick Activate'}
+      {loading ? '...' : <><Icon name="bolt" size="sm" /> Quick Activate</>}
     </button>
   )
 }

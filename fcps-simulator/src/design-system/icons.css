@@ -1,0 +1,43 @@
+/* =============================================================================
+   Icon primitive — base styles
+   ========================================================================== */
+
+.ds-icon {
+  display: inline-block;
+  flex: none;               /* never let flex layouts squash a glyph */
+  vertical-align: -0.125em; /* optical baseline alignment next to text */
+  color: currentColor;
+  fill: none;
+  stroke: currentColor;
+  overflow: visible;
+}
+
+/* Icons inside buttons/links should not intercept the click target. */
+button .ds-icon,
+a .ds-icon,
+[role='button'] .ds-icon {
+  pointer-events: none;
+}
+
+/* Optional muted treatment for secondary affordances. */
+.ds-icon--muted { opacity: 0.6; }
+
+/* Optional emphasis: apply on the PARENT, e.g. .metric-card--positive { color: … } */
+.ds-icon--inherit { color: inherit; }
+
+/* -----------------------------------------------------------------------------
+   Defensive rules.
+   The codemod catches the vast majority of legacy icons, but colour-emoji fonts
+   can be reintroduced by a stray copy-paste. These rules force any emoji that
+   slips back in to render as a monochrome glyph rather than a 3D sticker, so a
+   regression looks like a small bug instead of a broken brand.
+   -------------------------------------------------------------------------- */
+
+:root {
+  --ds-emoji-fallback-font: 'Noto Emoji', 'Segoe UI Symbol', 'Symbola', sans-serif;
+}
+
+.ds-no-color-emoji {
+  font-family: var(--ds-emoji-fallback-font);
+  font-variant-emoji: text;
+}

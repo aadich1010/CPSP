@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { updatePaymentSetting } from './actions'
+import Icon from '@/design-system/Icon';
+import type { IconName } from '@/design-system/icon-registry';
 
 type Setting = {
   provider: 'jazzcash' | 'easypaisa' | 'bank'
@@ -11,9 +13,9 @@ type Setting = {
 }
 
 const PROVIDER_META: Record<Setting['provider'], { title: string; icon: string; color: string; extraLabel: string }> = {
-  jazzcash: { title: 'JazzCash', icon: '📱', color: '#f59e0b', extraLabel: 'Notes (optional)' },
-  easypaisa: { title: 'EasyPaisa', icon: '💸', color: '#16a34a', extraLabel: 'Notes (optional)' },
-  bank: { title: 'Bank Transfer', icon: '🏛️', color: '#2563eb', extraLabel: 'Bank Name' },
+  jazzcash: { title: 'JazzCash', icon: 'mobilePay', color: '#f59e0b', extraLabel: 'Notes (optional)' },
+  easypaisa: { title: 'EasyPaisa', icon: 'wallet', color: '#16a34a', extraLabel: 'Notes (optional)' },
+  bank: { title: 'Bank Transfer', icon: 'bank', color: '#2563eb', extraLabel: 'Bank Name' },
 }
 
 export default function PaymentSettingsClient({ initialSettings }: { initialSettings: Setting[] }) {
@@ -79,7 +81,7 @@ function ProviderCard({ setting, onSaved }: { setting: Setting; onSaved: (s: Set
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-        <span style={{ fontSize: '1.5rem' }}>{meta.icon}</span>
+        <Icon name={meta.icon as IconName} size="xl" />
         <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a' }}>{meta.title}</h3>
       </div>
 

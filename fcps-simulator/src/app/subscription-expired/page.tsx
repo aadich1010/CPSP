@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { Save, X, Loader2 } from 'lucide-react'
+import Icon from '@/design-system/Icon';
 
 interface PaymentSetting {
   provider: 'jazzcash' | 'easypaisa' | 'bank'
@@ -118,7 +119,7 @@ export default function SubscriptionExpiredPage() {
           fontWeight: 700,
           marginBottom: 10
         }}>
-          <span style={{ fontSize: '1rem' }}>⚡</span> PREMIUM ACCESS REQUIRED
+          <span style={{ fontSize: '1rem' }}><Icon name="bolt" /></span> PREMIUM ACCESS REQUIRED
         </div>
         <h1 style={{ fontSize: '2rem', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 8 }}>
           Unlock Your Potential
@@ -241,9 +242,9 @@ export default function SubscriptionExpiredPage() {
 
       {/* Trust Badges */}
       <div style={{ marginTop: 24, display: 'flex', gap: 20, opacity: 0.5, fontSize: '0.75rem', fontWeight: 600 }}>
-        <span>🔒 Secure</span>
-        <span>⚡ Instant Access</span>
-        <span>📞 24/7 Support</span>
+        <span><Icon name="locked" /> Secure</span>
+        <span><Icon name="bolt" /> Instant Access</span>
+        <span><Icon name="support" /> 24/7 Support</span>
       </div>
     </div>
   )
