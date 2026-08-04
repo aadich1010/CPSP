@@ -17,6 +17,7 @@ export default function SubscriptionExpiredPage() {
   const [settings, setSettings] = useState<PaymentSetting[]>([])
   const [loading, setLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [wasDemo, setWasDemo] = useState(false)
   const [editingProvider, setEditingProvider] = useState<PaymentSetting | null>(null)
   const supabase = createClient()
 
@@ -31,10 +32,15 @@ export default function SubscriptionExpiredPage() {
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('role')
+          .select('role, subscription_status')
           .eq('id', user.id)
           .single()
         setIsAdmin(profile?.role === 'admin')
+        // A 'demo' account that landed here got here via the 3-day expiry
+        // (see 20260805000000 migration), not because they were never
+        // activated -- worth a different message than the generic
+        // "pending activation" copy shown to brand-new/held accounts.
+        setWasDemo(profile?.subscription_status === 'demo')
       }
 
       // 2. Fetch payment settings
@@ -122,11 +128,14 @@ export default function SubscriptionExpiredPage() {
           <span style={{ fontSize: '1rem' }}><Icon name="bolt" /></span> PREMIUM ACCESS REQUIRED
         </div>
         <h1 style={{ fontSize: '2rem', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 8 }}>
-          Unlock Your Potential
+          {wasDemo ? 'Your Demo Period Has Ended' : 'Unlock Your Potential'}
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: 1.5 }}>
-          Your account is <span style={{ color: '#f59e0b', fontWeight: 700 }}>pending activation</span>. 
-          Complete payment for full access.
+          {wasDemo ? (
+            <>Your <span style={{ color: '#f59e0b', fontWeight: 700 }}>3-day demo access</span> has expired. Subscribe now to keep practicing with the full question bank.</>
+          ) : (
+            <>Your account is <span style={{ color: '#f59e0b', fontWeight: 700 }}>pending activation</span>. Complete payment for full access.</>
+          )}
         </p>
       </motion.div>
 

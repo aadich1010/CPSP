@@ -15,7 +15,9 @@ const ALL_SUBJECTS = [
   'Mixed (All Subjects)',
 ]
 
-const DEMO_SUBJECTS = ['Anatomy', 'Physiology', 'Biochemistry', 'Pathology']
+// Demo accounts now get every subject (see 20260805000000 migration) --
+// only the 10-question cap and the fixed (non-shuffled) question set
+// still distinguish demo from a paid account.
 
 export default function ExamSetupPage() {
   const router = useRouter()
@@ -47,7 +49,7 @@ export default function ExamSetupPage() {
     if (pre) setSubject(pre)
   }, [router])
 
-  const SUBJECTS = isPremium ? ALL_SUBJECTS : DEMO_SUBJECTS
+  const SUBJECTS = ALL_SUBJECTS
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -82,7 +84,7 @@ export default function ExamSetupPage() {
           {/* Demo banner */}
           {!isPremium && (
             <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-700 leading-relaxed">
-              <Icon name="unlocked" /> Demo Access — 4 subjects, 10 questions per exam. Ask the admin to upgrade your account for the full question bank and longer mocks.
+              <Icon name="unlocked" /> Demo Access — all subjects unlocked, 10 fixed questions per exam, valid for 3 days. Subscribe to unlock the full question bank and longer mocks.
             </div>
           )}
 
