@@ -363,6 +363,84 @@
   animation-play-state: var(--vvip-timer-play);
 }
 
+/* -------------------------------------------------------- celebration fx
+   Confetti + balloons, pure CSS. Sits between the scrim (z-index 0-ish,
+   via stacking order) and the card (z-index 4+ via its own layers), so it
+   reads as "happening around the card" rather than on top of the text. */
+
+.vvip-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.vvip-confetti-piece {
+  position: absolute;
+  top: -5%;
+  opacity: 0;
+  animation-name: vvip-confetti-fall;
+  animation-timing-function: cubic-bezier(0.36, 0.11, 0.89, 0.32);
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+@keyframes vvip-confetti-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  8% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--vvip-drift), 115vh, 0) rotate(540deg);
+  }
+}
+
+.vvip-balloon {
+  position: absolute;
+  bottom: -18%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  animation-name: vvip-balloon-rise;
+  animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+.vvip-balloon-body {
+  width: 26px;
+  height: 32px;
+  border-radius: 50% 50% 50% 50% / 58% 58% 42% 42%;
+  box-shadow: -4px -6px 10px rgba(255, 255, 255, 0.22) inset, 0 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+.vvip-balloon-string {
+  width: 1px;
+  height: 26px;
+  margin-top: 2px;
+  background: rgba(236, 231, 220, 0.35);
+}
+
+@keyframes vvip-balloon-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) translateX(0);
+  }
+  10% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-135vh) translateX(18px);
+  }
+}
+
 /* ------------------------------------------------------------------ exit */
 
 .vvip-overlay[data-phase='leave'] .vvip-scrim {
@@ -457,6 +535,7 @@
   }
 
   .vvip-sheen { display: none; }
+  .vvip-fx    { display: none; }
 
   .vvip-seal-ring {
     stroke-dashoffset: 0;

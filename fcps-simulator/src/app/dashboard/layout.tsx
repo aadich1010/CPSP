@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 import ForensicWatermark from '@/components/ForensicWatermark'
 import AntiTheft from '@/components/AntiTheft'
+import VvipWelcomeGate from '@/components/vvip'
 import Icon from '@/design-system/Icon';
 
 export default async function DashboardLayout({
@@ -40,6 +41,23 @@ export default async function DashboardLayout({
       <ForensicWatermark
         userEmail={profile.email || user.email || ''}
         userName={profile.full_name || ''}
+      />
+      {/* Fires once per login session, only when subscription_status is
+          genuinely 'active' and not expired (see isPaidMember() in
+          lib/subscription.ts) -- i.e. right after someone's payment gets
+          approved and they land back on the dashboard. Auto-dismisses
+          after 5s, confetti + balloons per the requested "party popup"
+          feel. Demo accounts never see this, only real subscribers. */}
+      <VvipWelcomeGate
+        user={{
+          id: profile.id,
+          email: profile.email || user.email,
+          full_name: profile.full_name,
+          subscription_status: profile.subscription_status,
+          subscription_expires_at: profile.subscription_expires_at,
+        }}
+        title="Congratulations!"
+        message="Your subscription is now active — the full question bank, timed mock exams, and performance analytics are all unlocked."
       />
 
       {/* Sidebar */}

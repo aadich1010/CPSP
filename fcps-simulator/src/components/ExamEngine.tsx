@@ -266,9 +266,10 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [submitted, handleSubmit])
 
-  const currentQ   = questions[currentIndex]
-  const answered   = answers.filter(Boolean).length
-  const unanswered = questions.length - answered
+  const currentQ     = questions[currentIndex]
+  const answered     = answers.filter(Boolean).length
+  const unanswered   = questions.length - answered
+  const allAnswered  = unanswered === 0
 
   function selectAnswer(label: string) {
     if (submitted) return
@@ -436,14 +437,14 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
               <button
                 className="btn btn-primary btn-sm"
                 onClick={handleNext}
-                disabled={submitted || answers[currentIndex] === null}
+                disabled={submitted || answers[currentIndex] === null || allAnswered}
                 style={{
                   minWidth: '80px',
-                  opacity: answers[currentIndex] === null ? 0.4 : 1,
-                  cursor: answers[currentIndex] === null ? 'not-allowed' : 'pointer',
+                  opacity: (answers[currentIndex] === null || allAnswered) ? 0.4 : 1,
+                  cursor: (answers[currentIndex] === null || allAnswered) ? 'not-allowed' : 'pointer',
                 }}
               >
-                Next →
+                {allAnswered ? 'All Answered' : 'Next →'}
               </button>
             </div>
           </div>
