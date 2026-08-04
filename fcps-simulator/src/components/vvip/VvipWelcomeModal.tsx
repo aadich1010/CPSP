@@ -112,6 +112,9 @@ export interface VvipWelcomeModalProps {
   message?: string;
   pauseOnHover?: boolean;
   portalTarget?: Element | null;
+  /** Default true. Pass false to make this close ONLY via the holdMs
+   *  auto-timer -- no Dismiss button, scrim click, or Escape key. */
+  dismissible?: boolean;
 }
 
 export default function VvipWelcomeModal({
@@ -125,6 +128,7 @@ export default function VvipWelcomeModal({
   message = 'Your full question bank, timed mock exams, and performance analytics are unlocked.',
   pauseOnHover = false,
   portalTarget,
+  dismissible = true,
 }: VvipWelcomeModalProps) {
   // Client-only flag without a setState-in-effect. Returns false during SSR and
   // on the hydration pass, true thereafter — which is exactly what createPortal
@@ -164,6 +168,15 @@ export default function VvipWelcomeModal({
     window.clearTimeout(exitTimerRef.current);
     exitTimerRef.current = window.setTimeout(finish, resolvedExitMs);
   }, [finish, resolvedExitMs]);
+
+  // The auto-timer always calls beginExit directly (see `arm`). Every
+  // USER-initiated close path (Dismiss button, scrim click, Escape) goes
+  // through this gate instead, so dismissible={false} truly means "cannot
+  // be closed early" rather than just hiding the button.
+  const requestManualClose = useCallback(() => {
+    if (!dismissible) return;
+    beginExit();
+  }, [dismissible, beginExit]);
 
   /* ------------------------------------------------------------ hold timer */
 
@@ -217,7 +230,7 @@ export default function VvipWelcomeModal({
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.stopPropagation();
-        beginExit();
+        requestManualClose();
         return;
       }
       if (event.key !== 'Tab') return;
@@ -246,7 +259,7 @@ export default function VvipWelcomeModal({
       const target = returnFocusRef.current;
       if (target instanceof HTMLElement) target.focus({ preventScroll: true });
     };
-  }, [open, mounted, beginExit]);
+  }, [open, mounted, requestManualClose]);
 
   /* -------------------------------------------------------- hover pausing */
 
@@ -281,7 +294,7 @@ export default function VvipWelcomeModal({
       data-phase={phase}
       style={{ '--vvip-hold': `${holdMs}ms`, '--vvip-exit': `${resolvedExitMs}ms` } as React.CSSProperties}
     >
-      <div className="vvip-scrim" onClick={beginExit} aria-hidden="true" />
+      <div className="vvip-scrim" onClick={requestManualClose} aria-hidden="true" />
       {!reduced && <CelebrationFx />}
 
       <section
@@ -332,11 +345,15 @@ export default function VvipWelcomeModal({
           </dl>
         ) : null}
 
-        <footer className="vvip-foot">
-          <button type="button" className="vvip-dismiss" ref={closeRef} onClick={beginExit}>
-            Dismiss
-          </button>
-          <span className="vvip-auto">Closes automatically</span>
+        <footer className="vvip-foot" style={!dismissible ? { justifyContent: 'center' } : undefined}>
+          {dismissible && (
+            <button type="button" className="vvip-dismiss" ref={closeRef} onClick={requestManualClose}>
+              Dismiss
+            </button>
+          )}
+          <span className="vvip-auto">
+            Closes automatically in {Math.round(holdMs / 1000)}s
+          </span>
         </footer>
 
         <div className="vvip-timer" aria-hidden="true">

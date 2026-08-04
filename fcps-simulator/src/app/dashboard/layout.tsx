@@ -42,12 +42,13 @@ export default async function DashboardLayout({
         userEmail={profile.email || user.email || ''}
         userName={profile.full_name || ''}
       />
-      {/* Fires once per login session, only when subscription_status is
-          genuinely 'active' and not expired (see isPaidMember() in
-          lib/subscription.ts) -- i.e. right after someone's payment gets
-          approved and they land back on the dashboard. Auto-dismisses
-          after 5s, confetti + balloons per the requested "party popup"
-          feel. Demo accounts never see this, only real subscribers. */}
+      {/* Fires once per LOGIN (see useVvipWelcome's session-key comment --
+          a page refresh does not re-show it, but a fresh login does), only
+          when subscription_status is genuinely 'active' and not expired
+          (see isPaidMember() in lib/subscription.ts). Confetti + balloons,
+          stays up 30s, and cannot be dismissed early -- no button, scrim
+          click, or Escape closes it before the timer does. Demo accounts
+          never see this, only real subscribers. */}
       <VvipWelcomeGate
         user={{
           id: profile.id,
@@ -57,7 +58,9 @@ export default async function DashboardLayout({
           subscription_expires_at: profile.subscription_expires_at,
         }}
         title="Congratulations!"
-        message="Your subscription is now active — the full question bank, timed mock exams, and performance analytics are all unlocked."
+        message="Your subscription is now active — the full question bank, timed mock exams, and performance analytics are all unlocked. Have a good day, and best of luck for your exam!"
+        holdMs={30000}
+        dismissible={false}
       />
 
       {/* Sidebar */}
