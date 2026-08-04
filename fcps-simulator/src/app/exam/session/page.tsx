@@ -45,6 +45,14 @@ export default async function ExamSessionPage({
     p_mode: mode,
   })
 
+  // Demo accounts get exactly 3 completed attempts (see 20260805010000
+  // migration) -- get_exam_questions() raises this specific error once
+  // they're used up, so send them to the same "subscribe now" screen the
+  // 3-day expiry uses, instead of a confusing generic failure.
+  if (fetchError?.message?.includes('DEMO_ATTEMPTS_EXHAUSTED')) {
+    redirect('/subscription-expired')
+  }
+
   if (fetchError || !allQuestions?.length) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', gap: 16 }}>
@@ -97,6 +105,7 @@ export default async function ExamSessionPage({
       timeLimitSeconds={timeLimitSeconds}
       candidateName={candidateName}
       candidateEmail={candidateEmail}
+      shuffleAnswers={isPremium}
     />
   )
 }

@@ -84,7 +84,7 @@ export default function ExamSetupPage() {
           {/* Demo banner */}
           {!isPremium && (
             <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-700 leading-relaxed">
-              <Icon name="unlocked" /> Demo Access — all subjects unlocked, 10 fixed questions per exam, valid for 3 days. Subscribe to unlock the full question bank and longer mocks.
+              <Icon name="unlocked" /> Demo Access — all subjects unlocked, 10 fixed questions per exam (same questions, same order, every time), up to 3 attempts within 3 days. Subscribe to unlock the full question bank and longer mocks.
             </div>
           )}
 

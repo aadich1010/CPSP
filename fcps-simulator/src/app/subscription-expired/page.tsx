@@ -132,7 +132,7 @@ export default function SubscriptionExpiredPage() {
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: 1.5 }}>
           {wasDemo ? (
-            <>Your <span style={{ color: '#f59e0b', fontWeight: 700 }}>3-day demo access</span> has expired. Subscribe now to keep practicing with the full question bank.</>
+            <>You&apos;ve used up your <span style={{ color: '#f59e0b', fontWeight: 700 }}>free demo</span> — either all 3 attempts or the 3-day trial window. Subscribe now to keep practicing with the full question bank.</>
           ) : (
             <>Your account is <span style={{ color: '#f59e0b', fontWeight: 700 }}>pending activation</span>. Complete payment for full access.</>
           )}

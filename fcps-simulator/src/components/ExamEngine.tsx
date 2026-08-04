@@ -31,6 +31,11 @@ interface ExamEngineProps {
   candidateName?:   string
   /** Printed on the assessment report so a physical copy is traceable. */
   candidateEmail?:  string
+  /** Default true (paid exam behaviour: options shuffled once per attempt,
+   *  same as question order being randomised server-side). Pass false for
+   *  demo accounts so the fixed question set also keeps a fixed, unshuffled
+   *  option order -- the whole demo attempt looks identical every time. */
+  shuffleAnswers?:  boolean
 }
 
 type Answer = string | null
@@ -100,6 +105,28 @@ export function shuffleOptions(q: Question): ShuffledQuestion {
   return { display, toOriginal, toDisplay }
 }
 
+/** Same shape as shuffleOptions(), but the identity mapping -- options
+ *  stay in their original A/B/C/D/E order. Used for demo accounts so the
+ *  fixed question set also has a fixed, unshuffled option order every
+ *  attempt (see get_exam_questions() in 20260805000000_demo_3day_fixed_
+ *  questions_all_subjects.sql for the matching "don't shuffle the
+ *  questions either" half of this). */
+export function identityOptions(q: Question): ShuffledQuestion {
+  const present = OPTION_LABELS.filter((l) => {
+    const t = getOptionText(q, l)
+    return t !== null && t.trim() !== ''
+  })
+
+  const toOriginal: Record<string, string> = {}
+  const toDisplay:  Record<string, string> = {}
+  present.forEach((label) => {
+    toOriginal[label] = label
+    toDisplay[label] = label
+  })
+
+  return { display: { ...q }, toOriginal, toDisplay }
+}
+
 function formatTime(secs: number): string {
   const h = Math.floor(secs / 3600)
   const m = Math.floor((secs % 3600) / 60)
@@ -108,12 +135,17 @@ function formatTime(secs: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail }: ExamEngineProps) {
+export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail, shuffleAnswers = true }: ExamEngineProps) {
   // Shuffled ONCE per mount (lazy initialiser), never on re-render -- otherwise
   // the options would jump around under the student's cursor every tick of the
   // timer. Question ORDER is already randomised per attempt server-side by
   // get_exam_questions(); this adds per-attempt option order on top.
-  const [shuffled] = useState<ShuffledQuestion[]>(() => rawQuestions.map(shuffleOptions))
+  // Demo accounts pass shuffleAnswers={false} -- identityOptions() keeps
+  // A/B/C/D/E in their original order so the fixed demo question set looks
+  // exactly the same on every attempt, by anyone.
+  const [shuffled] = useState<ShuffledQuestion[]>(() =>
+    rawQuestions.map(shuffleAnswers ? shuffleOptions : identityOptions)
+  )
   // Memoised: `shuffled` is stable from useState, so `questions` keeps a
   // stable identity. Rebuilding it each render would re-fire the timer
   // effect (handleSubmit depends on it) on every single tick.
