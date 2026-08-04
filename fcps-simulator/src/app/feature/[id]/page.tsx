@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { FEATURES } from '@/lib/featuresData';
 import { useMemo } from 'react';
+import Icon from '@/design-system/Icon';
+import type { IconName } from '@/design-system/icon-registry';
 
 export default function FeaturePage() {
   const params = useParams();
@@ -68,7 +70,7 @@ export default function FeaturePage() {
             color: feature.color,
             boxShadow: `0 10px 30px ${feature.color}20`
           }}>
-            {feature.icon}
+            <Icon name={feature.icon as IconName} size={48} />
           </div>
           <div>
             <div style={{

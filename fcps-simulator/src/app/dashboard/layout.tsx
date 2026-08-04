@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 import ForensicWatermark from '@/components/ForensicWatermark'
 import AntiTheft from '@/components/AntiTheft'
+import Icon from '@/design-system/Icon';
 
 export default async function DashboardLayout({
   children,
@@ -75,7 +76,7 @@ export default async function DashboardLayout({
             }}
           >
             <span>
-              ⚠️ Your subscription expires in <strong>{daysLeft} day{daysLeft !== 1 ? 's' : ''}</strong>.
+              <Icon name="warning" /> Your subscription expires in <strong>{daysLeft} day{daysLeft !== 1 ? 's' : ''}</strong>.
             </span>
             <a
               href="/subscription-expired"

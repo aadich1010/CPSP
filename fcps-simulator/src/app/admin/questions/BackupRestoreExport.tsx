@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { backupQuestions, restoreQuestions } from './actions'
+import Icon from '@/design-system/Icon';
 
 export default function BackupRestoreExport() {
   const [loading, setLoading] = useState(false)
@@ -304,7 +305,7 @@ export default function BackupRestoreExport() {
             boxShadow: '0 2px 4px rgba(13, 148, 136, 0.15)'
           }}
         >
-          📄 Export ▾
+          <Icon name="download" size="sm" /> Export ▾
         </button>
 
         {dropdownOpen && (
@@ -350,7 +351,7 @@ export default function BackupRestoreExport() {
                 onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f8fafc')}
                 onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
-                📝 Word (.doc)
+                <Icon name="notes" size="sm" /> Word (.doc)
               </button>
               <button 
                 onClick={() => handleExport('pdf')} 
@@ -367,7 +368,7 @@ export default function BackupRestoreExport() {
                 onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f8fafc')}
                 onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
-                📄 PDF (.pdf)
+                <Icon name="notes" size="sm" /> PDF (.pdf)
               </button>
             </div>
           </>

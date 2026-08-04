@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { logout } from '@/app/auth/actions'
+import Icon from '@/design-system/Icon';
+import type { IconName } from '@/design-system/icon-registry';
 
 export default async function AdminLayout({
   children,
@@ -58,7 +60,7 @@ export default async function AdminLayout({
                 boxShadow: '0 4px 10px rgba(16,185,129,0.2)'
               }}
             >
-              <span style={{ fontSize: '1rem' }}>⚙️</span>
+              <span style={{ fontSize: '1rem' }}><Icon name="settings" /></span>
             </div>
             <div>
               <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0f172a' }}>
@@ -74,11 +76,11 @@ export default async function AdminLayout({
         {/* Nav */}
         <nav style={{ flex: 1, padding: '14px 0' }}>
           {[
-            { href: '/admin',          label: 'Dashboard',  icon: '📊' },
-            { href: '/admin/analytics', label: 'Analytics', icon: '📈' },
-            { href: '/admin/users',    label: 'Users',      icon: '👥' },
-            { href: '/admin/questions',label: 'Questions',  icon: '📝' },
-            { href: '/admin/settings/payment', label: 'Payment Settings', icon: '💳' },
+            { href: '/admin',          label: 'Dashboard',  icon: 'analytics' },
+            { href: '/admin/analytics', label: 'Analytics', icon: 'trendUp' },
+            { href: '/admin/users',    label: 'Users',      icon: 'community' },
+            { href: '/admin/questions',label: 'Questions',  icon: 'practice' },
+            { href: '/admin/settings/payment', label: 'Payment Settings', icon: 'billing' },
           ].map((item) => (
             <Link
               key={item.href}
@@ -97,7 +99,7 @@ export default async function AdminLayout({
                 borderRadius: 8,
               }}
             >
-              <span>{item.icon}</span>
+              <Icon name={item.icon as IconName} size="md" />
               <span>{item.label}</span>
             </Link>
           ))}
@@ -106,7 +108,7 @@ export default async function AdminLayout({
         {/* User */}
         <div style={{ padding: '14px 12px', borderTop: '1px solid rgba(139,92,246,0.1)' }}>
           <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: 10, paddingLeft: 6 }}>
-            👑 {profile?.full_name || 'Admin'}
+            <Icon name="premium" size="sm" /> {profile?.full_name || 'Admin'}
           </div>
           <Link
             href="/dashboard"

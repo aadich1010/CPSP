@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import ExamEngine from '@/components/ExamEngine'
+import Icon from '@/design-system/Icon';
 
 export default async function ExamSessionPage({
   searchParams,
@@ -47,7 +48,7 @@ export default async function ExamSessionPage({
   if (fetchError || !allQuestions?.length) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', gap: 16 }}>
-        <div style={{ fontSize: '3rem' }}>📭</div>
+        <div style={{ fontSize: '3rem' }}><Icon name="empty" /></div>
         <p style={{ fontSize: '1rem', fontWeight: 500 }}>
           No questions found for <strong style={{ color: '#0d9488' }}>{subject}</strong>.
         </p>

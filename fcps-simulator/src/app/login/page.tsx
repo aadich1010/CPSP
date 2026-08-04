@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { login } from '@/app/auth/actions'
 import { ArrowRight, Loader2, Mail, Lock, ShieldCheck } from 'lucide-react'
+import Icon from '@/design-system/Icon';
 
 function LoginForm() {
   const searchParams = useSearchParams()
@@ -97,7 +98,7 @@ function LoginForm() {
           {/* Error */}
           {error && (
             <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-              <span className="mt-0.5 shrink-0">⚠️</span>
+              <span className="mt-0.5 shrink-0"><Icon name="warning" /></span>
               {error}
             </div>
           )}
@@ -140,7 +141,7 @@ function LoginForm() {
       </div>
 
       <p className="mt-6 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-        {isAdmin ? '🔒 Admin authentication required' : '🔒 Subscription-based access · Admin-verified'}
+        <Icon name="locked" size="xs" /> {isAdmin ? 'Admin authentication required' : 'Subscription-based access · Admin-verified'}
       </p>
     </div>
   )

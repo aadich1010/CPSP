@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server'
+import Icon from '@/design-system/Icon';
 
 export const dynamic = 'force-dynamic'
 
@@ -86,7 +87,7 @@ export default async function AnalyticsPage() {
             marginBottom: 16,
           }}
         >
-          ℹ️ No activations logged yet. This page only has data from activations made after the
+          <Icon name="info" /> No activations logged yet. This page only has data from activations made after the
           audit log was added — past activity from before that couldn&apos;t be reconstructed
           since it was never recorded anywhere.
         </div>
@@ -105,7 +106,7 @@ export default async function AnalyticsPage() {
             marginBottom: 16,
           }}
         >
-          ⚠️ {rows.length - withAmount.length} of {rows.length} activation(s) were logged without an
+          <Icon name="warning" size="sm" /> {rows.length - withAmount.length} of {rows.length} activation(s) were logged without an
           amount (skipped at activation time), so revenue below is a floor, not the full total.
         </div>
       )}

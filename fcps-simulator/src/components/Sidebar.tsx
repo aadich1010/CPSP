@@ -4,12 +4,14 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logout } from '@/app/auth/actions'
+import Icon from '@/design-system/Icon';
+import type { IconName } from '@/design-system/icon-registry';
 
 const NAV_ITEMS = [
-  { href: '/dashboard',          icon: '🏠', label: 'Dashboard' },
-  { href: '/exam/setup',         icon: '📝', label: 'Start Exam' },
-  { href: '/dashboard/history',  icon: '📋', label: 'Exam History' },
-  { href: '/dashboard/analysis', icon: '📊', label: 'Performance' },
+  { href: '/dashboard',          icon: 'dashboard', label: 'Dashboard' },
+  { href: '/exam/setup',         icon: 'practice', label: 'Start Exam' },
+  { href: '/dashboard/history',  icon: 'mockExam', label: 'Exam History' },
+  { href: '/dashboard/analysis', icon: 'analytics', label: 'Performance' },
 ]
 
 interface SidebarProps {
@@ -96,7 +98,7 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
               href={item.href}
               className={`sidebar-link ${isActive ? 'active' : ''}`}
             >
-              <span className="text-lg">{item.icon}</span>
+              <Icon name={item.icon as IconName} size="lg" />
               <span className="font-semibold">{item.label}</span>
             </Link>
           )
@@ -111,7 +113,7 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
               href="/admin"
               className={`sidebar-link ${pathname.startsWith('/admin') ? 'active' : ''}`}
             >
-              <span className="text-lg">⚙️</span>
+              <span className="text-lg"><Icon name="settings" /></span>
               <span className="font-semibold">Administration</span>
             </Link>
           </div>
@@ -127,7 +129,7 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
             href="/#pricing"
             className="unlock-cta flex items-center justify-center gap-2 w-full rounded-xl px-4 py-3 text-[12px] font-black uppercase tracking-wider text-white shadow-md"
           >
-            <span className="text-base">🔓</span>
+            <span className="text-base"><Icon name="unlocked" /></span>
             Unlock Full Access
           </Link>
         </div>
@@ -145,7 +147,7 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
           >
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-bold uppercase tracking-wider">
-                {daysLeft <= 7 ? '⚠️ Expiring Soon' : '✅ Active Status'}
+                {daysLeft <= 7 ? <><Icon name="warning" size="xs" /> Expiring Soon</> : <><Icon name="correct" size="xs" /> Active Status</>}
               </span>
             </div>
             <div className="text-xs font-medium">
@@ -166,7 +168,7 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
               {profile.full_name || 'User'}
             </div>
             <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-              {profile.role === 'admin' ? '👑 Admin' : '🎓 Candidate'}
+              {profile.role === 'admin' ? <><Icon name="premium" size="xs" /> Admin</> : <><Icon name="graduation" size="xs" /> Candidate</>}
             </div>
           </div>
         </div>

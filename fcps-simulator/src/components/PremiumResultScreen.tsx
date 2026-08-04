@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import PrintableReport from "./PrintableReport";
 
 /* ── Types ─────────────────────────────────────── */
+import Icon from '@/design-system/Icon';
 interface Question {
   id: string; question_text: string; correct_answer?: string; subject: string;
   option_a?: string|null; option_b?: string|null; option_c?: string|null;
@@ -312,7 +313,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
             ))}
           </div>
           <div className="rs-hbtns">
-            <button className="rs-btn print" onClick={handlePrint}>🖨️ Print Result</button>
+            <button className="rs-btn print" onClick={handlePrint}><Icon name="print" /> Print Result</button>
             <a href="/exam/setup" className="rs-btn primary">New Attempt</a>
             <a href="/dashboard" className="rs-btn">Exit</a>
           </div>

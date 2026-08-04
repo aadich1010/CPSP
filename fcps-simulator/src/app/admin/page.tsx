@@ -2,6 +2,8 @@ import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import QuickActivateButton from './QuickActivateButton'
+import Icon from '@/design-system/Icon';
+import type { IconName } from '@/design-system/icon-registry';
 
 export const dynamic = 'force-dynamic'
 
@@ -63,15 +65,15 @@ export default async function AdminDashboardPage() {
         }}
       >
         {[
-          { label: 'Total Users',    value: totalUsers    ?? 0, icon: '👥', color: '#7c3aed' },
-          { label: 'Active Subs',    value: activeUsers   ?? 0, icon: '✅', color: '#16a34a' },
-          { label: 'Demo Users',     value: demoUsers     ?? 0, icon: '⏳', color: '#d97706' },
-          { label: 'Questions',      value: totalQuestions ?? 0, icon: '📝', color: '#0f766e' },
-          { label: 'Exam Attempts',  value: totalAttempts ?? 0, icon: '📊', color: '#2563eb' },
+          { label: 'Total Users',    value: totalUsers    ?? 0, icon: 'community', color: '#7c3aed' },
+          { label: 'Active Subs',    value: activeUsers   ?? 0, icon: 'correct', color: '#16a34a' },
+          { label: 'Demo Users',     value: demoUsers     ?? 0, icon: 'timer', color: '#d97706' },
+          { label: 'Questions',      value: totalQuestions ?? 0, icon: 'practice', color: '#0f766e' },
+          { label: 'Exam Attempts',  value: totalAttempts ?? 0, icon: 'analytics', color: '#2563eb' },
         ].map((stat) => (
           <div key={stat.label} className="glass-card" style={{ padding: '14px 16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ fontSize: '1.1rem' }}>{stat.icon}</div>
+              <Icon name={stat.icon as IconName} size="lg" />
               <div style={{ fontSize: '1.4rem', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
                 {stat.value}
               </div>
@@ -101,13 +103,13 @@ export default async function AdminDashboardPage() {
           Quick Actions:
         </span>
         <Link href="/admin/users" className="btn btn-primary btn-sm">
-          👥 Manage Users
+          <Icon name="community" /> Manage Users
         </Link>
         <Link href="/admin/questions" className="btn btn-ghost btn-sm">
-          📝 Question Bank
+          <Icon name="practice" /> Question Bank
         </Link>
         <Link href="/admin/questions/import" className="btn btn-ghost btn-sm">
-          🤖 AI Import
+          <Icon name="ai" /> AI Import
         </Link>
       </div>
 
@@ -125,7 +127,7 @@ export default async function AdminDashboardPage() {
               gap: 8,
             }}
           >
-            ⏳ Demo Users — Awaiting Upgrade ({demoProfiles.length})
+            <Icon name="timer" size="md" /> Demo Users — Awaiting Upgrade ({demoProfiles.length})
           </h2>
           <div className="table-wrapper">
             <table>

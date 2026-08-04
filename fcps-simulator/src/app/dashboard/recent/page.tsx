@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Icon from '@/design-system/Icon';
 
 export default async function RecentExamsPage() {
   const supabase = await createClient()
@@ -27,7 +28,7 @@ export default async function RecentExamsPage() {
       <div className="glass" style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
         {!attempts || attempts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <div style={{ fontSize: '3rem', marginBottom: 16 }}>📝</div>
+            <div style={{ fontSize: '3rem', marginBottom: 16 }}><Icon name="practice" /></div>
             <p style={{ color: '#64748b' }}>No exams taken yet. Start your first mock to see history here!</p>
             <Link href="/exam/setup" className="btn btn-primary" style={{ marginTop: 16 }}>
               Start Mock Exam

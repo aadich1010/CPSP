@@ -9,7 +9,7 @@ export default function DeleteAllButton() {
   const router = useRouter()
 
   const handleHandleDelete = async () => {
-    if (!confirm('⚠️ ARE YOU SURE? This will delete ALL questions from the database forever! This cannot be undone.')) {
+    if (!confirm('ARE YOU SURE? This will delete ALL questions from the database forever! This cannot be undone.')) {
       return
     }
 

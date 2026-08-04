@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Icon from '@/design-system/Icon';
 
 interface SubjectDropdownProps {
   currentSubject: string;
@@ -43,7 +44,7 @@ export default function SubjectDropdown({ currentSubject, subjects }: SubjectDro
         }}
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          📂 {currentSubject === 'all' ? 'All Subjects' : currentSubject}
+          <Icon name="library" size="sm" /> {currentSubject === 'all' ? 'All Subjects' : currentSubject}
         </span>
         <span style={{ fontSize: '0.55rem', opacity: 0.8, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: '#ffffff' }}>▼</span>
       </button>
@@ -79,7 +80,7 @@ export default function SubjectDropdown({ currentSubject, subjects }: SubjectDro
               textDecoration: 'none'
             }}
           >
-            📁 All Subjects
+            <Icon name="library" size="sm" /> All Subjects
           </Link>
           <div style={{ height: 1, background: '#f1f5f9', margin: '4px 0' }} />
           <div style={{ maxHeight: '400px', overflowY: 'auto' }}>

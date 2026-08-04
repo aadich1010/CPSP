@@ -5,6 +5,7 @@ import { importQuestionsBulk } from '../actions'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import Icon from '@/design-system/Icon';
 
 const SUBJECTS = [
   'Anatomy', 'Physiology', 'Biochemistry', 'Pathology', 'Pharmacology', 
@@ -180,7 +181,7 @@ export default function ImportQuestionsPage() {
             <h3 style={{ marginBottom: 16, fontSize: '1rem', fontWeight: 700 }}>Step 1: Input Data</h3>
             
             <label className="btn btn-primary" style={{ width: '100%', padding: '16px', display: 'flex', gap: 10, cursor: 'pointer', marginBottom: 16 }}>
-              📂 UPLOAD FILE
+              <Icon name="library" /> UPLOAD FILE
               <input type="file" accept=".json,.txt" style={{ display: 'none' }} onChange={(e) => {
                 const file = e.target.files?.[0]; if (!file) return;
                 const r = new FileReader(); r.onload = (ev) => setRawText(ev.target?.result as string); r.readAsText(file);
@@ -188,18 +189,18 @@ export default function ImportQuestionsPage() {
             </label>
 
             <button onClick={handleParse} disabled={parsing || !rawText} className="btn btn-ghost" style={{ width: '100%', border: '1px solid #334155', color: '#cbd5e1' }}>
-              {parsing ? 'Processing...' : '🔍 Parse Questions'}
+              {parsing ? 'Processing...' : <><Icon name="search" size="sm" /> Parse Questions</>}
             </button>
           </div>
 
           <AnimatePresence>
             {parsed.length > 0 && (
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ background: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)', borderRadius: 16, padding: 24, color: 'white', textAlign: 'center' }}>
-                <div style={{ fontSize: '2rem', marginBottom: 8 }}>✨</div>
+                <div style={{ fontSize: '2rem', marginBottom: 8 }}><Icon name="upgrade" /></div>
                 <h2 style={{ fontSize: '1.2rem', fontWeight: 900, marginBottom: 4 }}>{parsed.length} Questions Found</h2>
                 <p style={{ fontSize: '0.8rem', opacity: 0.9, marginBottom: 20 }}>Ready to save to database</p>
                 <button onClick={handleImport} disabled={importing} className="btn" style={{ width: '100%', background: 'white', color: '#0f766e', fontWeight: 900, padding: '12px', fontSize: '1rem' }}>
-                  {importing ? 'Saving...' : '🚀 SAVE NOW'}
+                  {importing ? 'Saving...' : <><Icon name="start" size="sm" /> SAVE NOW</>}
                 </button>
               </motion.div>
             )}
@@ -215,11 +216,11 @@ export default function ImportQuestionsPage() {
             placeholder="Paste your JSON here..."
           />
 
-          {parseError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: 16, borderRadius: 12 }}>❌ {parseError}</div>}
+          {parseError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: 16, borderRadius: 12 }}><Icon name="incorrect" size="sm" /> {parseError}</div>}
           
           {result && (
             <div style={{ background: result.error ? '#fef2f2' : '#f0fdf4', border: `1px solid ${result.error ? '#fecaca' : '#bbf7d0'}`, color: result.error ? '#b91c1c' : '#15803d', padding: 16, borderRadius: 12 }}>
-              {result.error ? `Error: ${result.error}` : `🎉 Success! Imported ${result.count} questions.`}
+              {result.error ? `Error: ${result.error}` : <><Icon name="correct" size="sm" /> Success! Imported {result.count} questions.</>}
             </div>
           )}
 

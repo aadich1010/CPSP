@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import PaymentSettingsClient from './PaymentSettingsClient'
+import Icon from '@/design-system/Icon';
 
 export const dynamic = 'force-dynamic'
 
@@ -51,7 +52,7 @@ export default async function PaymentSettingsPage() {
             marginBottom: 16,
           }}
         >
-          ⚠️ One or more providers still have placeholder details. Students currently see fake
+          <Icon name="warning" /> One or more providers still have placeholder details. Students currently see fake
           account numbers until you fill these in below.
         </div>
       )}

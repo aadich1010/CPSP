@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import PremiumResultScreen from './PremiumResultScreen'
 import { logger } from '@/lib/logger'
+import Icon from '@/design-system/Icon';
 
 export interface Question {
   id: string
@@ -347,7 +348,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
 
             {(mode === 'practice' && showExplain[currentIndex] && answers[currentIndex]) && (
               <div style={{ padding: '8px 12px', background: 'rgba(13,148,136,0.07)', border: '1px solid rgba(13,148,136,0.2)', borderRadius: 10, flexShrink: 0 }}>
-                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#0d9488', marginBottom: 3 }}>💡 Explanation</div>
+                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#0d9488', marginBottom: 3 }}><Icon name="info" /> Explanation</div>
                 <p style={{ fontSize: '0.74rem', color: '#475569', lineHeight: 1.5, margin: 0 }}>
                   {currentQ.explanation || 'No explanation provided.'}
                 </p>
@@ -364,7 +365,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
 
         <aside className="exam-palette">
           <div style={{ fontSize: '0.58rem', fontWeight: 800, color: '#0f172a', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-            📅 Question Palette
+            <Icon name="schedule" /> Question Palette
           </div>
           <div className="exam-palette-grid">
             {questions.map((_, i) => (

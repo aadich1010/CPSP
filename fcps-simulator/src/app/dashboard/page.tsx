@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Icon from '@/design-system/Icon';
+import type { IconName } from '@/design-system/icon-registry';
 
 const SUBJECTS = [
   'Anatomy', 'Physiology', 'Biochemistry', 'Pathology',
@@ -78,7 +80,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <div style={{ marginBottom: 12 }}>
         <h1 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: 0 }}>
-          Good day, Dr. {name} 👋
+          Good day, Dr. {name}
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.75rem' }}>
           {statusLine}
@@ -97,10 +99,10 @@ export default async function DashboardPage() {
         }}
       >
         {[
-          { label: 'Total Attempts', value: totalAttempts, icon: '📝', color: '#0f766e' },
-          { label: 'Average Score',  value: `${avgScore}%`, icon: '📊', color: '#16a34a' },
-          { label: 'Subjects',       value: SUBJECTS.length, icon: '📚', color: '#7c3aed' },
-          { label: 'Weak Areas',     value: weakSubjects.length, icon: '⚠️', color: '#d97706' },
+          { label: 'Total Attempts', value: totalAttempts, icon: 'practice', color: '#0f766e' },
+          { label: 'Average Score',  value: `${avgScore}%`, icon: 'analytics', color: '#16a34a' },
+          { label: 'Subjects',       value: SUBJECTS.length, icon: 'questionBank', color: '#7c3aed' },
+          { label: 'Weak Areas',     value: weakSubjects.length, icon: 'warning', color: '#d97706' },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -108,7 +110,7 @@ export default async function DashboardPage() {
             style={{ padding: '12px 14px' }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ fontSize: '1.1rem' }}>{stat.icon}</div>
+              <Icon name={stat.icon as IconName} size="lg" />
               <div
                 style={{ fontSize: '1.3rem', fontWeight: 800, color: stat.color, lineHeight: 1 }}
               >
@@ -143,16 +145,16 @@ export default async function DashboardPage() {
             Start Mock Exam
           </Link>
           <Link href="/dashboard/analysis" className="btn btn-ghost btn-sm" style={{ padding: '6px 12px' }}>
-            📊 Analysis
+            <Icon name="analytics" /> Analysis
           </Link>
           <Link href="/dashboard/history" className="btn btn-ghost btn-sm" style={{ padding: '6px 12px' }}>
-            📋 History
+            <Icon name="mockExam" /> History
           </Link>
           <Link href="/dashboard/recent" className="btn btn-ghost btn-sm" style={{ padding: '6px 12px' }}>
-            📝 Recent Exams
+            <Icon name="practice" /> Recent Exams
           </Link>
           <Link href="/dashboard/weak" className="btn btn-ghost btn-sm" style={{ padding: '6px 12px' }}>
-            ⚠️ Weak Subjects
+            <Icon name="warning" /> Weak Subjects
           </Link>
         </div>
       </div>
