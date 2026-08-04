@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import PremiumResultScreen from './PremiumResultScreen'
+import AntiTheft from './AntiTheft'
+import ForensicWatermark from './ForensicWatermark'
 import { logger } from '@/lib/logger'
 import Icon from '@/design-system/Icon';
 
@@ -153,6 +155,10 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers,      setAnswers]      = useState<Answer[]>(Array(questions.length).fill(null))
+  // A question can be skipped without answering exactly ONCE. Once true,
+  // the Skip button is disabled for that question -- the only way past it
+  // on a second visit is to actually answer it.
+  const [skippedOnce,  setSkippedOnce]  = useState<boolean[]>(Array(questions.length).fill(false))
   const [submitted,    setSubmitted]    = useState(false)
   const [timeLeft,     setTimeLeft]     = useState(timeLimitSeconds)
   const [showExplain,  setShowExplain]  = useState<boolean[]>(Array(questions.length).fill(false))
@@ -282,7 +288,11 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
     return 'option-btn'
   }
 
-  const handleAdvance = () => {
+  // Forward scan first (currentIndex+1 .. end), THEN wrap to the start
+  // (0 .. currentIndex-1). This is what makes skipped questions come back
+  // in their original sequence order once the first pass reaches the end,
+  // rather than jumping around.
+  const advanceToNextUnanswered = () => {
     for (let i = currentIndex + 1; i < questions.length; i++) {
       if (answers[i] === null) { setCurrentIndex(i); return }
     }
@@ -291,6 +301,22 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
     }
     if (currentIndex < questions.length - 1) setCurrentIndex(currentIndex + 1)
     else setCurrentIndex(0)
+  }
+
+  // Skip is only allowed the FIRST time a question is visited. On a second
+  // visit (it comes back around unanswered), skippedOnce is already true,
+  // the button is disabled, and answering is the only way forward.
+  const handleSkip = () => {
+    if (submitted || answers[currentIndex] !== null || skippedOnce[currentIndex]) return
+    const next = [...skippedOnce]; next[currentIndex] = true; setSkippedOnce(next)
+    advanceToNextUnanswered()
+  }
+
+  // Next only moves forward once the current question has actually been
+  // answered -- answering is what "attempting" a question means here.
+  const handleNext = () => {
+    if (submitted || answers[currentIndex] === null) return
+    advanceToNextUnanswered()
   }
 
   if (submitted && gradedQuestions && result) {
@@ -316,6 +342,12 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
 
   return (
     <div className="h-screen w-screen overflow-hidden no-select" style={{ display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
+      {/* Only mounted for the ACTIVE exam, not the result screen -- the
+          result screen's PrintableReport deliberately needs printing to
+          keep working, and these unmount/clean up automatically once
+          `submitted` flips and this branch stops rendering. */}
+      <AntiTheft />
+      <ForensicWatermark userEmail={candidateEmail || ''} userName={candidateName || ''} />
       <header className="exam-header" style={{ flexShrink: 0, background: '#ffffff', borderBottom: '2px solid #0d9488', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 2px 12px rgba(13,148,136,0.08)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#0d9488', boxShadow: '0 0 0 3px rgba(13,148,136,0.15)' }} />
@@ -389,8 +421,30 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
             )}
 
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', flexShrink: 0, marginTop: '10px' }}>
-              <button className="btn btn-primary btn-sm" onClick={handleAdvance} style={{ minWidth: '80px' }}>Skip</button>
-              <button className="btn btn-primary btn-sm" onClick={handleAdvance} style={{ minWidth: '80px' }}>Next →</button>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={handleSkip}
+                disabled={submitted || answers[currentIndex] !== null || skippedOnce[currentIndex]}
+                style={{
+                  minWidth: '80px',
+                  opacity: (answers[currentIndex] !== null || skippedOnce[currentIndex]) ? 0.4 : 1,
+                  cursor: (answers[currentIndex] !== null || skippedOnce[currentIndex]) ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {skippedOnce[currentIndex] && answers[currentIndex] === null ? 'Already Skipped' : 'Skip'}
+              </button>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={handleNext}
+                disabled={submitted || answers[currentIndex] === null}
+                style={{
+                  minWidth: '80px',
+                  opacity: answers[currentIndex] === null ? 0.4 : 1,
+                  cursor: answers[currentIndex] === null ? 'not-allowed' : 'pointer',
+                }}
+              >
+                Next →
+              </button>
             </div>
           </div>
         </div>
