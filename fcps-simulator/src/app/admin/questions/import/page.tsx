@@ -10,7 +10,7 @@ import Icon from '@/design-system/Icon';
 const SUBJECTS = [
   'Anatomy', 'Physiology', 'Biochemistry', 'Pathology', 'Pharmacology', 
   'Microbiology', 'Forensic Medicine', 'Community Medicine', 'Surgery', 
-  'Medicine', 'Obstetrics & Gynecology', 'Pediatrics', 'ENT', 'Ophthalmology',
+  'General Surgery', 'Anesthesia', 'Medicine', 'Obstetrics & Gynecology', 'Pediatrics', 'ENT', 'Ophthalmology',
   'Miscellaneous'
 ]
 
@@ -60,6 +60,8 @@ export default function ImportQuestionsPage() {
     if (lower.includes('virus') || lower.includes('bacteria') || lower.includes('infection')) return 'Microbiology'
     if (lower.includes('cancer') || lower.includes('tumor') || lower.includes('malignant')) return 'Pathology'
     if (lower.includes('enzyme') || lower.includes('protein') || lower.includes('glucose')) return 'Biochemistry'
+    if (lower.includes('anesthesia') || lower.includes('anaesthesia') || lower.includes('intubation') || lower.includes('sedation')) return 'Anesthesia'
+    if (lower.includes('surgery') || lower.includes('surgical') || lower.includes('operative') || lower.includes('incision')) return 'General Surgery'
     return 'Miscellaneous'
   }
 

@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation'
 const SUBJECTS = [
   'Anatomy', 'Physiology', 'Biochemistry', 'Pathology',
   'Pharmacology', 'Microbiology', 'Forensic Medicine',
-  'Community Medicine', 'Surgery', 'Medicine',
+  'Community Medicine', 'Surgery', 'General Surgery', 'Anesthesia', 'Medicine',
   'Obstetrics & Gynecology', 'Pediatrics', 'ENT', 'Ophthalmology',
 ]
 
