@@ -4,6 +4,7 @@ import Sidebar from '@/components/Sidebar'
 import ForensicWatermark from '@/components/ForensicWatermark'
 import AntiTheft from '@/components/AntiTheft'
 import VvipWelcomeGate from '@/components/vvip'
+import { isPaidMember } from '@/lib/subscription'
 import Icon from '@/design-system/Icon';
 
 export default async function DashboardLayout({
@@ -35,6 +36,19 @@ export default async function DashboardLayout({
     ? Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
     : null
 
+  // True exactly once per subscriber: the very first dashboard load after
+  // has_seen_welcome was still false. Every login after that -- including
+  // this same one on a refresh, since we flip the flag below before
+  // rendering -- gets the shorter "Welcome back" treatment instead.
+  const isFirstWelcome = isPaidMember(profile) && profile.has_seen_welcome !== true
+  if (isFirstWelcome) {
+    // Fire this now so a second tab or a fast refresh immediately after
+    // sees has_seen_welcome=true and gets "Welcome back", not another
+    // "Congratulations". The per-login-session gate in useVvipWelcome
+    // still controls whether THIS render actually shows the modal.
+    await supabase.from('profiles').update({ has_seen_welcome: true }).eq('id', user.id)
+  }
+
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <AntiTheft />
@@ -45,10 +59,13 @@ export default async function DashboardLayout({
       {/* Fires once per LOGIN (see useVvipWelcome's session-key comment --
           a page refresh does not re-show it, but a fresh login does), only
           when subscription_status is genuinely 'active' and not expired
-          (see isPaidMember() in lib/subscription.ts). Confetti + balloons,
-          stays up 30s, and cannot be dismissed early -- no button, scrim
-          click, or Escape closes it before the timer does. Demo accounts
-          never see this, only real subscribers. */}
+          (see isPaidMember() in lib/subscription.ts). Demo accounts never
+          see this, only real subscribers. Confetti + balloons either way
+          (CelebrationFx is unconditional inside VvipWelcomeModal).
+          - TRUE first login ever (has_seen_welcome was false): the big
+            30s "Congratulations" version, cannot be dismissed early.
+          - Every login after that: a lighter 5s "Welcome back", closeable
+            as normal. */}
       <VvipWelcomeGate
         user={{
           id: profile.id,
@@ -57,10 +74,14 @@ export default async function DashboardLayout({
           subscription_status: profile.subscription_status,
           subscription_expires_at: profile.subscription_expires_at,
         }}
-        title="Congratulations!"
-        message="Your subscription is now active — the full question bank, timed mock exams, and performance analytics are all unlocked. Have a good day, and best of luck for your exam!"
-        holdMs={30000}
-        dismissible={false}
+        title={isFirstWelcome ? 'Congratulations!' : 'Welcome back!'}
+        message={
+          isFirstWelcome
+            ? 'Your subscription is now active — the full question bank, timed mock exams, and performance analytics are all unlocked. Have a good day, and best of luck for your exam!'
+            : 'Have a good day, and best of luck for your exam!'
+        }
+        holdMs={isFirstWelcome ? 30000 : 5000}
+        dismissible={!isFirstWelcome}
       />
 
       {/* Sidebar */}

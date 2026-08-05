@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logout } from '@/app/auth/actions'
+import VvipWelcomeModal from './vvip/VvipWelcomeModal'
+import { isPaidMember } from '@/lib/subscription'
 import Icon from '@/design-system/Icon';
 import type { IconName } from '@/design-system/icon-registry';
 
@@ -29,6 +31,17 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [lastPathname, setLastPathname] = useState(pathname)
+  const [showBye, setShowBye] = useState(false)
+  const isPaid = isPaidMember(profile)
+
+  // Paid accounts get a 3s "goodbye" popup (with the same confetti/balloon
+  // fx as the welcome ones) before actually signing out -- logout() only
+  // runs once the popup's own timer closes it, in onClose below. Demo/admin
+  // accounts sign out instantly, same as before this feature existed.
+  function handleSignOutClick() {
+    if (!isPaid) { void logout(); return }
+    setShowBye(true)
+  }
 
   // Close the mobile drawer whenever the route changes (i.e. after
   // tapping a nav link). Adjusting state during render instead of in a
@@ -172,16 +185,28 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
             </div>
           </div>
         </div>
-        <form action={logout}>
-          <button
-            type="submit"
-            className="btn btn-ghost !border-slate-200 !text-slate-600 btn-full btn-sm !py-2"
-          >
-            Sign Out
-          </button>
-        </form>
+        <button
+          type="button"
+          onClick={handleSignOutClick}
+          className="btn btn-ghost !border-slate-200 !text-slate-600 btn-full btn-sm !py-2"
+        >
+          Sign Out
+        </button>
       </div>
       </aside>
+
+      {showBye && (
+        <VvipWelcomeModal
+          user={profile}
+          open
+          onClose={() => { void logout() }}
+          holdMs={3000}
+          dismissible={false}
+          honorific=""
+          title="Goodbye!"
+          message="You've been signed out. Keep practicing, and best of luck for your exam!"
+        />
+      )}
     </>
   )
 }
