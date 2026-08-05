@@ -46,7 +46,23 @@ export default async function DashboardLayout({
     // sees has_seen_welcome=true and gets "Welcome back", not another
     // "Congratulations". The per-login-session gate in useVvipWelcome
     // still controls whether THIS render actually shows the modal.
-    await supabase.from('profiles').update({ has_seen_welcome: true }).eq('id', user.id)
+    //
+    // The error IS checked (unlike before): an RLS policy on this table
+    // previously caused this exact update to fail with 42P17 ("infinite
+    // recursion detected in policy for relation profiles") on every single
+    // login, silently, because the result was never inspected -- so
+    // has_seen_welcome never actually flipped and every login showed the
+    // 30s Congratulations modal instead of just the first. See the
+    // 20260806000000_fix_profiles_update_rls_recursion migration for the
+    // policy fix. Logging here (rather than throwing) keeps a DB hiccup
+    // from breaking the whole dashboard load for a subscriber.
+    const { error: welcomeFlagError } = await supabase
+      .from('profiles')
+      .update({ has_seen_welcome: true })
+      .eq('id', user.id)
+    if (welcomeFlagError) {
+      console.error('[dashboard/layout] failed to set has_seen_welcome:', welcomeFlagError)
+    }
   }
 
   return (
