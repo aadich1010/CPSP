@@ -51,6 +51,35 @@ export default function ImportQuestionsPage() {
   const [result, setResult] = useState<ImportResult | null>(null)
   const router = useRouter()
 
+  // British/American spelling (and a couple of common shorthand) variants
+  // that should land in the same subject bucket as the canonical SUBJECTS
+  // entry above, keyed lowercase. Without this, a JSON batch that spells a
+  // subject differently than a previous batch silently creates a second,
+  // orphaned subject that never shows up on its own card/filter -- e.g. one
+  // real import used 'Anaesthesia' while the subject list (and every other
+  // batch) used 'Anesthesia', so that question was invisible everywhere
+  // except a raw database query until it was manually merged.
+  const SUBJECT_ALIASES: Record<string, string> = {
+    'anaesthesia': 'Anesthesia',
+    'anaesthesiology': 'Anesthesia',
+    'anesthesiology': 'Anesthesia',
+    'general surgery': 'General Surgery',
+    'paediatrics': 'Pediatrics',
+    'gynaecology': 'Obstetrics & Gynecology',
+    'obstetrics & gynaecology': 'Obstetrics & Gynecology',
+    'obstetrics and gynecology': 'Obstetrics & Gynecology',
+    'obstetrics and gynaecology': 'Obstetrics & Gynecology',
+    'obs & gynae': 'Obstetrics & Gynecology',
+    'ent (otolaryngology)': 'ENT',
+    'otolaryngology': 'ENT',
+    'ophthalmology & eye': 'Ophthalmology',
+  }
+
+  function normalizeSubject(raw: string): string {
+    const trimmed = raw.trim()
+    return SUBJECT_ALIASES[trimmed.toLowerCase()] ?? trimmed
+  }
+
   function detectSubjectFromText(text: string): string {
     const lower = text.toLowerCase()
     if (lower.includes('nerve') || lower.includes('artery') || lower.includes('muscle')) return 'Anatomy'
@@ -121,7 +150,7 @@ export default function ImportQuestionsPage() {
           let ansLetter = String(field(q, 'answer', 'correct_answer', 'ans') ?? '').toUpperCase().trim()
           if (ansLetter.length > 1) ansLetter = ansLetter.charAt(0)
 
-          const subName = field(q, 'subject', 'Subject') ?? detectSubjectFromText(String(qText))
+          const subName = normalizeSubject(String(field(q, 'subject', 'Subject') ?? detectSubjectFromText(String(qText))))
 
           return {
             question_text: String(qText).trim(),
