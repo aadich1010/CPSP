@@ -35,6 +35,18 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Default Server Action body limit is 1MB. The bulk question importer
+  // (/admin/questions/import) posts the entire parsed JSON array in one
+  // action call, and a few hundred MCQs with explanations easily clears
+  // 1MB -- Next.js was rejecting those uploads with a 413 "Body exceeded
+  // 1 MB limit" before importQuestionsBulk() ever ran, so nothing was
+  // saved and the question count on /admin/questions never moved. Raised
+  // to 10mb, generous enough for a multi-thousand-question bulk import.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
 };
 
 export default nextConfig;

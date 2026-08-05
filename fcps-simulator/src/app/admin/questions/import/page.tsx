@@ -160,7 +160,22 @@ export default function ImportQuestionsPage() {
         router.refresh()
       }
     } catch (err: unknown) {
-      setResult({ error: err instanceof Error ? err.message : String(err) })
+      // A payload that clears the Server Action body limit (was 1MB by
+      // default -- see next.config.ts) never reaches importQuestionsBulk
+      // at all; Next.js rejects it at the HTTP layer with a 413, which
+      // surfaces here as a generic fetch/parse failure rather than the
+      // structured { error } response above. Detect that case specifically
+      // so a huge batch doesn't look like a silent no-op -- it was
+      // previously very easy to read "Success! Imported N questions" from
+      // a *different*, earlier, smaller attempt and not notice this one
+      // never actually saved.
+      const message = err instanceof Error ? err.message : String(err)
+      const isTooLarge = /body exceeded|1 ?mb|413|payload too large/i.test(message)
+      setResult({
+        error: isTooLarge
+          ? 'This batch is too large to upload in one go. Split it into smaller files (a few hundred questions each) and import them one at a time.'
+          : message,
+      })
     } finally {
       setImporting(false)
     }
@@ -222,7 +237,19 @@ export default function ImportQuestionsPage() {
           
           {result && (
             <div style={{ background: result.error ? '#fef2f2' : '#f0fdf4', border: `1px solid ${result.error ? '#fecaca' : '#bbf7d0'}`, color: result.error ? '#b91c1c' : '#15803d', padding: 16, borderRadius: 12 }}>
-              {result.error ? `Error: ${result.error}` : <><Icon name="correct" size="sm" /> Success! Imported {result.count} questions.</>}
+              {result.error ? (
+                `Error: ${result.error}`
+              ) : (
+                <>
+                  <Icon name="correct" size="sm" /> Success! Processed {result.count} questions
+                  {typeof result.newCount === 'number' && typeof result.updatedCount === 'number' ? (
+                    <>
+                      {' '}&mdash; <strong>{result.newCount} new</strong>, {result.updatedCount} already existed
+                      (matched by question text, so those were updated in place rather than added again).
+                    </>
+                  ) : '.'}
+                </>
+              )}
             </div>
           )}
 
