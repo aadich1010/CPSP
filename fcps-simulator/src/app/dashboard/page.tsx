@@ -42,6 +42,19 @@ export default async function DashboardPage() {
     p_user_id: user.id,
   }) as { data: SubjectStat[] | null }
 
+  // Total size of the question bank per subject (not this user's attempt
+  // history -- see get_subject_question_counts() migration). questions has
+  // no SELECT policy for students at all, so this has to go through a
+  // SECURITY DEFINER RPC that only ever returns subject + a count, never
+  // question_text/correct_answer/explanation.
+  const { data: subjectCountsRaw } = await supabase.rpc('get_subject_question_counts') as {
+    data: { subject: string; question_count: number }[] | null
+  }
+  const subjectCountMap: Record<string, number> = {}
+  subjectCountsRaw?.forEach((s) => {
+    subjectCountMap[s.subject] = s.question_count
+  })
+
   const totalAttempts = totalAttemptsCount ?? 0
   const totalCorrectAll = subjectStats?.reduce((acc, s) => acc + s.total_correct, 0) ?? 0
   const totalQuestionsAll = subjectStats?.reduce((acc, s) => acc + s.total_questions, 0) ?? 0
@@ -192,7 +205,7 @@ export default async function DashboardPage() {
                     textOverflow: 'ellipsis',
                   }}
                 >
-                  {subject}
+                  {subject} ({subjectCountMap[subject] ?? 0})
                 </div>
                 {pct !== null && (
                   <div
