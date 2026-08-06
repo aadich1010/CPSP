@@ -199,13 +199,23 @@ export default async function DashboardPage() {
                     fontSize: '0.75rem',
                     fontWeight: 600,
                     color: '#1e293b',
-                    marginBottom: pct !== null ? 4 : 0,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
+                    marginBottom: 3,
+                    whiteSpace: 'normal',
+                    overflowWrap: 'break-word',
+                    lineHeight: 1.25,
                   }}
                 >
-                  {subject} ({subjectCountMap[subject] ?? 0})
+                  {subject}
+                </div>
+                <div
+                  style={{
+                    fontSize: '0.68rem',
+                    color: '#64748b',
+                    fontWeight: 600,
+                    marginBottom: pct !== null ? 3 : 0,
+                  }}
+                >
+                  {subjectCountMap[subject] ?? 0} questions
                 </div>
                 {pct !== null && (
                   <div
