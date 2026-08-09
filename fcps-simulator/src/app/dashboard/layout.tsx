@@ -69,7 +69,12 @@ export default async function DashboardLayout({
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <AntiTheft />
-      <DeviceSessionGuard />
+      {/* Admins are exempt from the 1-device rule, so they never hold an
+          active_sessions row. Mounting the guard for them (they reach this
+          layout via the admin panel's "Student View" link) would have it
+          find no session, treat that as a mismatch, and sign them out
+          within 60 seconds. Students are unaffected. */}
+      {profile.role !== 'admin' && <DeviceSessionGuard />}
       <ForensicWatermark
         userEmail={profile.email || user.email || ''}
         userName={profile.full_name || ''}

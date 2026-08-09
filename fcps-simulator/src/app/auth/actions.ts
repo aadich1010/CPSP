@@ -47,15 +47,25 @@ export async function login(formData: FormData) {
   // above is real and would otherwise leave a valid cookie behind even
   // though we're refusing this login -- sign it back out immediately so
   // this browser is left in exactly the state it was in before the attempt.
-  if (!fingerprint) {
-    await supabase.auth.signOut()
-    return { error: 'Missing device fingerprint. Please refresh and try again.' }
-  }
+  //
+  // Admins are deliberately exempt. The rule exists to stop one paid
+  // student account being shared across a study group -- that reasoning
+  // does not apply to the operator, who legitimately administers the
+  // platform from a desktop and a phone. More importantly there is no
+  // recovery path: an admin whose slot is stuck (browser closed without
+  // signing out, lost device) would be locked out of the very panel used
+  // to clear session slots, and only a direct database edit could undo it.
+  if (profile.role !== 'admin') {
+    if (!fingerprint) {
+      await supabase.auth.signOut()
+      return { error: 'Missing device fingerprint. Please refresh and try again.' }
+    }
 
-  const claim = await claimDeviceSession(fingerprint)
-  if (!claim.ok) {
-    await supabase.auth.signOut()
-    return { error: claim.error, code: claim.code }
+    const claim = await claimDeviceSession(fingerprint)
+    if (!claim.ok) {
+      await supabase.auth.signOut()
+      return { error: claim.error, code: claim.code }
+    }
   }
 
   if (profile.role === 'admin') {

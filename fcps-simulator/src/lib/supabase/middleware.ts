@@ -91,6 +91,23 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && (isProtectedRoute || isAdminRoute)) {
+    // The role is needed before the device-session check below (admins are
+    // exempt from it), so this lookup now runs first. Same single query as
+    // before -- only its position moved.
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role, subscription_status, subscription_expires_at')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile) {
+      const response = NextResponse.redirect(new URL('/login?error=missing_profile', request.url))
+      response.cookies.delete(
+        'sb-' + process.env.NEXT_PUBLIC_SUPABASE_URL!.split('//')[1].split('.')[0] + '-auth-token'
+      )
+      return response
+    }
+
     // ── Device-session gatekeeper (fast path) ──────────────────────────
     // Runs on EVERY request to a protected/admin route, including plain
     // page navigations that never touch a Server Action -- which is why
@@ -104,44 +121,37 @@ export async function updateSession(request: NextRequest) {
     // cleanup cron) or this specific request is coming from a different
     // browser than the one that holds the slot -- both cases: force a
     // clean sign-out rather than let a stale/foreign session limp along.
-    const { data: deviceSession } = await supabase
-      .from('active_sessions')
-      .select('device_user_agent')
-      .eq('user_id', user.id)
-      .eq('is_active', true)
-      .maybeSingle()
+    //
+    // Admins are skipped: login() never claims a slot for them (see
+    // app/auth/actions.ts), so they hold no active_sessions row at all --
+    // running this check on them would take the `!deviceSession` branch
+    // and sign the operator out on every single admin page load.
+    if (profile.role !== 'admin') {
+      const { data: deviceSession } = await supabase
+        .from('active_sessions')
+        .select('device_user_agent')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .maybeSingle()
 
-    const liveUserAgent = request.headers.get('user-agent') || ''
+      const liveUserAgent = request.headers.get('user-agent') || ''
 
-    if (!deviceSession || deviceSession.device_user_agent !== liveUserAgent) {
-      // Manually clear the auth cookie on the response we're actually
-      // returning, the same way the "!profile" branch below does --
-      // supabase.auth.signOut() here would instead mutate the (discarded)
-      // `supabaseResponse` closure variable via the cookies.setAll callback
-      // above, and that update would never reach the client on a response
-      // object we don't return.
-      const url = request.nextUrl.clone()
-      url.pathname = '/login'
-      url.searchParams.set('error', deviceSession ? 'device_mismatch' : 'session_ended')
-      const response = NextResponse.redirect(url)
-      response.cookies.delete(
-        'sb-' + process.env.NEXT_PUBLIC_SUPABASE_URL!.split('//')[1].split('.')[0] + '-auth-token'
-      )
-      return response
-    }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role, subscription_status, subscription_expires_at')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile) {
-      const response = NextResponse.redirect(new URL('/login?error=missing_profile', request.url))
-      response.cookies.delete(
-        'sb-' + process.env.NEXT_PUBLIC_SUPABASE_URL!.split('//')[1].split('.')[0] + '-auth-token'
-      )
-      return response
+      if (!deviceSession || deviceSession.device_user_agent !== liveUserAgent) {
+        // Manually clear the auth cookie on the response we're actually
+        // returning, the same way the "!profile" branch above does --
+        // supabase.auth.signOut() here would instead mutate the (discarded)
+        // `supabaseResponse` closure variable via the cookies.setAll callback
+        // above, and that update would never reach the client on a response
+        // object we don't return.
+        const url = request.nextUrl.clone()
+        url.pathname = '/login'
+        url.searchParams.set('error', deviceSession ? 'device_mismatch' : 'session_ended')
+        const response = NextResponse.redirect(url)
+        response.cookies.delete(
+          'sb-' + process.env.NEXT_PUBLIC_SUPABASE_URL!.split('//')[1].split('.')[0] + '-auth-token'
+        )
+        return response
+      }
     }
 
     if (isAdminRoute && profile.role !== 'admin') {

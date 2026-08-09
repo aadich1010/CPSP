@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { logout } from '@/app/auth/actions'
 import Icon from '@/design-system/Icon';
 import type { IconName } from '@/design-system/icon-registry';
-import DeviceSessionGuard from '@/components/DeviceSessionGuard'
 
 export default async function AdminLayout({
   children,
@@ -23,9 +22,13 @@ export default async function AdminLayout({
 
   if (profile?.role !== 'admin') redirect('/dashboard')
 
+  // No DeviceSessionGuard is mounted in this layout on purpose: admins are
+  // exempt from the 1-device rule (see login() in app/auth/actions.ts), so
+  // they never hold an active_sessions row. The guard would find no matching
+  // session, read that as a mismatch, and sign the admin out of the panel
+  // every 60 seconds.
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#ffffff', flexWrap: 'wrap' }}>
-      <DeviceSessionGuard />
       {/* Admin Sidebar */}
       <aside
         className="admin-sidebar"
