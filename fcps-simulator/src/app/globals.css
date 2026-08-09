@@ -533,3 +533,67 @@ table.data-table td, table.data-table th { color: #000000; }
    than washing out to near-white. */
 .table-wrapper td .muted,
 table.data-table td .muted { color: #334155; }
+
+/* ─── INSTALLED-APP (PWA) BEHAVIOUR ───────────────────────────────
+   Makes the site behave like a native Android/iOS app once it has been
+   added to the home screen. Everything here is deliberately scoped so
+   it cannot change how the site looks in a normal browser tab. */
+
+/* Kill the mobile-browser tap flash and the 300ms double-tap-zoom delay
+   on things the user actually taps. Text is untouched, so pinch-zoom and
+   selection still work everywhere else. */
+a, button, [role="button"], input, select, textarea, label, summary {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Stop the whole page rubber-banding / pull-to-refresh, which is the
+   single biggest giveaway that an installed app is "just a website".
+   overscroll within inner scrollers is preserved. */
+html, body {
+  overscroll-behavior-y: none;
+}
+
+/* Notch, punch-hole and gesture-bar clearance. Pairs with
+   viewportFit:'cover' in layout.tsx -- without both, content renders
+   underneath the system UI on modern phones. */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Utilities for any fixed header/footer that must clear the system UI. */
+.safe-top    { padding-top:    env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+@media (display-mode: standalone) {
+  /* Running installed: no browser chrome, so the app owns the full
+     viewport and must reserve the status/gesture bars itself. */
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Chrome (UI) should not be selectable/long-press-draggable -- native
+     apps do not do that. Question and explanation text stays selectable
+     so candidates can still highlight while revising. */
+  nav, header, footer, button, [role="button"] {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Native apps do not show a text caret on non-inputs. */
+  a { -webkit-touch-callout: none; }
+}
+
+/* Honour the OS "reduce motion" setting -- required for app-store-grade
+   accessibility and stops animation-heavy screens from causing nausea. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

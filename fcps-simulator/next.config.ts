@@ -12,6 +12,11 @@ const csp = [
   `img-src 'self' data: blob:`,
   `font-src 'self' data:`,
   `connect-src 'self' https://${supabaseHost} wss://${supabaseHost}`,
+  // PWA: the service worker and the web app manifest are both same-origin.
+  // Without these two the fallback chain still resolves to 'self', but a
+  // few browsers refuse to register a worker unless worker-src is explicit.
+  `worker-src 'self'`,
+  `manifest-src 'self'`,
   `frame-ancestors 'none'`,
   `base-uri 'self'`,
   `form-action 'self'`,
@@ -33,7 +38,35 @@ const nextConfig: NextConfig = {
         source: '/:path*',
         headers: securityHeaders,
       },
+      {
+        // The service worker must never be served from cache. If a stale
+        // sw.js sticks around, installed users keep running old logic and
+        // can never be updated -- so force a revalidation every load.
+        source: '/sw.js',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' },
+          { key: 'Service-Worker-Allowed', value: '/' },
+        ],
+      },
+      {
+        source: '/manifest.json',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=3600' },
+        ],
+      },
     ];
+  },
+  // Default Server Action body limit is 1MB. The bulk question importer
+  // (/admin/questions/import) posts the entire parsed JSON array in one
+  // action call, and a few hundred MCQs with explanations easily clears
+  // 1MB -- Next.js was rejecting those uploads with a 413 "Body exceeded
+  // 1 MB limit" before importQuestionsBulk() ever ran, so nothing was
+  // saved and the question count on /admin/questions never moved. Raised
+  // to 10mb, generous enough for a multi-thousand-question bulk import.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
   },
 };
 

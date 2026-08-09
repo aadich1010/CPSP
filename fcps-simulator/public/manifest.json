@@ -1,0 +1,57 @@
+{
+  "name": "FCPS Part 1 CBT Simulator",
+  "short_name": "FCPS Sim",
+  "description": "Premium Computer Based Test simulator for FCPS Part 1 examination preparation. Real-pattern MCQs across all major subjects.",
+  "id": "/",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#F9FAFB",
+  "theme_color": "#F9FAFB",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "medical", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Mock Exam",
+      "short_name": "Exam",
+      "url": "/exam/setup",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Performance Analytics",
+      "short_name": "Analytics",
+      "url": "/dashboard/analysis",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}
