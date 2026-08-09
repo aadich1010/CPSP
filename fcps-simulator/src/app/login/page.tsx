@@ -4,8 +4,19 @@ import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { login } from '@/app/auth/actions'
+import { generateDeviceFingerprint } from '@/lib/deviceSession/clientFingerprint'
 import { ArrowRight, Loader2, Mail, Lock, ShieldCheck } from 'lucide-react'
 import Icon from '@/design-system/Icon';
+
+// Exact copy required by the single-device-session spec -- matches the
+// message the server returns in claimDeviceSession()'s rejection (see
+// src/lib/deviceSession/actions.ts, DEVICE_LIMIT_MESSAGE) and the
+// middleware/DeviceSessionGuard mismatch redirect below.
+const SESSION_ERROR_MESSAGES: Record<string, string> = {
+  device_mismatch: 'Session invalidated due to a device mismatch. Please log in again.',
+  session_ended: 'Your session has ended. Please log in again.',
+  missing_profile: 'Account not found. Contact admin.',
+}
 
 function LoginForm() {
   const searchParams = useSearchParams()
@@ -13,14 +24,28 @@ function LoginForm() {
   const isAdmin = type === 'admin'
 
   const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState('')
+  // Surfaces the exact toast-style message when middleware.ts or
+  // DeviceSessionGuard redirected here after force-signing this browser
+  // out (?error=device_mismatch | session_ended), reusing the existing
+  // error banner below rather than adding a separate toast component.
+  // Computed as a lazy initial state (not an effect) since searchParams is
+  // already available synchronously on first render.
+  const [error, setError] = useState(() => {
+    const reason = searchParams?.get('error')
+    return reason && SESSION_ERROR_MESSAGES[reason] ? SESSION_ERROR_MESSAGES[reason] : ''
+  })
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const form   = e.currentTarget
-    const result = await login(new FormData(form))
+    const form     = e.currentTarget
+    const formData = new FormData(form)
+    // Raw fingerprint (User-Agent + screen res + per-login random id),
+    // hashed server-side in claimDeviceSession() -- see
+    // src/lib/deviceSession/fingerprint.ts and clientFingerprint.ts.
+    formData.set('fingerprint', await generateDeviceFingerprint())
+    const result = await login(formData)
     if (result?.error) {
       setError(result.error)
       setLoading(false)

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { logout } from '@/app/auth/actions'
 import Icon from '@/design-system/Icon';
 import type { IconName } from '@/design-system/icon-registry';
+import DeviceSessionGuard from '@/components/DeviceSessionGuard'
 
 export default async function AdminLayout({
   children,
@@ -24,6 +25,7 @@ export default async function AdminLayout({
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#ffffff', flexWrap: 'wrap' }}>
+      <DeviceSessionGuard />
       {/* Admin Sidebar */}
       <aside
         className="admin-sidebar"

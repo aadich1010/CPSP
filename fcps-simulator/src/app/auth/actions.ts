@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { claimDeviceSession, releaseDeviceSession, releaseAllDeviceSessions } from '@/lib/deviceSession/actions'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -11,6 +12,10 @@ export async function login(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const type = formData.get('type') as string
+  // Raw device fingerprint (User-Agent + screen res + per-login random id),
+  // generated client-side in login/page.tsx via generateDeviceFingerprint()
+  // and attached to the FormData right before this action is invoked.
+  const fingerprint = formData.get('fingerprint') as string | null
 
   const { error } = await supabase.auth.signInWithPassword({ email, password })
 
@@ -33,6 +38,24 @@ export async function login(formData: FormData) {
   if (type === 'admin' && profile.role !== 'admin') {
     await supabase.auth.signOut()
     return { error: 'Unauthorized. Admin access required for Member Login.' }
+  }
+
+  // ── 1-device-per-account gatekeeper ────────────────────────────────────
+  // Runs AFTER credentials + portal-type are confirmed valid, so we never
+  // burn a device-limit rejection on a login that was going to fail anyway.
+  // On rejection: the Supabase Auth session created by signInWithPassword()
+  // above is real and would otherwise leave a valid cookie behind even
+  // though we're refusing this login -- sign it back out immediately so
+  // this browser is left in exactly the state it was in before the attempt.
+  if (!fingerprint) {
+    await supabase.auth.signOut()
+    return { error: 'Missing device fingerprint. Please refresh and try again.' }
+  }
+
+  const claim = await claimDeviceSession(fingerprint)
+  if (!claim.ok) {
+    await supabase.auth.signOut()
+    return { error: claim.error, code: claim.code }
   }
 
   if (profile.role === 'admin') {
@@ -78,10 +101,30 @@ export async function register(formData: FormData) {
 }
 
 export async function logout() {
+  // Release this account's device slot BEFORE signing out of Supabase Auth
+  // -- releaseDeviceSession() reads auth.uid() from the still-live session,
+  // so it has to run first.
+  await releaseDeviceSession()
+
   const supabase = await createClient()
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
   redirect('/login')
+}
+
+/**
+ * "Logout from all devices" -- releases every active device slot for this
+ * account (in steady state, just the caller's own, since the 1-device rule
+ * caps it at one) and signs this browser out. Exposed as an explicit,
+ * separately-callable action for an account-security "this wasn't me" flow.
+ */
+export async function logoutAllDevices() {
+  await releaseAllDeviceSessions()
+
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  revalidatePath('/', 'layout')
+  redirect('/login?loggedOutAll=1')
 }
 
 export async function requestPasswordReset(formData: FormData) {

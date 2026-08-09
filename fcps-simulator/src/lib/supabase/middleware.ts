@@ -91,6 +91,45 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && (isProtectedRoute || isAdminRoute)) {
+    // ── Device-session gatekeeper (fast path) ──────────────────────────
+    // Runs on EVERY request to a protected/admin route, including plain
+    // page navigations that never touch a Server Action -- which is why
+    // this check uses the live `User-Agent` request header (always
+    // present) rather than the full fingerprint (User-Agent + screen res
+    // + per-login id), which only travels on explicit Server Action calls
+    // (login, and DeviceSessionGuard's periodic validateDeviceFingerprint
+    // ping -- see src/components/DeviceSessionGuard.tsx for that stronger,
+    // precise check). A mismatch here means either this account's one
+    // device slot was released elsewhere (logout, logout-all, the 24h
+    // cleanup cron) or this specific request is coming from a different
+    // browser than the one that holds the slot -- both cases: force a
+    // clean sign-out rather than let a stale/foreign session limp along.
+    const { data: deviceSession } = await supabase
+      .from('active_sessions')
+      .select('device_user_agent')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .maybeSingle()
+
+    const liveUserAgent = request.headers.get('user-agent') || ''
+
+    if (!deviceSession || deviceSession.device_user_agent !== liveUserAgent) {
+      // Manually clear the auth cookie on the response we're actually
+      // returning, the same way the "!profile" branch below does --
+      // supabase.auth.signOut() here would instead mutate the (discarded)
+      // `supabaseResponse` closure variable via the cookies.setAll callback
+      // above, and that update would never reach the client on a response
+      // object we don't return.
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      url.searchParams.set('error', deviceSession ? 'device_mismatch' : 'session_ended')
+      const response = NextResponse.redirect(url)
+      response.cookies.delete(
+        'sb-' + process.env.NEXT_PUBLIC_SUPABASE_URL!.split('//')[1].split('.')[0] + '-auth-token'
+      )
+      return response
+    }
+
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, subscription_status, subscription_expires_at')

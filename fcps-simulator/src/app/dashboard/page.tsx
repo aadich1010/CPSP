@@ -7,7 +7,7 @@ import type { IconName } from '@/design-system/icon-registry';
 const SUBJECTS = [
   'Anatomy', 'Physiology', 'Biochemistry', 'Pathology',
   'Pharmacology', 'Microbiology', 'Forensic Medicine',
-  'Community Medicine', 'Surgery', 'Medicine',
+  'Community Medicine', 'Surgery', 'General Surgery', 'Anesthesia', 'Medicine',
   'Obstetrics & Gynecology', 'Pediatrics', 'ENT', 'Ophthalmology',
 ]
 
@@ -41,6 +41,19 @@ export default async function DashboardPage() {
   const { data: subjectStats } = await supabase.rpc('get_user_dashboard_stats', {
     p_user_id: user.id,
   }) as { data: SubjectStat[] | null }
+
+  // Total size of the question bank per subject (not this user's attempt
+  // history -- see get_subject_question_counts() migration). questions has
+  // no SELECT policy for students at all, so this has to go through a
+  // SECURITY DEFINER RPC that only ever returns subject + a count, never
+  // question_text/correct_answer/explanation.
+  const { data: subjectCountsRaw } = await supabase.rpc('get_subject_question_counts') as {
+    data: { subject: string; question_count: number }[] | null
+  }
+  const subjectCountMap: Record<string, number> = {}
+  subjectCountsRaw?.forEach((s) => {
+    subjectCountMap[s.subject] = s.question_count
+  })
 
   const totalAttempts = totalAttemptsCount ?? 0
   const totalCorrectAll = subjectStats?.reduce((acc, s) => acc + s.total_correct, 0) ?? 0
@@ -186,13 +199,23 @@ export default async function DashboardPage() {
                     fontSize: '0.75rem',
                     fontWeight: 600,
                     color: '#1e293b',
-                    marginBottom: pct !== null ? 4 : 0,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
+                    marginBottom: 3,
+                    whiteSpace: 'normal',
+                    overflowWrap: 'break-word',
+                    lineHeight: 1.25,
                   }}
                 >
                   {subject}
+                </div>
+                <div
+                  style={{
+                    fontSize: '0.68rem',
+                    color: '#64748b',
+                    fontWeight: 600,
+                    marginBottom: pct !== null ? 3 : 0,
+                  }}
+                >
+                  {subjectCountMap[subject] ?? 0} questions
                 </div>
                 {pct !== null && (
                   <div

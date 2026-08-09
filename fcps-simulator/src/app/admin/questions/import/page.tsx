@@ -10,7 +10,7 @@ import Icon from '@/design-system/Icon';
 const SUBJECTS = [
   'Anatomy', 'Physiology', 'Biochemistry', 'Pathology', 'Pharmacology', 
   'Microbiology', 'Forensic Medicine', 'Community Medicine', 'Surgery', 
-  'Medicine', 'Obstetrics & Gynecology', 'Pediatrics', 'ENT', 'Ophthalmology',
+  'General Surgery', 'Anesthesia', 'Medicine', 'Obstetrics & Gynecology', 'Pediatrics', 'ENT', 'Ophthalmology',
   'Miscellaneous'
 ]
 
@@ -51,6 +51,35 @@ export default function ImportQuestionsPage() {
   const [result, setResult] = useState<ImportResult | null>(null)
   const router = useRouter()
 
+  // British/American spelling (and a couple of common shorthand) variants
+  // that should land in the same subject bucket as the canonical SUBJECTS
+  // entry above, keyed lowercase. Without this, a JSON batch that spells a
+  // subject differently than a previous batch silently creates a second,
+  // orphaned subject that never shows up on its own card/filter -- e.g. one
+  // real import used 'Anaesthesia' while the subject list (and every other
+  // batch) used 'Anesthesia', so that question was invisible everywhere
+  // except a raw database query until it was manually merged.
+  const SUBJECT_ALIASES: Record<string, string> = {
+    'anaesthesia': 'Anesthesia',
+    'anaesthesiology': 'Anesthesia',
+    'anesthesiology': 'Anesthesia',
+    'general surgery': 'General Surgery',
+    'paediatrics': 'Pediatrics',
+    'gynaecology': 'Obstetrics & Gynecology',
+    'obstetrics & gynaecology': 'Obstetrics & Gynecology',
+    'obstetrics and gynecology': 'Obstetrics & Gynecology',
+    'obstetrics and gynaecology': 'Obstetrics & Gynecology',
+    'obs & gynae': 'Obstetrics & Gynecology',
+    'ent (otolaryngology)': 'ENT',
+    'otolaryngology': 'ENT',
+    'ophthalmology & eye': 'Ophthalmology',
+  }
+
+  function normalizeSubject(raw: string): string {
+    const trimmed = raw.trim()
+    return SUBJECT_ALIASES[trimmed.toLowerCase()] ?? trimmed
+  }
+
   function detectSubjectFromText(text: string): string {
     const lower = text.toLowerCase()
     if (lower.includes('nerve') || lower.includes('artery') || lower.includes('muscle')) return 'Anatomy'
@@ -60,6 +89,8 @@ export default function ImportQuestionsPage() {
     if (lower.includes('virus') || lower.includes('bacteria') || lower.includes('infection')) return 'Microbiology'
     if (lower.includes('cancer') || lower.includes('tumor') || lower.includes('malignant')) return 'Pathology'
     if (lower.includes('enzyme') || lower.includes('protein') || lower.includes('glucose')) return 'Biochemistry'
+    if (lower.includes('anesthesia') || lower.includes('anaesthesia') || lower.includes('intubation') || lower.includes('sedation')) return 'Anesthesia'
+    if (lower.includes('surgery') || lower.includes('surgical') || lower.includes('operative') || lower.includes('incision')) return 'General Surgery'
     return 'Miscellaneous'
   }
 
@@ -119,7 +150,7 @@ export default function ImportQuestionsPage() {
           let ansLetter = String(field(q, 'answer', 'correct_answer', 'ans') ?? '').toUpperCase().trim()
           if (ansLetter.length > 1) ansLetter = ansLetter.charAt(0)
 
-          const subName = field(q, 'subject', 'Subject') ?? detectSubjectFromText(String(qText))
+          const subName = normalizeSubject(String(field(q, 'subject', 'Subject') ?? detectSubjectFromText(String(qText))))
 
           return {
             question_text: String(qText).trim(),
@@ -158,7 +189,22 @@ export default function ImportQuestionsPage() {
         router.refresh()
       }
     } catch (err: unknown) {
-      setResult({ error: err instanceof Error ? err.message : String(err) })
+      // A payload that clears the Server Action body limit (was 1MB by
+      // default -- see next.config.ts) never reaches importQuestionsBulk
+      // at all; Next.js rejects it at the HTTP layer with a 413, which
+      // surfaces here as a generic fetch/parse failure rather than the
+      // structured { error } response above. Detect that case specifically
+      // so a huge batch doesn't look like a silent no-op -- it was
+      // previously very easy to read "Success! Imported N questions" from
+      // a *different*, earlier, smaller attempt and not notice this one
+      // never actually saved.
+      const message = err instanceof Error ? err.message : String(err)
+      const isTooLarge = /body exceeded|1 ?mb|413|payload too large/i.test(message)
+      setResult({
+        error: isTooLarge
+          ? 'This batch is too large to upload in one go. Split it into smaller files (a few hundred questions each) and import them one at a time.'
+          : message,
+      })
     } finally {
       setImporting(false)
     }
@@ -220,7 +266,19 @@ export default function ImportQuestionsPage() {
           
           {result && (
             <div style={{ background: result.error ? '#fef2f2' : '#f0fdf4', border: `1px solid ${result.error ? '#fecaca' : '#bbf7d0'}`, color: result.error ? '#b91c1c' : '#15803d', padding: 16, borderRadius: 12 }}>
-              {result.error ? `Error: ${result.error}` : <><Icon name="correct" size="sm" /> Success! Imported {result.count} questions.</>}
+              {result.error ? (
+                `Error: ${result.error}`
+              ) : (
+                <>
+                  <Icon name="correct" size="sm" /> Success! Processed {result.count} questions
+                  {typeof result.newCount === 'number' && typeof result.updatedCount === 'number' ? (
+                    <>
+                      {' '}&mdash; <strong>{result.newCount} new</strong>, {result.updatedCount} already existed
+                      (matched by question text, so those were updated in place rather than added again).
+                    </>
+                  ) : '.'}
+                </>
+              )}
             </div>
           )}
 
