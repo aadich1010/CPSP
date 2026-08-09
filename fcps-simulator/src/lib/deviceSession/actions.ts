@@ -12,7 +12,7 @@ import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { hashFingerprint } from './fingerprint'
 
-export const DEVICE_LIMIT_MESSAGE =
+const DEVICE_LIMIT_MESSAGE =
   'You are already logged in on another device. You can only be active on one device at a time. Please logout from the other device first.'
 
 type ClaimResult = { ok: true } | { ok: false; error: string; code: 'DEVICE_LIMIT_EXCEEDED' | 'INTERNAL_ERROR' }
