@@ -180,12 +180,14 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  if (user && (pathname === '/login' || pathname === '/register')) {
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-    const url = request.nextUrl.clone()
-    url.pathname = profile?.role === 'admin' ? '/admin/users' : '/dashboard'
-    return NextResponse.redirect(url)
-  }
+  // Intentionally NOT auto-redirecting an already-authenticated visitor away
+  // from /login or /register. Supabase's auth cookie lives for a long time,
+  // so silently skipping the login form here meant clicking "Login" could
+  // drop a returning visitor straight into the dashboard without ever
+  // asking for credentials -- surprising even with nothing "saved" in the
+  // browser, since it was the server-side cookie doing it, not autofill.
+  // The login form always renders now; submitting it re-authenticates
+  // explicitly every time.
 
   return supabaseResponse
 }

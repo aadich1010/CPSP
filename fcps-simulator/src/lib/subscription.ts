@@ -111,13 +111,25 @@ export function renewalDate(
   }
 }
 
+// Common South-Asian formal/religious first names (Muhammad, Syed, ...) that
+// people are addressed by their SECOND name day-to-day -- e.g. "Muhammad
+// Adeel" goes by "Adeel", not "Muhammad". Only stripped when a further word
+// remains, so a profile whose full_name is literally just "Muhammad" still
+// gets greeted by it instead of an empty string.
+const COMMON_PREFIX_NAMES = /^(muhammad|mohammad|mohammed|mohd|md|syed|hafiz)$/i;
+
 /** First name for the greeting. Never returns "undefined". */
 export function firstNameOf(profile: SubscriptionProfile | null | undefined): string {
   const cleaned = String(profile?.full_name ?? '').replace(/\s+/g, ' ').trim();
   if (!cleaned) return '';
   // Strip an existing honorific so we never render "Dr. Dr. Ayesha".
   const withoutTitle = cleaned.replace(/^(dr\.?|prof\.?|mr\.?|mrs\.?|ms\.?|miss)\s+/i, '');
-  return withoutTitle.split(' ')[0] || '';
+  const words = withoutTitle.split(' ').filter(Boolean);
+  if (words.length === 0) return '';
+  if (words.length > 1 && COMMON_PREFIX_NAMES.test(words[0])) {
+    return words[1];
+  }
+  return words[0];
 }
 
 /** Up to two uppercase initials for the seal. Falls back to a bullet. */
