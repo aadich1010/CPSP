@@ -6,15 +6,9 @@ import DeleteAllButton from './DeleteAllButton'
 import SubjectDropdown from './SubjectDropdown'
 import BackupRestoreExport from './BackupRestoreExport'
 import Icon from '@/design-system/Icon';
+import { SUBJECTS } from '@/lib/subjects'
 
 export const dynamic = 'force-dynamic'
-
-const SUBJECTS = [
-  'Anatomy', 'Physiology', 'Biochemistry', 'Pathology',
-  'Pharmacology', 'Microbiology', 'Forensic Medicine',
-  'Community Medicine', 'Surgery', 'General Surgery', 'Anesthesia', 'Medicine',
-  'Obstetrics & Gynecology', 'Pediatrics', 'ENT', 'Ophthalmology',
-]
 
 export default async function AdminQuestionsPage({
   searchParams,

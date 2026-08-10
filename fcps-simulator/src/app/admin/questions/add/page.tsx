@@ -1,12 +1,6 @@
 import { addQuestion } from '../actions'
 import Link from 'next/link'
-
-const SUBJECTS = [
-  'Anatomy', 'Physiology', 'Biochemistry', 'Pathology',
-  'Pharmacology', 'Microbiology', 'Forensic Medicine',
-  'Community Medicine', 'Surgery', 'General Surgery', 'Anesthesia', 'Medicine',
-  'Obstetrics & Gynecology', 'Pediatrics', 'ENT', 'Ophthalmology',
-]
+import { SUBJECTS } from '@/lib/subjects'
 
 export default function AddQuestionPage() {
   return (

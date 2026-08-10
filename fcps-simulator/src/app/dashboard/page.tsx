@@ -3,13 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Icon from '@/design-system/Icon';
 import type { IconName } from '@/design-system/icon-registry';
-
-const SUBJECTS = [
-  'Anatomy', 'Physiology', 'Biochemistry', 'Pathology',
-  'Pharmacology', 'Microbiology', 'Forensic Medicine',
-  'Community Medicine', 'Surgery', 'General Surgery', 'Anesthesia', 'Medicine',
-  'Obstetrics & Gynecology', 'Pediatrics', 'ENT', 'Ophthalmology',
-]
+import { SUBJECTS } from '@/lib/subjects'
 
 interface SubjectStat {
   subject: string

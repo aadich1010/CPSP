@@ -6,13 +6,9 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import Icon from '@/design-system/Icon';
+import { SUBJECTS as CANONICAL_SUBJECTS } from '@/lib/subjects'
 
-const SUBJECTS = [
-  'Anatomy', 'Physiology', 'Biochemistry', 'Pathology', 'Pharmacology', 
-  'Microbiology', 'Forensic Medicine', 'Community Medicine', 'Surgery', 
-  'General Surgery', 'Anesthesia', 'Medicine', 'Obstetrics & Gynecology', 'Pediatrics', 'ENT', 'Ophthalmology',
-  'Miscellaneous'
-]
+const SUBJECTS = [...CANONICAL_SUBJECTS, 'Miscellaneous']
 
 interface ParsedQuestion {
   question_text: string

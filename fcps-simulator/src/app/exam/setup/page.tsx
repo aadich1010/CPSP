@@ -6,14 +6,9 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Play, ChevronDown } from 'lucide-react'
 import Icon from '@/design-system/Icon';
+import { SUBJECTS } from '@/lib/subjects'
 
-const ALL_SUBJECTS = [
-  'Anatomy', 'Physiology', 'Biochemistry', 'Pathology',
-  'Pharmacology', 'Microbiology', 'Forensic Medicine',
-  'Community Medicine', 'Surgery', 'General Surgery', 'Anesthesia', 'Medicine',
-  'Obstetrics & Gynecology', 'Pediatrics', 'ENT', 'Ophthalmology',
-  'Mixed (All Subjects)',
-]
+const ALL_SUBJECTS = [...SUBJECTS, 'Mixed (All Subjects)']
 
 // Demo accounts now get every subject (see 20260805000000 migration) --
 // only the 10-question cap and the fixed (non-shuffled) question set
@@ -26,6 +21,13 @@ export default function ExamSetupPage() {
   const [subject,   setSubject]   = useState('Anatomy')
   const [count,     setCount]     = useState('50')
   const [mode,      setMode]      = useState('exam')
+  // Live per-subject question-bank size, so a subject with no content yet
+  // (e.g. a newly-added card the admin hasn't populated) is visibly "0
+  // questions" here instead of only failing after "Begin Exam" is clicked.
+  // Same RPC the dashboard's "Practice by Subject" grid already uses --
+  // see get_subject_question_counts() in
+  // supabase/migrations/20260806010000_add_subject_question_counts_rpc.sql.
+  const [subjectCounts, setSubjectCounts] = useState<Record<string, number>>({})
 
   useEffect(() => {
     const supabase = createClient()
@@ -41,6 +43,14 @@ export default function ExamSetupPage() {
       setSubject('Anatomy')
       setCount(premium ? '50' : '10')
       setLoading(false)
+    })
+
+    supabase.rpc('get_subject_question_counts').then(({ data }) => {
+      const counts: Record<string, number> = {}
+      ;(data as { subject: string; question_count: number }[] | null)?.forEach((s) => {
+        counts[s.subject] = s.question_count
+      })
+      setSubjectCounts(counts)
     })
 
     // pre-select from URL ?subject=
@@ -97,20 +107,33 @@ export default function ExamSetupPage() {
                 <span className="ml-2 text-xs font-normal text-slate-400">— select one</span>
               </label>
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-4">
-                {SUBJECTS.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => setSubject(s)}
-                    className={`rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-all ${
-                      subject === s
-                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-[0_0_0_2px_rgba(16,185,129,0.2)]'
-                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-emerald-300 hover:bg-emerald-50/50'
-                    }`}
-                  >
-                    {s}
-                  </button>
-                ))}
+                {SUBJECTS.map((s) => {
+                  const available =
+                    s === 'Mixed (All Subjects)'
+                      ? Object.values(subjectCounts).reduce((sum, n) => sum + n, 0)
+                      : subjectCounts[s] ?? 0
+                  const empty = available === 0
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setSubject(s)}
+                      title={empty ? 'No questions in this subject yet' : undefined}
+                      className={`rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-all ${
+                        subject === s
+                          ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-[0_0_0_2px_rgba(16,185,129,0.2)]'
+                          : empty
+                          ? 'border-slate-200 bg-slate-50 text-slate-400 hover:border-emerald-300 hover:bg-emerald-50/50'
+                          : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-emerald-300 hover:bg-emerald-50/50'
+                      }`}
+                    >
+                      <div>{s}</div>
+                      <div className={`mt-0.5 text-[10px] font-bold ${empty ? 'text-amber-500' : 'text-slate-400'}`}>
+                        {empty ? 'No questions yet' : `${available} questions`}
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
