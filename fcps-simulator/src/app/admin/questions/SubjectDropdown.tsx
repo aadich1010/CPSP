@@ -6,7 +6,7 @@ import Icon from '@/design-system/Icon';
 
 interface SubjectDropdownProps {
   currentSubject: string;
-  subjects: string[];
+  subjects: readonly string[];
 }
 
 export default function SubjectDropdown({ currentSubject, subjects }: SubjectDropdownProps) {

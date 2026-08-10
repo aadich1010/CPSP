@@ -3,3 +3,6 @@
 # not in version control (previously caused a public repo exposure incident).
 /MCQS/
 /Anatomy/
+
+.vercel
+.env*
