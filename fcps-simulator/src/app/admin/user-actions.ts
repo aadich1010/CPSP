@@ -78,3 +78,108 @@ export async function revokeSubscription(userId: string) {
 // dashboard "quick activate" button) keep working without a separate
 // migration of call sites.
 export const quickActivateUser = activateSubscription
+
+/**
+ * Permanently deletes a student's account: auth.users row (via the admin
+ * API) plus everything that cascades from it -- profiles, active_sessions,
+ * exam_attempts, exam_sessions -- per the `on delete cascade` foreign keys
+ * already in place. Irreversible; the client is expected to confirm with
+ * the admin before calling this.
+ */
+export async function deleteUserAccount(userId: string) {
+  const admin = await requireAdmin()
+  const adminDb = await createAdminClient()
+
+  // Audit log first, while the row (and the FK it points at) still exists --
+  // once the user is gone the log entry would otherwise be the only record
+  // this account ever existed. Best-effort: a logging failure shouldn't
+  // block a deletion the admin explicitly asked for.
+  const { error: auditError } = await adminDb.from('admin_audit_log').insert({
+    actor_id: admin.id,
+    action: 'delete_user',
+    target_user_id: userId,
+    details: {},
+  })
+  if (auditError) console.error('Audit log write failed (deletion still proceeding):', auditError)
+
+  const { error } = await adminDb.auth.admin.deleteUser(userId)
+  if (error) {
+    console.error('Delete user error:', error)
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/admin')
+  revalidatePath('/admin/users')
+  revalidatePath('/admin/analytics')
+  revalidatePath('/admin/income')
+  return { success: true }
+}
+
+export type UserDetails = {
+  profile: {
+    id: string
+    full_name: string | null
+    email: string | null
+    phone: string | null
+    role: string | null
+    subscription_status: string | null
+    subscription_expires_at: string | null
+    created_at: string
+  } | null
+  examStats: { attempts: number; avgScore: number | null }
+  payments: Array<{
+    id: string
+    action: string
+    created_at: string
+    days: number | null
+    amount_pkr: number | null
+  }>
+}
+
+/** Full profile + subscription + payment-history lookup for the Users-page
+ *  "Details" panel. Deliberately NOT exposed on the dashboard's demo-users
+ *  table -- that one only deep-links here. */
+export async function getUserDetails(userId: string): Promise<UserDetails> {
+  await requireAdmin()
+  const adminDb = await createAdminClient()
+
+  const [{ data: profile }, { data: attempts }, { data: auditRows }] = await Promise.all([
+    adminDb
+      .from('profiles')
+      .select('id, full_name, email, phone, role, subscription_status, subscription_expires_at, created_at')
+      .eq('id', userId)
+      .maybeSingle(),
+    adminDb.from('exam_attempts').select('score, total_questions').eq('user_id', userId),
+    adminDb
+      .from('admin_audit_log')
+      .select('id, action, created_at, details')
+      .eq('target_user_id', userId)
+      .in('action', ['activate', 'revoke'])
+      .order('created_at', { ascending: false }),
+  ])
+
+  const scored = (attempts ?? []).filter((a) => typeof a.total_questions === 'number' && a.total_questions > 0)
+  const avgScore =
+    scored.length > 0
+      ? Math.round(
+          (scored.reduce((sum, a) => sum + (a.score ?? 0) / (a.total_questions as number), 0) / scored.length) * 1000
+        ) / 10
+      : null
+
+  const payments = (auditRows ?? []).map((r) => {
+    const details = (r.details ?? {}) as { days?: number; amount_pkr?: number | null }
+    return {
+      id: r.id as string,
+      action: r.action as string,
+      created_at: r.created_at as string,
+      days: typeof details.days === 'number' ? details.days : null,
+      amount_pkr: typeof details.amount_pkr === 'number' ? details.amount_pkr : null,
+    }
+  })
+
+  return {
+    profile: profile ?? null,
+    examStats: { attempts: attempts?.length ?? 0, avgScore },
+    payments,
+  }
+}

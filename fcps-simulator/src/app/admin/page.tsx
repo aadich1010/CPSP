@@ -150,8 +150,12 @@ export default async function AdminDashboardPage() {
                     <td>
                       <div style={{ display: 'flex', gap: 8 }}>
                         <QuickActivateButton userId={p.id} />
+                        {/* Deep-links straight to the Users page and opens
+                            its Details modal there for this exact user --
+                            this table itself never renders subscription
+                            details inline, only the Users page does. */}
                         <Link
-                          href={`/admin/users?search=${encodeURIComponent(p.email || '')}`}
+                          href={`/admin/users?details=${encodeURIComponent(p.id)}`}
                           className="btn btn-ghost btn-sm"
                           style={{ fontSize: '0.7rem', padding: '4px 10px' }}
                         >
