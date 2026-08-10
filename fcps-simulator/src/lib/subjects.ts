@@ -35,6 +35,18 @@ export const SUBJECTS = [
   'Surgery',
   'General Surgery',
   'Anesthesia',
+  // 'Medicine' is being split into these five applied-basic-science buckets
+  // (pilot classification in progress -- see migration
+  // 20260811030000_pilot_classify_medicine_subjects.sql). Genuine clinical
+  // case-vignette questions (diagnosis/management, not basic-science recall)
+  // deliberately stay tagged 'Medicine' rather than being forced into one of
+  // these -- that content belongs under a future "Clinical Practice"
+  // section, not a Paper I/II basic-science card.
+  'Applied Physiology',
+  'Applied Pathology',
+  'Applied Pharmacology',
+  'Applied Biochemistry',
+  'Clinical Anatomy',
   'Medicine',
   'Obstetrics & Gynecology',
   'Pediatrics',
