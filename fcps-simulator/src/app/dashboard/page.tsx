@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Icon from '@/design-system/Icon';
 import type { IconName } from '@/design-system/icon-registry';
-import { SUBJECTS } from '@/lib/subjects'
+import { SUBJECTS, SUBJECT_GROUPS } from '@/lib/subjects'
 
 interface SubjectStat {
   subject: string
@@ -166,66 +166,73 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Subject Grid */}
+      {/* Subject Grid, grouped by paper */}
       <div style={{ marginTop: 20 }}>
-        <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', marginBottom: 12 }}>
-          Practice by Subject
-        </h2>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
-            gap: 8,
-          }}
-        >
-          {SUBJECTS.map((subject) => {
-            const data = subjectMap[subject]
-            const pct  = data ? Math.round((data.correct / data.total) * 100) : null
-            return (
-              <Link
-                key={subject}
-                href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
-                className="glass-card"
-                style={{ padding: '10px 12px', textDecoration: 'none' }}
-              >
-                <div
-                  style={{
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    color: '#1e293b',
-                    marginBottom: 3,
-                    whiteSpace: 'normal',
-                    overflowWrap: 'break-word',
-                    lineHeight: 1.25,
-                  }}
-                >
-                  {subject}
-                </div>
-                <div
-                  style={{
-                    fontSize: '0.68rem',
-                    color: '#64748b',
-                    fontWeight: 600,
-                    marginBottom: pct !== null ? 3 : 0,
-                  }}
-                >
-                  {subjectCountMap[subject] ?? 0} questions
-                </div>
-                {pct !== null && (
-                  <div
-                    style={{
-                      fontSize: '0.65rem',
-                      color: pct >= 60 ? '#16a34a' : '#d97706',
-                      fontWeight: 700,
-                    }}
+        {SUBJECT_GROUPS.map((group) => (
+          <div key={group.name} style={{ marginBottom: 20 }}>
+            <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', marginBottom: 2 }}>
+              {group.name}
+            </h2>
+            <p style={{ fontSize: '0.72rem', color: '#94a3b8', marginBottom: 10 }}>
+              {group.description}
+            </p>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
+                gap: 8,
+              }}
+            >
+              {group.subjects.map((subject) => {
+                const data = subjectMap[subject]
+                const pct  = data ? Math.round((data.correct / data.total) * 100) : null
+                return (
+                  <Link
+                    key={subject}
+                    href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
+                    className="glass-card"
+                    style={{ padding: '10px 12px', textDecoration: 'none' }}
                   >
-                    {pct}% last attempt
-                  </div>
-                )}
-              </Link>
-            )
-          })}
-        </div>
+                    <div
+                      style={{
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        color: '#1e293b',
+                        marginBottom: 3,
+                        whiteSpace: 'normal',
+                        overflowWrap: 'break-word',
+                        lineHeight: 1.25,
+                      }}
+                    >
+                      {subject}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '0.68rem',
+                        color: '#64748b',
+                        fontWeight: 600,
+                        marginBottom: pct !== null ? 3 : 0,
+                      }}
+                    >
+                      {subjectCountMap[subject] ?? 0} questions
+                    </div>
+                    {pct !== null && (
+                      <div
+                        style={{
+                          fontSize: '0.65rem',
+                          color: pct >= 60 ? '#16a34a' : '#d97706',
+                          fontWeight: 700,
+                        }}
+                      >
+                        {pct}% last attempt
+                      </div>
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        ))}
       </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { updateQuestion, deleteQuestion } from '../../actions'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { SUBJECTS } from '@/lib/subjects'
+import { SUBJECT_GROUPS } from '@/lib/subjects'
 
 export default async function EditQuestionPage({
   params,
@@ -50,8 +50,20 @@ export default async function EditQuestionPage({
           <div className="form-group">
             <label className="label" htmlFor="subject">Subject *</label>
             <select id="subject" name="subject" required className="input" defaultValue={question.subject}>
-              {SUBJECTS.map((s) => (
-                <option key={s} value={s}>{s}</option>
+              {/* Legacy questions can carry a subject string from before this
+                  taxonomy existed (e.g. 'Oncology', 'Neurology') that isn't in
+                  SUBJECT_GROUPS -- keep it selectable so saving the form
+                  doesn't silently re-tag the question to whatever option is
+                  first in the list. */}
+              {!SUBJECT_GROUPS.some((g) => g.subjects.includes(question.subject)) && (
+                <option value={question.subject}>{question.subject} (legacy, unlisted)</option>
+              )}
+              {SUBJECT_GROUPS.map((group) => (
+                <optgroup key={group.name} label={group.name}>
+                  {group.subjects.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           </div>

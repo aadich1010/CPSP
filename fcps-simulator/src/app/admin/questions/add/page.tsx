@@ -1,6 +1,6 @@
 import { addQuestion } from '../actions'
 import Link from 'next/link'
-import { SUBJECTS } from '@/lib/subjects'
+import { SUBJECT_GROUPS } from '@/lib/subjects'
 
 export default function AddQuestionPage() {
   return (
@@ -19,8 +19,12 @@ export default function AddQuestionPage() {
           <div className="form-group">
             <label className="label" htmlFor="subject">Subject *</label>
             <select id="subject" name="subject" required className="input">
-              {SUBJECTS.map((s) => (
-                <option key={s} value={s}>{s}</option>
+              {SUBJECT_GROUPS.map((group) => (
+                <optgroup key={group.name} label={group.name}>
+                  {group.subjects.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           </div>
