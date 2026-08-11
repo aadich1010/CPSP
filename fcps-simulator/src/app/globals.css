@@ -401,6 +401,33 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   box-shadow: 0 8px 24px rgba(16,185,129,0.08);
 }
 
+/* Single-line subject "pill" card (dashboard "Practice by Subject" grid) --
+   plain CSS hover instead of onMouseEnter/onMouseLeave because the
+   dashboard page is a Server Component and can't pass event-handler
+   functions as props to a Client Component like next/link's <Link>. */
+.subject-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 11px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: linear-gradient(135deg, #10b981, #14b8a6);
+  box-shadow: 0 2px 8px rgba(16,185,129,0.25);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.subject-pill:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 14px rgba(16,185,129,0.4);
+}
+
 /* ── BTN CLASSES (legacy pages) ─────────────────────────────── */
 .btn {
   display: inline-flex;
