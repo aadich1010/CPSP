@@ -183,53 +183,41 @@ export default async function DashboardPage() {
                 gap: 8,
               }}
             >
-              {group.subjects.map((subject) => {
-                const data = subjectMap[subject]
-                const pct  = data ? Math.round((data.correct / data.total) * 100) : null
-                return (
-                  <Link
-                    key={subject}
-                    href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
-                    className="glass-card"
-                    style={{ padding: '10px 12px', textDecoration: 'none' }}
-                  >
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        color: '#1e293b',
-                        marginBottom: 3,
-                        whiteSpace: 'normal',
-                        overflowWrap: 'break-word',
-                        lineHeight: 1.25,
-                      }}
-                    >
-                      {subject}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '0.68rem',
-                        color: '#64748b',
-                        fontWeight: 600,
-                        marginBottom: pct !== null ? 3 : 0,
-                      }}
-                    >
-                      {subjectCountMap[subject] ?? 0} questions
-                    </div>
-                    {pct !== null && (
-                      <div
-                        style={{
-                          fontSize: '0.65rem',
-                          color: pct >= 60 ? '#16a34a' : '#d97706',
-                          fontWeight: 700,
-                        }}
-                      >
-                        {pct}% last attempt
-                      </div>
-                    )}
-                  </Link>
-                )
-              })}
+              {group.subjects.map((subject) => (
+                <Link
+                  key={subject}
+                  href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
+                  title={`${subjectCountMap[subject] ?? 0} questions`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    padding: '11px 10px',
+                    borderRadius: 10,
+                    textDecoration: 'none',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    color: '#ffffff',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    background: 'linear-gradient(135deg, #10b981, #14b8a6)',
+                    boxShadow: '0 2px 8px rgba(16,185,129,0.25)',
+                    transition: 'transform 0.15s, box-shadow 0.15s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.03)'
+                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(16,185,129,0.4)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)'
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(16,185,129,0.25)'
+                  }}
+                >
+                  {subject}
+                </Link>
+              ))}
             </div>
           </div>
         ))}

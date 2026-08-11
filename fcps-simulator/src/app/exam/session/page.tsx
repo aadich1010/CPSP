@@ -2,11 +2,12 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import ExamEngine from '@/components/ExamEngine'
 import Icon from '@/design-system/Icon';
+import { SUBJECT_GROUPS } from '@/lib/subjects'
 
 export default async function ExamSessionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ subject?: string; count?: string; mode?: string }>
+  searchParams: Promise<{ subject?: string; count?: string; mode?: string; group?: string }>
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -28,6 +29,19 @@ export default async function ExamSessionPage({
   let   count   = Math.min(Math.max(parseInt(params.count || '50') || 50, 1), 200)
   const mode    = params.mode === 'practice' ? 'practice' : 'exam'
 
+  // A "Start Mixed Exam" pick scoped to one paper (from the exam setup
+  // wizard's weightage popup) arrives as ?group=<paper name> alongside a
+  // human-readable ?subject= label like 'Mixed (Paper I — Basic
+  // Sciences)'. Resolve that paper name back to its member subjects here
+  // (SUBJECT_GROUPS is the single source of truth -- see src/lib/subjects.ts)
+  // and pass them to get_exam_questions() as p_subject_list so the actual
+  // filter is driven by real subject membership, not by re-parsing the
+  // display label.
+  const group = params.group
+    ? SUBJECT_GROUPS.find((g) => g.name === params.group)
+    : undefined
+  const subjectList = group ? group.subjects : undefined
+
   // Demo accounts are hard-capped to 10 questions / 5 minutes. This is
   // just for a correct timer -- get_exam_questions() enforces the same
   // cap server-side regardless of what count is requested here, so this
@@ -43,6 +57,7 @@ export default async function ExamSessionPage({
     p_subject: subject,
     p_count: count,
     p_mode: mode,
+    p_subject_list: subjectList,
   })
 
   // Demo accounts get exactly 3 completed attempts (see 20260805010000

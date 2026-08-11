@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Play, ChevronDown, ArrowLeft, ArrowRight, Check, Shuffle } from 'lucide-react'
+import { Play, ChevronDown, ArrowLeft, ArrowRight, Check, Shuffle, X } from 'lucide-react'
 import Icon from '@/design-system/Icon';
 import { SUBJECT_GROUPS } from '@/lib/subjects'
 
@@ -28,6 +28,14 @@ export default function ExamSetupPage() {
   const [subject,   setSubject]   = useState(MIXED_ALL)
   const [count,     setCount]     = useState('50')
   const [mode,      setMode]      = useState('exam')
+  // Set only when "Start Mixed Exam" was chosen from a paper's weightage
+  // popup -- carries the paper name through to submit so /exam/session can
+  // resolve it back to a subject list server-side (see ?group= handling in
+  // src/app/exam/session/page.tsx). null for a single-subject pick or the
+  // global "Mixed (All Subjects)" pick.
+  const [mixedGroupName, setMixedGroupName] = useState<string | null>(null)
+  // Which paper's weightage popup is open, if any (step 1 only).
+  const [weightagePopup, setWeightagePopup] = useState<string | null>(null)
 
   // Live per-subject question-bank size, so a subject with no content yet
   // (e.g. a newly-added card the admin hasn't populated) is visibly "0
@@ -73,32 +81,58 @@ export default function ExamSetupPage() {
     }
   }, [router])
 
-  const totalQuestions = useMemo(
-    () => Object.values(subjectCounts).reduce((sum, n) => sum + n, 0),
-    [subjectCounts]
-  )
-
   const activeGroup = SUBJECT_GROUPS.find((g) => g.name === groupName) ?? null
+  const popupGroup  = SUBJECT_GROUPS.find((g) => g.name === weightagePopup) ?? null
+
+  // Weightage breakdown for the open popup -- estimated from how many
+  // questions each subject actually contributes to this paper's bank,
+  // NOT an official CPSP-published percentage (CPSP's syllabus lists
+  // topics per paper but no numeric weightage table -- see commit
+  // message on 20260811250000_mixed_paper_exam_subject_list.sql).
+  const popupBreakdown = useMemo(() => {
+    if (!popupGroup) return []
+    const total = popupGroup.subjects.reduce((sum, s) => sum + (subjectCounts[s] ?? 0), 0)
+    return popupGroup.subjects
+      .map((s) => {
+        const n = subjectCounts[s] ?? 0
+        return { subject: s, n, pct: total > 0 ? Math.round((n / total) * 100) : 0 }
+      })
+      .sort((a, b) => b.n - a.n)
+  }, [popupGroup, subjectCounts])
 
   function pickMixedAll() {
     setGroupName(null)
+    setMixedGroupName(null)
     setSubject(MIXED_ALL)
     setStep(3)
   }
 
   function pickGroup(name: string) {
+    setWeightagePopup(null)
     setGroupName(name)
+    setMixedGroupName(null)
     setStep(2)
   }
 
   function pickSubject(s: string) {
+    setMixedGroupName(null)
     setSubject(s)
+    setStep(3)
+  }
+
+  function startMixedForGroup(name: string) {
+    setWeightagePopup(null)
+    setGroupName(null)
+    setMixedGroupName(name)
+    setSubject(`Mixed (${name})`)
     setStep(3)
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    router.push(`/exam/session?subject=${encodeURIComponent(subject)}&count=${count}&mode=${mode}`)
+    const qs = new URLSearchParams({ subject, count, mode })
+    if (mixedGroupName) qs.set('group', mixedGroupName)
+    router.push(`/exam/session?${qs.toString()}`)
   }
 
   if (loading) {
@@ -162,6 +196,69 @@ export default function ExamSetupPage() {
           })}
         </div>
 
+        {/* Weightage popup -- opens when a paper is picked at step 1 */}
+        {popupGroup && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4"
+            onClick={() => setWeightagePopup(null)}
+          >
+            <div
+              className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800">{popupGroup.name}</h3>
+                  <p className="mt-0.5 text-[11px] text-slate-400">
+                    Estimated weightage from the current question bank
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setWeightagePopup(null)}
+                  className="text-slate-300 transition hover:text-slate-500"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div className="mt-4 max-h-64 space-y-2.5 overflow-y-auto pr-1">
+                {popupBreakdown.map((row) => (
+                  <div key={row.subject}>
+                    <div className="mb-0.5 flex items-center justify-between text-[11px]">
+                      <span className="font-semibold text-slate-600">{row.subject}</span>
+                      <span className="font-bold text-slate-400">{row.pct}%</span>
+                    </div>
+                    <div className="h-1.5 w-full rounded-full bg-slate-100">
+                      <div
+                        className="h-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"
+                        style={{ width: `${row.pct}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 space-y-2">
+                <button
+                  type="button"
+                  onClick={() => pickGroup(popupGroup.name)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-xs font-bold text-slate-600 transition hover:border-emerald-300 hover:bg-emerald-50/50"
+                >
+                  Practice a specific subject
+                </button>
+                <button
+                  type="button"
+                  onClick={() => startMixedForGroup(popupGroup.name)}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 py-2.5 text-xs font-bold text-white shadow-[0_0_16px_rgba(16,185,129,0.3)] transition-all hover:scale-[1.02]"
+                >
+                  <Shuffle size={13} /> Start Mixed Exam — All of {popupGroup.name.split(' — ')[0]}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Card */}
         <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-lg">
 
@@ -180,28 +277,22 @@ export default function ExamSetupPage() {
                 <p className="mt-0.5 text-xs text-slate-400">Pick a section, or mix everything together.</p>
               </div>
               <div className="space-y-2">
-                {SUBJECT_GROUPS.map((g) => {
-                  const groupCount = g.subjects.reduce((sum, s) => sum + (subjectCounts[s] ?? 0), 0)
-                  return (
-                    <button
-                      key={g.name}
-                      type="button"
-                      onClick={() => pickGroup(g.name)}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left transition-all hover:border-emerald-300 hover:bg-emerald-50/50"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-sm font-bold text-slate-800">{g.name}</div>
-                          <div className="mt-0.5 text-xs text-slate-400">{g.description}</div>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0 pl-3">
-                          <span className="text-[10px] font-bold text-slate-400">{groupCount} questions</span>
-                          <ArrowRight size={14} className="text-slate-300" />
-                        </div>
+                {SUBJECT_GROUPS.map((g) => (
+                  <button
+                    key={g.name}
+                    type="button"
+                    onClick={() => setWeightagePopup(g.name)}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left transition-all hover:border-emerald-300 hover:bg-emerald-50/50"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm font-bold text-slate-800">{g.name}</div>
+                        <div className="mt-0.5 text-xs text-slate-400">{g.description}</div>
                       </div>
-                    </button>
-                  )
-                })}
+                      <ArrowRight size={14} className="shrink-0 text-slate-300" />
+                    </div>
+                  </button>
+                ))}
                 <button
                   type="button"
                   onClick={pickMixedAll}
@@ -215,10 +306,7 @@ export default function ExamSetupPage() {
                         <div className="mt-0.5 text-xs text-emerald-600/70">One exam drawing from every subject in the bank.</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0 pl-3">
-                      <span className="text-[10px] font-bold text-emerald-600">{totalQuestions} questions</span>
-                      <ArrowRight size={14} className="text-emerald-400" />
-                    </div>
+                    <ArrowRight size={14} className="shrink-0 text-emerald-400" />
                   </div>
                 </button>
               </div>
@@ -234,24 +322,21 @@ export default function ExamSetupPage() {
               </div>
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
                 {activeGroup.subjects.map((s) => {
-                  const available = subjectCounts[s] ?? 0
-                  const empty = available === 0
+                  const empty = (subjectCounts[s] ?? 0) === 0
                   return (
                     <button
                       key={s}
                       type="button"
                       onClick={() => pickSubject(s)}
-                      title={empty ? 'No questions in this subject yet' : undefined}
-                      className={`rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-all ${
+                      title={`${subjectCounts[s] ?? 0} questions`}
+                      className={`truncate rounded-lg px-3 py-2.5 text-center text-xs font-bold text-white transition-all ${
                         empty
-                          ? 'border-slate-200 bg-slate-50 text-slate-400 hover:border-emerald-300 hover:bg-emerald-50/50'
-                          : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-emerald-300 hover:bg-emerald-50/50'
+                          ? 'cursor-not-allowed bg-slate-300'
+                          : 'bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[0_2px_8px_rgba(16,185,129,0.25)] hover:scale-[1.03] hover:shadow-[0_4px_14px_rgba(16,185,129,0.4)]'
                       }`}
+                      disabled={empty}
                     >
-                      <div>{s}</div>
-                      <div className={`mt-0.5 text-[10px] font-bold ${empty ? 'text-amber-500' : 'text-slate-400'}`}>
-                        {empty ? 'No questions yet' : `${available} questions`}
-                      </div>
+                      {s}
                     </button>
                   )
                 })}
