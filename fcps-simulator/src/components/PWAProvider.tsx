@@ -143,12 +143,27 @@ export default function PWAProvider() {
     >
       <div className="pointer-events-auto mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-[0_8px_32px_rgba(15,23,42,0.16)] backdrop-blur-md">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#030712]">
-          <span
-            className="bg-gradient-to-b from-emerald-500 to-cyan-500 bg-clip-text font-serif text-2xl font-bold text-transparent"
-            aria-hidden="true"
-          >
-            F
-          </span>
+          {/* Same medical-cross + heartbeat-pulse mark as public/icon-*.png,
+              redrawn inline so this banner matches the app icon exactly. */}
+          <svg width="26" height="26" viewBox="0 0 48 48" aria-hidden="true">
+            <defs>
+              <linearGradient id="pwaLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#10B981" />
+                <stop offset="100%" stopColor="#06B6D4" />
+              </linearGradient>
+            </defs>
+            <g stroke="url(#pwaLogoGrad)" strokeWidth="3" strokeLinecap="round" fill="none">
+              <path d="M24 15.3 L24 32.7 M15.3 24 L32.7 24" />
+            </g>
+            <path
+              d="M14.7 24 L19.16 24 L23.44 19.13 L25.21 28.87 L29.12 24 L33.3 24"
+              fill="none" stroke="#030712" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"
+            />
+            <path
+              d="M14.7 24 L19.16 24 L23.44 19.13 L25.21 28.87 L29.12 24 L33.3 24"
+              fill="none" stroke="url(#pwaLogoGrad)" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"
+            />
+          </svg>
         </div>
 
         <div className="min-w-0 flex-1">
