@@ -121,26 +121,33 @@ export default async function DashboardPage() {
           marginBottom: 16,
         }}
       >
+        {/* Same "executive muted jewel-tone" palette as the subject cards
+            below (src/lib/subjectColors.ts) -- deep matte fill + white
+            text, each pre-verified for AAA contrast (>=7:1) rather than
+            the old white-card-with-colored-icon treatment. */}
         {[
-          { label: 'Total Attempts', value: totalAttempts, icon: 'practice', color: '#0f766e' },
-          { label: 'Average Score',  value: `${avgScore}%`, icon: 'analytics', color: '#16a34a' },
-          { label: 'Subjects',       value: SUBJECTS.length, icon: 'questionBank', color: '#7c3aed' },
-          { label: 'Weak Areas',     value: weakSubjects.length, icon: 'warning', color: '#d97706' },
+          { label: 'Total Attempts', value: totalAttempts, icon: 'practice', bg: '#245F61', bgDark: '#154042' },
+          { label: 'Average Score',  value: `${avgScore}%`, icon: 'analytics', bg: '#24613A', bgDark: '#154225' },
+          { label: 'Subjects',       value: SUBJECTS.length, icon: 'questionBank', bg: '#422768', bgDark: '#2C174A' },
+          { label: 'Weak Areas',     value: weakSubjects.length, icon: 'warning', bg: '#684D27', bgDark: '#4A3517' },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="glass-card"
-            style={{ padding: '12px 14px' }}
+            style={{
+              padding: '12px 14px',
+              borderRadius: 14,
+              background: `linear-gradient(135deg, ${stat.bg}, ${stat.bgDark})`,
+              boxShadow: `0 2px 8px ${stat.bg}55`,
+              color: '#ffffff',
+            }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <Icon name={stat.icon as IconName} size="lg" />
-              <div
-                style={{ fontSize: '1.3rem', fontWeight: 800, color: stat.color, lineHeight: 1 }}
-              >
+              <div style={{ fontSize: '1.3rem', fontWeight: 800, lineHeight: 1 }}>
                 {stat.value}
               </div>
             </div>
-            <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: 2, fontWeight: 600 }}>
+            <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.82)', marginTop: 2, fontWeight: 600 }}>
               {stat.label}
             </div>
           </div>
