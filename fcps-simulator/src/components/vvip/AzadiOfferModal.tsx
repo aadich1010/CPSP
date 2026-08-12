@@ -245,6 +245,13 @@ export default function AzadiOfferModal({ forceOpen = false }: AzadiOfferModalPr
           </span>
         </span>
 
+        <div className="azadi-headline">
+          <h2>
+            FCPS Part 1 <span className="grad">Paper I &amp; Paper II</span> Exam Preparation
+          </h2>
+          <p>Ultra Pro Solution &middot; As Per Original Exam Interface</p>
+        </div>
+
         <div className="azadi-countdown" aria-label="Time remaining on the Azadi offer">
           <div className="azadi-cd-box"><div className="azadi-cd-num">{pad(days)}</div><div className="azadi-cd-label">Days</div></div>
           <div className="azadi-cd-box"><div className="azadi-cd-num">{pad(hours)}</div><div className="azadi-cd-label">Hours</div></div>

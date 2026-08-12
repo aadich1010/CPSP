@@ -257,6 +257,32 @@
 .azadi-btn--platinum:hover { color: #3d2200; box-shadow: 0 12px 30px -8px rgba(244, 168, 60, .55); border-color: transparent; }
 .azadi-btn--platinum:hover::before { opacity: 1; }
 
+/* ------------------------------------------------------------ headline */
+
+.azadi-headline { width: 100%; text-align: center; margin: 2px 0 16px; }
+.azadi-headline h2 {
+  font-size: clamp(15px, 2.6vw, 19px);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: .1px;
+  line-height: 1.32;
+  margin: 0;
+}
+.azadi-headline h2 .grad {
+  background: linear-gradient(90deg, #3cf0b0, #12d492 45%, #f4a83c 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.azadi-headline p {
+  margin: 5px 0 0;
+  font-size: clamp(10px, 1.8vw, 11.5px);
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #9fb3ab;
+}
+
 /* ----------------------------------------------------------- countdown */
 
 .azadi-countdown { display: flex; justify-content: center; gap: 8px; margin: 0 0 22px; flex-wrap: wrap; width: 100%; }
