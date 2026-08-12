@@ -16,6 +16,12 @@ import { useEffect, useState } from 'react'
  *      instead.
  *
  * The banner never appears once the app is already running standalone.
+ *
+ * Dismissal is per-session (sessionStorage), not permanent: closing the
+ * banner quiets it for the rest of that browser session/tab, but it comes
+ * back the next time the site is opened fresh (new tab, restart, etc.) so
+ * users who haven't installed yet keep getting offered the option instead
+ * of it disappearing forever after one accidental/curious dismiss.
  */
 
 const DISMISS_KEY = 'fcps-install-dismissed'
@@ -73,7 +79,7 @@ export default function PWAProvider() {
 
     let dismissed = false
     try {
-      dismissed = localStorage.getItem(DISMISS_KEY) === '1'
+      dismissed = sessionStorage.getItem(DISMISS_KEY) === '1'
     } catch {
       // Storage can throw in locked-down browsers; treat as "not dismissed".
     }
@@ -113,7 +119,7 @@ export default function PWAProvider() {
   const dismiss = () => {
     setVisible(false)
     try {
-      localStorage.setItem(DISMISS_KEY, '1')
+      sessionStorage.setItem(DISMISS_KEY, '1')
     } catch {
       /* ignore */
     }
