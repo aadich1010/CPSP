@@ -5,23 +5,19 @@ import Icon from '@/design-system/Icon';
 import type { IconName } from '@/design-system/icon-registry';
 import type { CSSProperties } from 'react'
 import { SUBJECTS, SUBJECT_GROUPS } from '@/lib/subjects'
+import { SUBJECT_COLORS, SUBJECT_COLOR_FALLBACK } from '@/lib/subjectColors'
 
-// Gives every subject its own hue (by its fixed position in the canonical
-// SUBJECTS list) instead of cycling through a handful of repeating gradient
-// classes -- with the golden angle (~137.508deg) as the step, no two hues in
-// a row of N subjects land close together on the wheel no matter how many
-// subjects exist, so the grid reads as N distinct, vivid colors rather than
-// the same 6 tones repeating every 6 cards.
-const GOLDEN_ANGLE = 137.508
+// Fixed "executive muted jewel-tone" palette (src/lib/subjectColors.ts) --
+// replaces the earlier golden-angle-generated bright/neon HSL gradients,
+// which tested as eye-straining. Every subject still gets its own unique,
+// pre-verified-AAA-contrast color; it's just a lookup now instead of a
+// formula, so the exact tones are art-directed rather than computed.
 function subjectPillStyle(subject: string): CSSProperties {
-  const idx = SUBJECTS.indexOf(subject as (typeof SUBJECTS)[number])
-  const hue = ((idx >= 0 ? idx : 0) * GOLDEN_ANGLE) % 360
-  const hue2 = (hue + 30) % 360
-  const glow = `hsl(${hue.toFixed(1)} 85% 45% / 0.4)`
+  const { bg, bgDark } = SUBJECT_COLORS[subject] ?? SUBJECT_COLOR_FALLBACK
   return {
-    background: `linear-gradient(135deg, hsl(${hue.toFixed(1)} 82% 57%), hsl(${hue2.toFixed(1)} 82% 47%))`,
-    boxShadow: `0 2px 8px hsl(${hue.toFixed(1)} 82% 45% / 0.25)`,
-    ['--pill-glow' as string]: glow,
+    background: `linear-gradient(135deg, ${bg}, ${bgDark})`,
+    boxShadow: `0 2px 8px ${bg}55`,
+    ['--pill-glow' as string]: `${bg}66`,
   } as CSSProperties
 }
 
