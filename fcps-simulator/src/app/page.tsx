@@ -41,6 +41,12 @@ const STEPS = [
   { num: 'III', title: 'Simulate',  desc: 'Take timed mock exams, analyze weak areas, and track every gain.', icon: Cpu,    color: '#3B82F6' },
 ]
 
+// "Azadi Offer" (Independence Day discount) -- 40% off Advanced & Platinum
+// only, valid until 14 Aug 2026 midnight. Standard and Elite Pro are
+// untouched. See AZADI_OFFER_DEADLINE below for the cutoff used to
+// auto-expire the badge/strikethrough once the offer ends.
+const AZADI_OFFER_DEADLINE = new Date('2026-08-15T00:00:00+05:00') // PKT midnight, 14 Aug -> 15 Aug
+
 const PLANS = [
   {
     name: 'Standard',
@@ -57,26 +63,30 @@ const PLANS = [
     period: '/ 3 months',
     features: ['3 months access', 'Smart heatmaps', 'Forensic security', 'VIP support'],
     cta: 'Instant access',
-    featured: true,
-    badge: 'Best value',
-  },
-  {
-    name: 'Advanced',
-    price: 'Rs. 8,999',
-    period: '/ 6 months',
-    features: ['6 months access', 'Premium analytics', 'Priority sync', 'Extended bank'],
-    cta: 'Go advanced',
     featured: false,
     badge: null,
   },
   {
+    name: 'Advanced',
+    originalPrice: 'Rs. 8,999',
+    price: 'Rs. 5,399',
+    period: '/ 6 months',
+    features: ['6 months access', 'Premium analytics', 'Priority sync', 'Extended bank'],
+    cta: 'Go advanced',
+    featured: true,
+    badge: 'Best value',
+    azadiOffer: true,
+  },
+  {
     name: 'Platinum',
-    price: 'Rs. 14,999',
+    originalPrice: 'Rs. 14,999',
+    price: 'Rs. 8,999',
     period: '/ 1 year',
     features: ['1 year access', 'Ultimate prep kit', 'Direct support', 'Full analytics'],
     cta: 'Go platinum',
     featured: false,
     badge: null,
+    azadiOffer: true,
   },
 ]
 
@@ -358,6 +368,11 @@ function CbtTerminal() {
    PAGE
 ═══════════════════════════════════════════════════════════════ */
 export default function Home() {
+  // Offer auto-expires after the deadline instead of needing a manual code
+  // change/redeploy on 15 Aug -- cards just silently fall back to their
+  // normal (non-discounted) price/badge state once this flips false.
+  const azadiOfferActive = Date.now() < AZADI_OFFER_DEADLINE.getTime()
+
   return (
     <main className="w-full min-h-screen flex flex-col items-center overflow-x-clip bg-white text-slate-900 selection:bg-emerald-500 selection:text-white">
 
@@ -643,10 +658,33 @@ export default function Home() {
                   )}
 
                   <div className="mb-0.5 text-[12px] font-semibold text-slate-500">{plan.name}</div>
-                  <div className={`mb-0.5 text-xl font-black ${plan.featured ? 'glow-text' : 'text-slate-900'}`}>
-                    {plan.price}
-                  </div>
-                  <div className="mb-6 text-xs text-slate-400">{plan.period}</div>
+
+                  {plan.azadiOffer && azadiOfferActive ? (
+                    <>
+                      <div
+                        className="text-sm font-semibold text-red-500"
+                        style={{ textDecoration: 'line-through', textDecorationColor: '#ef4444', textDecorationThickness: '2px' }}
+                      >
+                        {plan.originalPrice}
+                      </div>
+                      <div
+                        className={`mb-0.5 text-2xl font-black ${plan.featured ? 'glow-text' : 'text-orange-600'}`}
+                      >
+                        {plan.price}
+                      </div>
+                      <div className="mb-2 text-xs text-slate-400">{plan.period} &middot; 40% off</div>
+                      <div className="mb-6 inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-emerald-600 px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-wide text-white shadow-[0_2px_10px_rgba(234,88,12,0.35)]">
+                        🇵🇰 Azadi Offer &bull; Valid till 14 Aug 2026
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className={`mb-0.5 text-xl font-black ${plan.featured ? 'glow-text' : 'text-slate-900'}`}>
+                        {plan.price}
+                      </div>
+                      <div className="mb-6 text-xs text-slate-400">{plan.period}</div>
+                    </>
+                  )}
 
                   <ul className="mb-6 flex flex-1 flex-col gap-3">
                     {plan.features.map((f) => (
