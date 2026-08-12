@@ -48,7 +48,26 @@ const STEPS = [
 // only, valid until 14 Aug 2026 midnight. Standard and Elite Pro are
 // untouched. Deadline + plan data now live in ../lib/azadiOffer.ts, shared
 // with the AzadiOfferModal popup so both stay in sync.
-const PLANS = [
+//
+// Explicitly typed (rather than left to array-literal inference) because
+// mixing inline object literals with a spread of the externally-typed
+// AZADI_PLANS array makes TS infer a real union instead of one merged
+// object type -- accessing plan.azadiOffer on that union then fails to
+// type-check for the elements that don't declare it.
+interface Plan {
+  name: string
+  originalPrice?: string
+  price: string
+  period: string
+  features: string[]
+  cta: string
+  ctaHref?: string
+  featured: boolean
+  badge: string | null
+  azadiOffer?: boolean
+}
+
+const PLANS: Plan[] = [
   {
     name: 'Standard',
     price: 'Rs. 1,999',
