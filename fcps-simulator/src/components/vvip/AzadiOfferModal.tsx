@@ -39,7 +39,7 @@ function AzadiParticles() {
       id: i,
       left: Math.random() * 100,
       top: Math.random() * 100,
-      size: 8 + Math.random() * 10,
+      size: 6 + Math.random() * 7,
       color: i % 2 === 0 ? '#12d492' : '#f4a83c',
       duration: 14 + Math.random() * 12,
       delay: Math.random() * 6,
@@ -115,7 +115,7 @@ function OfferCard({ plan, onCtaClick }: { plan: (typeof AZADI_PLANS)[number]; o
           {plan.features.map((f, i) => (
             <li key={f} style={{ animationDelay: `${0.15 + i * 0.12}s` }}>
               <span className="azadi-chk">
-                <Check size={11} strokeWidth={3} />
+                <Check size={8} strokeWidth={3} />
               </span>
               {f}
             </li>
@@ -127,7 +127,7 @@ function OfferCard({ plan, onCtaClick }: { plan: (typeof AZADI_PLANS)[number]; o
           onClick={onCtaClick}
           className={`azadi-btn azadi-btn--${variant}`}
         >
-          {plan.cta} <ArrowRight size={15} className="azadi-arr" />
+          {plan.cta} <ArrowRight size={11} className="azadi-arr" />
         </Link>
       </div>
     </div>
@@ -236,7 +236,7 @@ export default function AzadiOfferModal({ forceOpen = false }: AzadiOfferModalPr
 
       <div className="azadi-panel" ref={panelRef} role="dialog" aria-modal="true" aria-labelledby={labelId}>
         <button type="button" className="azadi-close" ref={closeRef} onClick={close} aria-label="Close offer popup">
-          <X size={18} />
+          <X size={13} />
         </button>
 
         <span className="azadi-eyebrow-wrap">
