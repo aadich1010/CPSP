@@ -29,11 +29,22 @@ export async function login(formData: FormData) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role, subscription_status, subscription_expires_at')
+    .select('role, subscription_status, subscription_expires_at, blocked_until')
     .eq('id', user.id)
     .single()
 
   if (!profile) return { error: 'Account not found. Contact admin.' }
+
+  // Temporary admin-issued block (src/app/admin/user-actions.ts blockUser()).
+  // Independent of subscription_status -- checked here so a blocked user is
+  // rejected right at login with a clear message, and again in
+  // middleware.ts on every request so an already-open session is cut off
+  // too, not just new logins.
+  if (profile.blocked_until && new Date(profile.blocked_until) > new Date()) {
+    await supabase.auth.signOut()
+    const until = new Date(profile.blocked_until).toLocaleString('en-PK', { dateStyle: 'medium', timeStyle: 'short' })
+    return { error: `Your account is temporarily blocked until ${until}. Contact the admin if you believe this is a mistake.` }
+  }
 
   if (type === 'admin' && profile.role !== 'admin') {
     await supabase.auth.signOut()
@@ -80,15 +91,27 @@ export async function login(formData: FormData) {
 export async function register(formData: FormData) {
   const supabase = await createClient()
 
-  const email    = formData.get('email') as string
-  const password = formData.get('password') as string
-  const fullName = formData.get('fullName') as string
+  const email          = formData.get('email') as string
+  const password       = formData.get('password') as string
+  const fullName       = formData.get('fullName') as string
+  const phone          = (formData.get('phone') as string | null)?.trim() || null
+  const pmdcNumber     = (formData.get('pmdcNumber') as string | null)?.trim() || null
+  const medicalCollege = (formData.get('medicalCollege') as string | null)?.trim() || null
 
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { full_name: fullName },
+      // Picked up by the handle_new_user() trigger (see supabase/migrations/
+      // 20260812260000_add_registration_fields_and_blocking.sql), which
+      // inserts the profiles row -- the client never inserts into profiles
+      // directly (no INSERT policy for authenticated, by design).
+      data: {
+        full_name: fullName,
+        phone,
+        pmdc_number: pmdcNumber,
+        medical_college: medicalCollege,
+      },
     },
   })
 

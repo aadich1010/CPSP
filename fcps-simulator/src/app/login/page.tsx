@@ -16,6 +16,7 @@ const SESSION_ERROR_MESSAGES: Record<string, string> = {
   device_mismatch: 'Session invalidated due to a device mismatch. Please log in again.',
   session_ended: 'Your session has ended. Please log in again.',
   missing_profile: 'Account not found. Contact admin.',
+  blocked: 'Your account has been temporarily blocked by the admin. Please try again later.',
 }
 
 function LoginForm() {

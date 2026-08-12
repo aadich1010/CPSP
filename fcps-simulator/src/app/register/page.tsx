@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { register } from '@/app/auth/actions'
-import { ArrowRight, Loader2, UserPlus, Mail, Lock, User, ShieldCheck, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, Loader2, UserPlus, Mail, Lock, User, ShieldCheck, CheckCircle2, Phone, BadgeCheck, GraduationCap } from 'lucide-react'
 import Icon from '@/design-system/Icon';
+import { MEDICAL_COLLEGE_GROUPS } from '@/lib/medicalColleges'
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
@@ -23,7 +24,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="relative h-screen overflow-hidden bg-[#f8fafc] flex items-center justify-center px-4 py-4">
+    <div className="relative min-h-screen bg-[#f8fafc] flex items-center justify-center px-4 py-8">
 
       {/* background grid */}
       <div
@@ -42,7 +43,7 @@ export default function RegisterPage() {
         style={{ background: 'radial-gradient(circle, #10B981, transparent)' }}
       />
 
-      <div className="relative z-10 w-full max-w-[440px]">
+      <div className="relative z-10 w-full max-w-[440px] sm:max-w-[640px]">
 
         {/* ── LOGO ── */}
         <div className="mb-4 text-center">
@@ -54,7 +55,7 @@ export default function RegisterPage() {
         </div>
 
         {/* ── CARD ── */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.08)] sm:p-6">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.08)] sm:p-7">
 
           {success ? (
             /* ── SUCCESS STATE ── */
@@ -74,12 +75,12 @@ export default function RegisterPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-3">
 
-              {/* ── FULL NAME ── */}
-              <div>
-                <label htmlFor="fullName" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                  <User size={11} className="text-emerald-400" /> Full Name
-                </label>
-                <div className="relative">
+              {/* ── FULL NAME + CELL NUMBER ── */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="fullName" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <User size={11} className="text-emerald-400" /> Full Name
+                  </label>
                   <input
                     id="fullName"
                     name="fullName"
@@ -89,38 +90,95 @@ export default function RegisterPage() {
                     className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)] focus:ring-0"
                   />
                 </div>
+
+                <div>
+                  <label htmlFor="phone" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <Phone size={11} className="text-emerald-400" /> Cell Number
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    inputMode="tel"
+                    autoComplete="tel"
+                    placeholder="03XX-XXXXXXX"
+                    className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
+                  />
+                </div>
               </div>
 
-              {/* ── EMAIL ── */}
-              <div>
-                <label htmlFor="email" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                  <Mail size={11} className="text-emerald-400" /> Email Address
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  placeholder="doctor@example.com"
-                  className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
-                />
+              {/* ── PMDC NUMBER + MEDICAL COLLEGE ── */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="pmdcNumber" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <BadgeCheck size={11} className="text-emerald-400" /> PMDC Number
+                  </label>
+                  <input
+                    id="pmdcNumber"
+                    name="pmdcNumber"
+                    type="text"
+                    required
+                    placeholder="e.g. 123456-P"
+                    className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="medicalCollege" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <GraduationCap size={11} className="text-emerald-400" /> Medical College
+                  </label>
+                  <input
+                    id="medicalCollege"
+                    name="medicalCollege"
+                    type="text"
+                    required
+                    list="medical-college-options"
+                    autoComplete="off"
+                    placeholder="Type to search..."
+                    className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
+                  />
+                  <datalist id="medical-college-options">
+                    {MEDICAL_COLLEGE_GROUPS.map((group) =>
+                      group.colleges.map((college) => (
+                        <option key={college} value={college} label={group.province} />
+                      ))
+                    )}
+                  </datalist>
+                </div>
               </div>
 
-              {/* ── PASSWORD ── */}
-              <div>
-                <label htmlFor="password" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                  <Lock size={11} className="text-emerald-400" /> Password
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  minLength={8}
-                  placeholder="Min. 8 characters"
-                  className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
-                />
+              {/* ── EMAIL + PASSWORD ── */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="email" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <Mail size={11} className="text-emerald-400" /> Email Address
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    placeholder="doctor@example.com"
+                    className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <Lock size={11} className="text-emerald-400" /> Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    minLength={8}
+                    placeholder="Min. 8 characters"
+                    className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
+                  />
+                </div>
               </div>
 
               {/* ── ERROR ── */}

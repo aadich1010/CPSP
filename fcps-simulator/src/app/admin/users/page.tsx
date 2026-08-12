@@ -12,7 +12,7 @@ export default async function AdminUsersPage() {
 
   const { data: profiles } = await adminDb
     .from('profiles')
-    .select('id, full_name, email, role, subscription_status, subscription_expires_at, created_at')
+    .select('id, full_name, email, phone, pmdc_number, medical_college, blocked_until, role, subscription_status, subscription_expires_at, created_at')
     .neq('role', 'admin')
     .order('created_at', { ascending: false })
 

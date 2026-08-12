@@ -96,12 +96,29 @@ export async function updateSession(request: NextRequest) {
     // before -- only its position moved.
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role, subscription_status, subscription_expires_at')
+      .select('role, subscription_status, subscription_expires_at, blocked_until')
       .eq('id', user.id)
       .single()
 
     if (!profile) {
       const response = NextResponse.redirect(new URL('/login?error=missing_profile', request.url))
+      response.cookies.delete(
+        'sb-' + process.env.NEXT_PUBLIC_SUPABASE_URL!.split('//')[1].split('.')[0] + '-auth-token'
+      )
+      return response
+    }
+
+    // ── Temporary admin block ───────────────────────────────────────────
+    // Runs on every request to a protected/admin route (not just login),
+    // so an admin blocking a user mid-session cuts off their already-open
+    // browser tab too, not just future logins. Admins are exempt -- same
+    // reasoning as the device-session gatekeeper below: there's no
+    // recovery path if the operator ever locked themselves out here.
+    if (profile.role !== 'admin' && profile.blocked_until && new Date(profile.blocked_until) > new Date()) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      url.searchParams.set('error', 'blocked')
+      const response = NextResponse.redirect(url)
       response.cookies.delete(
         'sb-' + process.env.NEXT_PUBLIC_SUPABASE_URL!.split('//')[1].split('.')[0] + '-auth-token'
       )
