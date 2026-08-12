@@ -12,6 +12,7 @@ import {
 import { FEATURES } from '../lib/featuresData'
 import FaqAccordion from '../components/FaqAccordion'
 import MobileNav from '../components/MobileNav'
+import BrandMark from '../components/BrandMark'
 
 /* ─── DATA ───────────────────────────────────────────────────── */
 const NAV_LINKS = [
@@ -391,8 +392,8 @@ export default function Home() {
         <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-4">
             <Link href="/" className="group flex items-center gap-3 shrink-0">
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-lg font-black text-slate-950 shadow-[0_0_18px_rgba(16,185,129,0.45)] transition-all group-hover:shadow-[0_0_28px_rgba(16,185,129,0.7)]">
-                F
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-[0_0_18px_rgba(16,185,129,0.45)] transition-all group-hover:shadow-[0_0_28px_rgba(16,185,129,0.7)]">
+                <BrandMark size={22} />
               </div>
               <div>
                 <span className="block text-base font-bold tracking-tight text-slate-900">FCPS Simulator</span>
@@ -793,8 +794,8 @@ export default function Home() {
           <div className="flex flex-wrap items-start justify-between gap-7">
             <div className="min-w-0 max-w-xs">
               <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 text-sm font-black text-slate-950 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-                  F
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+                  <BrandMark size={18} />
                 </div>
                 <span className="text-[15px] font-bold text-slate-900">FCPS Simulator</span>
               </div>

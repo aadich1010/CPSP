@@ -8,6 +8,7 @@ import VvipWelcomeModal from './vvip/VvipWelcomeModal'
 import { isPaidMember } from '@/lib/subscription'
 import Icon from '@/design-system/Icon';
 import type { IconName } from '@/design-system/icon-registry';
+import BrandMark from './BrandMark'
 
 const NAV_ITEMS = [
   { href: '/dashboard',          icon: 'dashboard', label: 'Dashboard' },
@@ -80,9 +81,7 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
       <div className="p-6 border-b border-teal-500/10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <BrandMark size={22} />
           </div>
           <div>
             <div className="text-[14px] font-black text-slate-900 leading-tight uppercase tracking-tight">
