@@ -63,6 +63,12 @@ export const SUBJECTS = [
   'Radiology (Imaging Basics)',
   'Dermatology (Basic Sciences)',
   'Emergency Medicine / Critical Care Basics',
+  'Cardiology',
+  'Neurology',
+  'Pulmonology',
+  'Gastroenterology',
+  'Nephrology',
+  'Oncology / Medical Oncology',
 
   // ── Clinical Practice — Case-Based Reasoning ──────────────────────────
   'Medicine (Clinical Vignettes)',
@@ -114,6 +120,12 @@ export const SUBJECT_GROUPS: SubjectGroup[] = [
       'Radiology (Imaging Basics)',
       'Dermatology (Basic Sciences)',
       'Emergency Medicine / Critical Care Basics',
+      'Cardiology',
+      'Neurology',
+      'Pulmonology',
+      'Gastroenterology',
+      'Nephrology',
+      'Oncology / Medical Oncology',
     ],
   },
   {

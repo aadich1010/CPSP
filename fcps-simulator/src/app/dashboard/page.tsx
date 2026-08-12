@@ -3,15 +3,26 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Icon from '@/design-system/Icon';
 import type { IconName } from '@/design-system/icon-registry';
+import type { CSSProperties } from 'react'
 import { SUBJECTS, SUBJECT_GROUPS } from '@/lib/subjects'
 
-// Cycles each subject through 6 gradient colors (by its position in the
-// canonical SUBJECTS list) so the dashboard grid reads as distinct subjects
-// at a glance instead of one flat green wall.
-function subjectPillColorClass(subject: string): string {
+// Gives every subject its own hue (by its fixed position in the canonical
+// SUBJECTS list) instead of cycling through a handful of repeating gradient
+// classes -- with the golden angle (~137.508deg) as the step, no two hues in
+// a row of N subjects land close together on the wheel no matter how many
+// subjects exist, so the grid reads as N distinct, vivid colors rather than
+// the same 6 tones repeating every 6 cards.
+const GOLDEN_ANGLE = 137.508
+function subjectPillStyle(subject: string): CSSProperties {
   const idx = SUBJECTS.indexOf(subject as (typeof SUBJECTS)[number])
-  const colorNumber = (idx >= 0 ? idx : 0) % 6 + 1
-  return `subject-pill-${colorNumber}`
+  const hue = ((idx >= 0 ? idx : 0) * GOLDEN_ANGLE) % 360
+  const hue2 = (hue + 30) % 360
+  const glow = `hsl(${hue.toFixed(1)} 85% 45% / 0.4)`
+  return {
+    background: `linear-gradient(135deg, hsl(${hue.toFixed(1)} 82% 57%), hsl(${hue2.toFixed(1)} 82% 47%))`,
+    boxShadow: `0 2px 8px hsl(${hue.toFixed(1)} 82% 45% / 0.25)`,
+    ['--pill-glow' as string]: glow,
+  } as CSSProperties
 }
 
 interface SubjectStat {
@@ -197,7 +208,8 @@ export default async function DashboardPage() {
                   key={subject}
                   href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
                   title={`${subjectCountMap[subject] ?? 0} questions`}
-                  className={`subject-pill ${subjectPillColorClass(subject)}`}
+                  className="subject-pill"
+                  style={subjectPillStyle(subject)}
                 >
                   {subject}
                 </Link>
