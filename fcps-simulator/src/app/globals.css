@@ -428,6 +428,27 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   box-shadow: 0 4px 14px rgba(16,185,129,0.4);
 }
 
+/* Multicolor variants -- cycled by subject index so the grid reads as
+   distinct subjects at a glance instead of one flat green wall. Same
+   shape/shadow/hover mechanics as .subject-pill, background only. */
+.subject-pill-1 { background: linear-gradient(135deg, #3B82F6, #06B6D4); box-shadow: 0 2px 8px rgba(59,130,246,0.25); }
+.subject-pill-1:hover { box-shadow: 0 4px 14px rgba(59,130,246,0.4); }
+
+.subject-pill-2 { background: linear-gradient(135deg, #8B5CF6, #3B82F6); box-shadow: 0 2px 8px rgba(139,92,246,0.25); }
+.subject-pill-2:hover { box-shadow: 0 4px 14px rgba(139,92,246,0.4); }
+
+.subject-pill-3 { background: linear-gradient(135deg, #EC4899, #F43F5E); box-shadow: 0 2px 8px rgba(236,72,153,0.25); }
+.subject-pill-3:hover { box-shadow: 0 4px 14px rgba(236,72,153,0.4); }
+
+.subject-pill-4 { background: linear-gradient(135deg, #F59E0B, #FBBF24); box-shadow: 0 2px 8px rgba(245,158,11,0.25); }
+.subject-pill-4:hover { box-shadow: 0 4px 14px rgba(245,158,11,0.4); }
+
+.subject-pill-5 { background: linear-gradient(135deg, #10B981, #14B8A6); box-shadow: 0 2px 8px rgba(16,185,129,0.25); }
+.subject-pill-5:hover { box-shadow: 0 4px 14px rgba(16,185,129,0.4); }
+
+.subject-pill-6 { background: linear-gradient(135deg, #6366F1, #8B5CF6); box-shadow: 0 2px 8px rgba(99,102,241,0.25); }
+.subject-pill-6:hover { box-shadow: 0 4px 14px rgba(99,102,241,0.4); }
+
 /* ── BTN CLASSES (legacy pages) ─────────────────────────────── */
 .btn {
   display: inline-flex;

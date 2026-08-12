@@ -5,6 +5,15 @@ import Icon from '@/design-system/Icon';
 import type { IconName } from '@/design-system/icon-registry';
 import { SUBJECTS, SUBJECT_GROUPS } from '@/lib/subjects'
 
+// Cycles each subject through 6 gradient colors (by its position in the
+// canonical SUBJECTS list) so the dashboard grid reads as distinct subjects
+// at a glance instead of one flat green wall.
+function subjectPillColorClass(subject: string): string {
+  const idx = SUBJECTS.indexOf(subject as (typeof SUBJECTS)[number])
+  const colorNumber = (idx >= 0 ? idx : 0) % 6 + 1
+  return `subject-pill-${colorNumber}`
+}
+
 interface SubjectStat {
   subject: string
   total_questions: number
@@ -188,7 +197,7 @@ export default async function DashboardPage() {
                   key={subject}
                   href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
                   title={`${subjectCountMap[subject] ?? 0} questions`}
-                  className="subject-pill"
+                  className={`subject-pill ${subjectPillColorClass(subject)}`}
                 >
                   {subject}
                 </Link>
