@@ -1,0 +1,292 @@
+/* =============================================================================
+   Azadi Offer Modal
+   -----------------------------------------------------------------------------
+   Design direction: deep emerald/charcoal void behind frosted glass cards,
+   with a single moment of luxury motion per card (rotating gradient border +
+   a hover sheen sweep). Pairs visually with vvip-welcome-modal.css (same
+   obsidian family) but swaps gold-only for the site's emerald/gold duo so it
+   reads as "Pakistan Independence Day" rather than a generic VIP moment.
+
+   Palette
+     void        #050705   page-depth black behind the glass
+     obsidian    #0f1015   card body
+     emerald     #12d492   Advanced plan accent / primary CTA
+     gold        #f4a83c   Platinum plan accent
+     ink         #eef4f1   warm off-white body text
+     muted       #93a39c   labels and secondary text
+
+   All selectors are single-class and scoped under .azadi-* to avoid
+   collisions with the rest of the dashboard/marketing stylesheets.
+   ========================================================================== */
+
+.azadi-overlay {
+  --azadi-void: #050705;
+  --azadi-obsidian: #0f1015;
+  --azadi-emerald: #12d492;
+  --azadi-emerald-dark: #0a8f60;
+  --azadi-gold: #f4a83c;
+  --azadi-gold-deep: #d9761a;
+  --azadi-ink: #eef4f1;
+  --azadi-muted: #93a39c;
+
+  position: fixed;
+  inset: 0;
+  z-index: 2147481900;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.azadi-overlay[data-phase='leave'] .azadi-scrim { animation: azadi-fade-out 260ms ease-in both; }
+.azadi-overlay[data-phase='leave'] .azadi-panel { animation: azadi-panel-out 260ms cubic-bezier(.4, 0, 1, 1) both; }
+
+/* ------------------------------------------------------------------ scrim */
+
+.azadi-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(18, 212, 146, 0.20), transparent 45%),
+    radial-gradient(circle at 88% 82%, rgba(244, 168, 60, 0.16), transparent 48%),
+    rgba(5, 7, 5, 0.82);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+  animation: azadi-fade-in 320ms ease-out both;
+}
+
+@keyframes azadi-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes azadi-fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* -------------------------------------------------------- floating shapes */
+
+.azadi-particles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.azadi-shape { position: absolute; opacity: 0.18; animation: azadi-drift linear infinite; }
+@keyframes azadi-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(22px, -26px) rotate(180deg); }
+}
+
+/* ------------------------------------------------------------------ panel */
+
+.azadi-panel {
+  position: relative;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 780px;
+  width: 100%;
+  animation: azadi-panel-in 640ms cubic-bezier(.22, 1.4, .36, 1) both;
+}
+
+@keyframes azadi-panel-in {
+  from { opacity: 0; transform: translateY(38px) scale(0.93); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes azadi-panel-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(18px) scale(0.96); }
+}
+
+/* ------------------------------------------------------------------ close */
+
+.azadi-close {
+  position: absolute;
+  top: -44px;
+  right: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.azadi-close:hover { background: rgba(255, 255, 255, 0.22); transform: rotate(90deg); }
+.azadi-close:focus-visible { outline: 2px solid var(--azadi-emerald); outline-offset: 2px; }
+
+/* --------------------------------------------------------------- eyebrow */
+
+.azadi-eyebrow-wrap { position: absolute; top: -78px; left: 50%; transform: translateX(-50%); text-align: center; width: max-content; max-width: 92vw; }
+.azadi-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: linear-gradient(90deg, rgba(18, 212, 146, .16), rgba(244, 168, 60, .16));
+  border: 1px solid rgba(255, 255, 255, .14);
+  padding: 6px 14px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; letter-spacing: .4px;
+  color: #bff7e0;
+}
+.azadi-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--azadi-emerald); box-shadow: 0 0 8px var(--azadi-emerald); animation: azadi-blink 1.6s ease-in-out infinite; }
+@keyframes azadi-blink { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+
+/* --------------------------------------------------------------- cards */
+
+.azadi-card {
+  position: relative;
+  border-radius: 24px;
+  padding: 2px;
+  width: 300px;
+  max-width: 100%;
+}
+
+.azadi-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 2px;
+  background: conic-gradient(from 0deg, var(--azadi-border-a), var(--azadi-border-b), var(--azadi-border-a));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: azadi-spin-border 6.5s linear infinite;
+}
+.azadi-card--advanced { --azadi-border-a: #12d492; --azadi-border-b: #0a3d2a; }
+.azadi-card--platinum { --azadi-border-a: #f4a83c; --azadi-border-b: #3d2a0a; }
+@keyframes azadi-spin-border { to { transform: rotate(360deg); } }
+
+.azadi-card-inner {
+  position: relative;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .015));
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  border-radius: 22px;
+  padding: 26px 24px 24px;
+  overflow: hidden;
+  z-index: 2;
+  transition: transform .4s cubic-bezier(.2, .8, .2, 1), box-shadow .4s ease;
+}
+.azadi-card--advanced .azadi-card-inner { box-shadow: 0 0 0 1px rgba(18, 212, 146, .15), 0 26px 55px -18px rgba(18, 212, 146, .35); }
+.azadi-card--platinum .azadi-card-inner { box-shadow: 0 0 0 1px rgba(244, 168, 60, .15), 0 26px 55px -18px rgba(244, 168, 60, .3); }
+.azadi-card:hover .azadi-card-inner { transform: scale(1.03) translateY(-3px); }
+.azadi-card--advanced:hover .azadi-card-inner { box-shadow: 0 0 0 1px rgba(18, 212, 146, .35), 0 36px 80px -18px rgba(18, 212, 146, .55); }
+.azadi-card--platinum:hover .azadi-card-inner { box-shadow: 0 0 0 1px rgba(244, 168, 60, .35), 0 36px 80px -18px rgba(244, 168, 60, .5); }
+
+.azadi-sheen {
+  position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+  background: linear-gradient(115deg, transparent, rgba(255, 255, 255, .2) 45%, transparent 90%);
+  transform: skewX(-18deg);
+  pointer-events: none; z-index: 3;
+}
+.azadi-sheen.run { animation: azadi-sweep 1.05s ease forwards; }
+@keyframes azadi-sweep { to { left: 130%; } }
+
+.azadi-badge-best {
+  position: absolute; top: 18px; right: 18px;
+  background: linear-gradient(90deg, #12d492, #3cf0b0);
+  color: #052318; font-weight: 800; font-size: 10.5px; letter-spacing: .4px;
+  padding: 6px 12px; border-radius: 999px;
+  animation: azadi-pulse-badge 2s ease-in-out infinite;
+  z-index: 4;
+}
+@keyframes azadi-pulse-badge {
+  0% { box-shadow: 0 0 0 0 rgba(18, 212, 146, .55); }
+  70% { box-shadow: 0 0 0 9px rgba(18, 212, 146, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(18, 212, 146, 0); }
+}
+
+.azadi-plan-label { font-size: 13px; font-weight: 700; color: #c9d6d0; }
+.azadi-old-price { color: #ff6b6b; text-decoration: line-through; font-size: 14px; font-weight: 600; opacity: .85; margin-top: 10px; }
+.azadi-new-price { font-weight: 800; font-size: 32px; letter-spacing: -.4px; }
+.azadi-card--advanced .azadi-new-price { color: #2cf5b0; text-shadow: 0 0 22px rgba(18, 212, 146, .4); }
+.azadi-card--platinum .azadi-new-price { color: #ffb85c; text-shadow: 0 0 22px rgba(244, 168, 60, .35); }
+.azadi-sub-price { color: #93a39c; font-size: 12.5px; margin-top: 2px; }
+
+.azadi-strip {
+  display: flex; align-items: center; gap: 7px;
+  background: linear-gradient(90deg, rgba(244, 168, 60, .9), rgba(18, 212, 146, .9));
+  background-size: 220% 100%;
+  animation: azadi-strip-shift 4s linear infinite;
+  padding: 9px 12px; border-radius: 11px; margin: 14px 0 16px;
+  font-size: 10.5px; font-weight: 700; color: #0b1410;
+}
+@keyframes azadi-strip-shift { 0% { background-position: 0 0; } 100% { background-position: 220% 0; } }
+.azadi-strip .pk { background: rgba(0, 0, 0, .2); padding: 2px 6px; border-radius: 6px; }
+
+.azadi-feat-list { list-style: none; padding: 0; margin: 0 0 20px; }
+.azadi-feat-list li {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 13.5px; color: #dbe7e1; padding: 6px 0;
+  opacity: 0; transform: translateX(-8px);
+  animation: azadi-feat-in .45s ease forwards;
+}
+@keyframes azadi-feat-in { to { opacity: 1; transform: translateX(0); } }
+
+.azadi-chk { width: 19px; height: 19px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.azadi-card--advanced .azadi-chk { background: rgba(18, 212, 146, .15); color: #2cf5b0; }
+.azadi-card--platinum .azadi-chk { background: rgba(244, 168, 60, .15); color: #ffb85c; }
+
+.azadi-btn {
+  width: 100%; border: none; cursor: pointer; border-radius: 13px;
+  padding: 13px 16px; font-size: 14px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  position: relative; overflow: hidden;
+  transition: transform .22s ease;
+  text-decoration: none;
+}
+.azadi-btn:hover { transform: translateY(-2px); }
+.azadi-btn .azadi-arr { transition: transform .22s ease; }
+.azadi-btn:hover .azadi-arr { transform: translateX(4px); }
+
+.azadi-btn--advanced {
+  color: #052318;
+  background: linear-gradient(90deg, #12d492, #3cf0b0, #12d492);
+  background-size: 220% 100%;
+  animation: azadi-fluid-pulse 3.2s ease-in-out infinite;
+}
+@keyframes azadi-fluid-pulse {
+  0%, 100% { background-position: 0 50%; box-shadow: 0 10px 26px -8px rgba(18, 212, 146, .5); }
+  50% { background-position: 100% 50%; box-shadow: 0 14px 34px -6px rgba(18, 212, 146, .8); }
+}
+
+.azadi-btn--platinum {
+  color: #ffe8c9;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(244, 168, 60, .4);
+}
+.azadi-btn--platinum::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, #f4a83c, #ffd88a, #d9761a);
+  opacity: 0; transition: opacity .3s ease; z-index: -1;
+}
+.azadi-btn--platinum:hover { color: #3d2200; box-shadow: 0 12px 30px -8px rgba(244, 168, 60, .55); border-color: transparent; }
+.azadi-btn--platinum:hover::before { opacity: 1; }
+
+/* ----------------------------------------------------------- countdown */
+
+.azadi-countdown { display: flex; justify-content: center; gap: 8px; margin: 0 0 22px; flex-wrap: wrap; width: 100%; }
+.azadi-cd-box {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02));
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 13px;
+  padding: 9px 6px;
+  min-width: 58px;
+  text-align: center;
+}
+.azadi-cd-num { font-weight: 800; font-size: 19px; color: #fff; font-variant-numeric: tabular-nums; }
+.azadi-cd-label { font-size: 8.5px; letter-spacing: 1.2px; text-transform: uppercase; color: #9fb3ab; margin-top: 1px; }
+
+/* -------------------------------------------------------------- motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .azadi-shape,
+  .azadi-badge-best,
+  .azadi-strip,
+  .azadi-btn--advanced,
+  .azadi-card::before,
+  .azadi-feat-list li {
+    animation: none !important;
+  }
+  .azadi-feat-list li { opacity: 1; transform: none; }
+  .azadi-panel { animation-duration: 1ms !important; }
+}
+
+@media (max-width: 640px) {
+  .azadi-close { top: -40px; }
+  .azadi-card { width: 100%; max-width: 340px; }
+}

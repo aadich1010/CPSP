@@ -10,9 +10,11 @@ import {
   TrendingUp, Clock, Users, Cpu, Shield, Wifi,
 } from 'lucide-react'
 import { FEATURES } from '../lib/featuresData'
+import { AZADI_PLANS, isAzadiOfferActive } from '../lib/azadiOffer'
 import FaqAccordion from '../components/FaqAccordion'
 import MobileNav from '../components/MobileNav'
 import BrandMark from '../components/BrandMark'
+import AzadiOfferModal from '../components/vvip/AzadiOfferModal'
 
 /* ─── DATA ───────────────────────────────────────────────────── */
 const NAV_LINKS = [
@@ -44,10 +46,8 @@ const STEPS = [
 
 // "Azadi Offer" (Independence Day discount) -- 40% off Advanced & Platinum
 // only, valid until 14 Aug 2026 midnight. Standard and Elite Pro are
-// untouched. See AZADI_OFFER_DEADLINE below for the cutoff used to
-// auto-expire the badge/strikethrough once the offer ends.
-const AZADI_OFFER_DEADLINE = new Date('2026-08-15T00:00:00+05:00') // PKT midnight, 14 Aug -> 15 Aug
-
+// untouched. Deadline + plan data now live in ../lib/azadiOffer.ts, shared
+// with the AzadiOfferModal popup so both stay in sync.
 const PLANS = [
   {
     name: 'Standard',
@@ -67,28 +67,7 @@ const PLANS = [
     featured: false,
     badge: null,
   },
-  {
-    name: 'Advanced',
-    originalPrice: 'Rs. 8,999',
-    price: 'Rs. 5,399',
-    period: '/ 6 months',
-    features: ['6 months access', 'Premium analytics', 'Priority sync', 'Extended bank'],
-    cta: 'Go advanced',
-    featured: true,
-    badge: 'Best value',
-    azadiOffer: true,
-  },
-  {
-    name: 'Platinum',
-    originalPrice: 'Rs. 14,999',
-    price: 'Rs. 8,999',
-    period: '/ 1 year',
-    features: ['1 year access', 'Ultimate prep kit', 'Direct support', 'Full analytics'],
-    cta: 'Go platinum',
-    featured: false,
-    badge: null,
-    azadiOffer: true,
-  },
+  ...AZADI_PLANS.map((p) => ({ ...p, azadiOffer: true })),
 ]
 
 const TESTIMONIALS = [
@@ -372,10 +351,13 @@ export default function Home() {
   // Offer auto-expires after the deadline instead of needing a manual code
   // change/redeploy on 15 Aug -- cards just silently fall back to their
   // normal (non-discounted) price/badge state once this flips false.
-  const azadiOfferActive = Date.now() < AZADI_OFFER_DEADLINE.getTime()
+  const azadiOfferActive = isAzadiOfferActive()
 
   return (
     <main className="w-full min-h-screen flex flex-col items-center overflow-x-clip bg-white text-slate-900 selection:bg-emerald-500 selection:text-white">
+
+      {/* ── AZADI OFFER POPUP (shows once per browser session on load) ── */}
+      <AzadiOfferModal />
 
       {/* ── ANNOUNCEMENT BAR ── */}
       <div className="w-full flex justify-center border-b border-emerald-100 bg-emerald-50/60">
