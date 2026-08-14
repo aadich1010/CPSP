@@ -1,0 +1,139 @@
+diff --git a/fcps-simulator/src/app/admin/questions/validate-question.test.ts b/fcps-simulator/src/app/admin/questions/validate-question.test.ts
+index 98f20db..e5d4023 100644
+--- a/fcps-simulator/src/app/admin/questions/validate-question.test.ts
++++ b/fcps-simulator/src/app/admin/questions/validate-question.test.ts
+@@ -50,6 +50,34 @@ describe('validateQuestion', () => {
+     expect(validateQuestion(validQuestion({ subject: '' }))).toMatch(/subject is required/i)
+   })
+ 
++  // Regression coverage for the August 2026 incident: ~1,860 questions were
++  // sitting in the database under subject strings that didn't byte-for-byte
++  // match src/lib/subjects.ts (typos, missing spaces around '/', genuinely
++  // new subjects never added to the list, or a plain 'General' catch-all),
++  // and every one of them was invisible to students on every subject
++  // card/filter despite being fully graded, explained content. This gate is
++  // what stops that from happening again silently.
++  it.each([
++    'Oncology',                    // missing '/ Medical Oncology' half
++    'Oncology/Medical Oncology',   // missing spaces around the slash
++    'Obstetrics',                  // missing '& Gynecology'
++    'General',                     // not a real subject at all
++    'Anaesthesia',                 // British spelling, not the canonical entry
++  ])('rejects a subject not in the canonical list: %j', (bad) => {
++    expect(validateQuestion(validQuestion({ subject: bad }))).toMatch(/not a recognized subject/i)
++  })
++
++  it('trims incidental whitespace before checking the subject, same as other fields', () => {
++    expect(validateQuestion(validQuestion({ subject: '  Anatomy  ' }))).toBeNull()
++  })
++
++  it('accepts every subject in the canonical list, including the newly added specialty ones', () => {
++    expect(validateQuestion(validQuestion({ subject: 'Endocrinology' }))).toBeNull()
++    expect(validateQuestion(validQuestion({ subject: 'Urology' }))).toBeNull()
++    expect(validateQuestion(validQuestion({ subject: 'Orthopedics' }))).toBeNull()
++    expect(validateQuestion(validQuestion({ subject: 'Oncology / Medical Oncology' }))).toBeNull()
++  })
++
+   it.each(['', 'F', '1', 'AA'])(
+     'rejects correct_answer %j when it is not A-E',
+     (bad) => {
+diff --git a/fcps-simulator/src/app/admin/questions/validate-question.ts b/fcps-simulator/src/app/admin/questions/validate-question.ts
+index 33c0d58..072aa2e 100644
+--- a/fcps-simulator/src/app/admin/questions/validate-question.ts
++++ b/fcps-simulator/src/app/admin/questions/validate-question.ts
+@@ -7,6 +7,8 @@
+ // it's split into its own ordinary module, which also makes it trivially
+ // unit-testable without mocking Supabase or Next.js internals.
+ 
++import { SUBJECTS } from '@/lib/subjects'
++
+ export type QuestionInput = {
+   question_text:  string
+   option_a:       string
+@@ -37,6 +39,21 @@ export function validateQuestion(q: QuestionInput, index?: number): string | nul
+     return `${where}: options A-D are all required.`
+   }
+   if (!q.subject?.trim()) return `${where}: subject is required.`
++  // Every screen that lists/filters/counts questions (dashboard cards, exam
++  // setup, admin list, get_subject_question_counts()) matches `subject`
++  // against this exact list of strings. A subject that's almost right --
++  // extra/missing whitespace, a typo, a slash instead of ' / ', a name that
++  // isn't on the list at all -- doesn't error here or anywhere downstream;
++  // it just silently never appears to a student under any subject. That's
++  // exactly how ~1,860 questions (an 'Oncology' vs 'Oncology / Medical
++  // Oncology' split, a whole untagged 'General' bucket, several subjects
++  // like 'Endocrinology' with no matching card at all, ...) went missing
++  // from the app in August 2026 despite being in the database the whole
++  // time. Reject anything that isn't byte-for-byte one of SUBJECTS instead
++  // of letting it through and failing invisibly later.
++  if (!(SUBJECTS as readonly string[]).includes(q.subject.trim())) {
++    return `${where}: "${q.subject}" is not a recognized subject. Pick one from the subject dropdown, or add it to src/lib/subjects.ts first if it's a genuinely new subject.`
++  }
+ 
+   const answer = q.correct_answer?.trim().toUpperCase()
+   if (!answer || !['A', 'B', 'C', 'D', 'E'].includes(answer)) {
+diff --git a/fcps-simulator/src/lib/subjects.ts b/fcps-simulator/src/lib/subjects.ts
+index d213460..71884a4 100644
+--- a/fcps-simulator/src/lib/subjects.ts
++++ b/fcps-simulator/src/lib/subjects.ts
+@@ -31,6 +31,40 @@
+  * 'Medicine (Clinical Vignettes)' (see 20260811240000_rename_medicine_to_
+  * clinical_vignettes.sql) and placed in their own "Clinical Practice" group
+  * rather than forced into a Paper I/II basic-science card.
++ *
++ * 2026-08-15 cleanup: a second, larger 'General' bucket (809 questions, same
++ * shape as the old 'Medicine' bucket -- an unsorted grab-bag spanning every
++ * specialty) was read question-by-question and reassigned to the subject its
++ * content actually matches. Six severely OCR-garbled rows were left tagged
++ * 'General' because their text is unreadable, not because they lack a
++ * subject -- see the admin question list filtered to 'General' to find and
++ * fix/delete them by hand.
++ *
++ * The same pass found ~20 near-duplicate/typo'd subject strings already
++ * sitting in the questions table that never matched any entry in this file
++ * (e.g. 'Oncology' and 'Oncology/Medical Oncology' next to this file's
++ * 'Oncology / Medical Oncology', or 'Obstetrics' next to 'Obstetrics &
++ * Gynecology') -- because get_exam_questions() and every dropdown/card here
++ * match on the *exact* string, those questions were invisible to students no
++ * matter which subject they picked. All were folded into their matching
++ * canonical entry below (narrow anaesthesia-subspecialty tags folded into
++ * 'Anesthesia', narrow basic-science splits like Histology/Embryology/
++ * Neuroanatomy folded into 'Anatomy', Cell Biology/Genetics into
++ * 'Biochemistry', Neurophysiology into 'Physiology', Trauma into 'Emergency
++ * Medicine / Critical Care Basics', Vascular Surgery into 'General Surgery').
++ * Endocrinology, Urology, and Orthopedics had real, substantial question
++ * banks (120-150+ each) with no reasonable existing home -- comparable in
++ * size to Cardiology/Neurology/ENT/Ophthalmology, which already have their
++ * own cards -- so they were added below as first-class subjects instead of
++ * being force-merged into an unrelated bucket.
++ *
++ * TAKEAWAY FOR FUTURE IMPORTS: any question inserted with a `subject` value
++ * that is not byte-for-byte one of the strings in SUBJECTS below will render
++ * nowhere in the student-facing app (not on the dashboard cards, not in the
++ * exam-setup subject picker, not in get_subject_question_counts()) even
++ * though it's sitting in the database. Validate new `subject` values against
++ * this file at insert time -- see validate-question.ts -- rather than
++ * discovering the mismatch later as a phantom 'General' bucket.
+  */
+ export const SUBJECTS = [
+   // ── Paper I — General Basic Sciences ──────────────────────────────────
+@@ -68,6 +102,9 @@ export const SUBJECTS = [
+   'Pulmonology',
+   'Gastroenterology',
+   'Nephrology',
++  'Endocrinology',
++  'Urology',
++  'Orthopedics',
+   'Oncology / Medical Oncology',
+ 
+   // ── Clinical Practice — Case-Based Reasoning ──────────────────────────
+@@ -125,6 +162,9 @@ export const SUBJECT_GROUPS: SubjectGroup[] = [
+       'Pulmonology',
+       'Gastroenterology',
+       'Nephrology',
++      'Endocrinology',
++      'Urology',
++      'Orthopedics',
+       'Oncology / Medical Oncology',
+     ],
+   },
