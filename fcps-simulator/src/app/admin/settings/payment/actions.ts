@@ -3,7 +3,11 @@
 import { createAdminClient, requireAdmin } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-type PaymentProvider = 'jazzcash' | 'easypaisa' | 'bank'
+// EasyPaisa removed -- only Bank and JazzCash are offered to students now.
+// The DB column (payment_settings.provider) is plain text, not an enum, so
+// narrowing this type doesn't require a migration; it just stops the app
+// from ever writing/reading an 'easypaisa' row again.
+type PaymentProvider = 'jazzcash' | 'bank'
 
 export async function updatePaymentSetting(
   provider: PaymentProvider,

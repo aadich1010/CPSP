@@ -5,8 +5,9 @@ import { updatePaymentSetting } from './actions'
 import Icon from '@/design-system/Icon';
 import type { IconName } from '@/design-system/icon-registry';
 
+// EasyPaisa removed -- only Bank and JazzCash are offered to students now.
 type Setting = {
-  provider: 'jazzcash' | 'easypaisa' | 'bank'
+  provider: 'jazzcash' | 'bank'
   account_number: string
   account_name: string
   extra_info: string | null
@@ -14,7 +15,6 @@ type Setting = {
 
 const PROVIDER_META: Record<Setting['provider'], { title: string; icon: string; color: string; extraLabel: string }> = {
   jazzcash: { title: 'JazzCash', icon: 'mobilePay', color: '#f59e0b', extraLabel: 'Notes (optional)' },
-  easypaisa: { title: 'EasyPaisa', icon: 'wallet', color: '#16a34a', extraLabel: 'Notes (optional)' },
   bank: { title: 'Bank Transfer', icon: 'bank', color: '#2563eb', extraLabel: 'Bank Name' },
 }
 

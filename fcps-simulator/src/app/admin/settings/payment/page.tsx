@@ -4,9 +4,13 @@ import Icon from '@/design-system/Icon';
 
 export const dynamic = 'force-dynamic'
 
+// EasyPaisa dropped from the buyer-facing checkout (product decision) --
+// only Bank and JazzCash are offered to students now, so the admin panel no
+// longer seeds/shows an EasyPaisa card. Any old 'easypaisa' row already in
+// the DB is simply ignored here (the column is untyped text, not an enum,
+// so leaving a stale row behind needs no migration).
 const PLACEHOLDER_DEFAULTS = [
   { provider: 'jazzcash' as const, account_number: '', account_name: '', extra_info: null },
-  { provider: 'easypaisa' as const, account_number: '', account_name: '', extra_info: null },
   { provider: 'bank' as const, account_number: '', account_name: '', extra_info: null },
 ]
 
@@ -18,7 +22,7 @@ export default async function PaymentSettingsPage() {
     .select('provider, account_number, account_name, extra_info')
     .order('provider')
 
-  // Guarantee all three providers always have a row to render, even if
+  // Guarantee all providers always have a row to render, even if
   // the table is empty or a provider was never seeded.
   const byProvider = new Map((data || []).map((d) => [d.provider, d]))
   const settings = PLACEHOLDER_DEFAULTS.map((d) => byProvider.get(d.provider) || d)

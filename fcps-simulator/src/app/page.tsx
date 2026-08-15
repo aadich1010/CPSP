@@ -54,35 +54,53 @@ const STEPS = [
 // AZADI_PLANS array makes TS infer a real union instead of one merged
 // object type -- accessing plan.azadiOffer on that union then fails to
 // type-check for the elements that don't declare it.
+//
+// ctaHref is now required (not optional) on every plan -- Standard and
+// Elite Pro previously had none and both CTA buttons hardcoded the same
+// bare "/subscription-expired" link regardless of which plan/price was
+// clicked, so the checkout page had no idea what the buyer intended to pay.
+// Each plan now carries its own checkout link with plan/amount/period baked
+// in as query params (see buildHref below), matching what azadiOffer.ts
+// already does for the two Azadi-discounted plans.
 interface Plan {
   name: string
   originalPrice?: string
   price: string
+  amount: number
   period: string
   features: string[]
   cta: string
-  ctaHref?: string
+  ctaHref: string
   featured: boolean
   badge: string | null
   azadiOffer?: boolean
+}
+
+function buildHref(plan: string, amount: number, period: string): string {
+  const params = new URLSearchParams({ plan, amount: String(amount), period })
+  return `/subscription-expired?${params.toString()}`
 }
 
 const PLANS: Plan[] = [
   {
     name: 'Standard',
     price: 'Rs. 1,999',
-    period: '/ 1 month',
+    amount: 1999,
+    period: '1 month',
     features: ['1 month access', 'Basic analytics', 'Mock exams'],
     cta: 'Get started',
+    ctaHref: buildHref('Standard', 1999, '1 month'),
     featured: false,
     badge: null,
   },
   {
     name: 'Elite Pro',
     price: 'Rs. 4,999',
-    period: '/ 3 months',
+    amount: 4999,
+    period: '3 months',
     features: ['3 months access', 'Smart heatmaps', 'Forensic security', 'VIP support'],
     cta: 'Instant access',
+    ctaHref: buildHref('Elite Pro', 4999, '3 months'),
     featured: false,
     badge: null,
   },
@@ -97,7 +115,7 @@ const TESTIMONIALS = [
 
 const FAQS = [
   { q: 'Is the interface same as the real exam?',  a: 'Yes — we have replicated the official CBT environment for 100% familiarity.'                                        },
-  { q: 'How do I activate my account?',            a: 'Simply share your payment proof via WhatsApp for instant premium activation.'                                       },
+  { q: 'How do I activate my account?',            a: 'Pay via Bank Transfer or JazzCash, then share your payment proof via WhatsApp. Activation is manually verified and usually completed within a few hours.' },
   { q: 'Can I track my progress?',                 a: 'Absolutely. Our Smart Analytics provide detailed heatmaps of your performance across all subjects.'                 },
 ]
 
@@ -644,7 +662,7 @@ export default function Home() {
           <SectionHead
             eyebrow="Pricing"
             title="Choose your plan"
-            sub="Transparent pricing. No hidden fees. Instant access after payment."
+            sub="Transparent pricing. No hidden fees. Bank Transfer or JazzCash — pick a plan below and we'll show you exactly what to pay."
           />
 
           <div className="mt-6 grid w-full grid-cols-1 gap-4 pt-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -700,11 +718,11 @@ export default function Home() {
                   </ul>
 
                   {plan.featured ? (
-                    <GlowBtn href="/subscription-expired">
+                    <GlowBtn href={plan.ctaHref}>
                       {plan.cta} <ArrowRight size={14} />
                     </GlowBtn>
                   ) : (
-                    <Link href="/subscription-expired"
+                    <Link href={plan.ctaHref}
                       className="block rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center text-[12.5px] font-semibold text-slate-700 transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700">
                       {plan.cta}
                     </Link>
