@@ -29,6 +29,11 @@ interface Profile {
 interface Props { profiles: Profile[] }
 
 const DURATIONS = [
+  // 7-day full-access grant for demo users -- gives them the complete
+  // paid experience (not the limited 3-attempt/3-day demo tier) for a
+  // week, without going through activateSubscription's normal
+  // amount-received prompt implying a real payment was made.
+  { label: '7 Days',   days: 7   },
   { label: '1 Month',  days: 30  },
   { label: '3 Months', days: 90  },
   { label: '6 Months', days: 180 },
@@ -36,6 +41,7 @@ const DURATIONS = [
 ]
 
 const PLAN_LABELS: Record<number, string> = {
+  7: '7 Days',
   30: '1 Month',
   90: '3 Months',
   180: '6 Months',
