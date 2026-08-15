@@ -61,10 +61,11 @@ function SubscriptionExpiredContent() {
           .eq('id', user.id)
           .single()
         setIsAdmin(profile?.role === 'admin')
-        // A 'demo' account that landed here got here via the 3-day expiry
-        // (see 20260805000000 migration), not because they were never
-        // activated -- worth a different message than the generic
-        // "pending activation" copy shown to brand-new/held accounts.
+        // A 'demo' account that landed here got here via the 7-day expiry
+        // (see 20260815120000_seven_day_full_access_trial.sql migration),
+        // not because they were never activated -- worth a different message
+        // than the generic "pending activation" copy shown to brand-new/held
+        // accounts.
         setWasDemo(profile?.subscription_status === 'demo')
       }
 
@@ -173,7 +174,7 @@ function SubscriptionExpiredContent() {
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: 1.5 }}>
           {wasDemo ? (
-            <>You&apos;ve used up your <span style={{ color: '#f59e0b', fontWeight: 700 }}>free demo</span> — either all 3 attempts or the 3-day trial window. Subscribe now to keep practicing with the full question bank.</>
+            <>You&apos;ve used up your <span style={{ color: '#f59e0b', fontWeight: 700 }}>7-day free trial</span> — but full access doesn&apos;t have to stop here. Subscribe now to keep practicing with the full question bank.</>
           ) : (
             <>Your account is <span style={{ color: '#f59e0b', fontWeight: 700 }}>pending activation</span>. Complete payment for full access.</>
           )}

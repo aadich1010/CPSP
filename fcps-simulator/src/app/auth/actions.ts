@@ -130,7 +130,7 @@ export async function register(formData: FormData) {
   // showed the user an error message even though their account had
   // already been created successfully by the trigger.
 
-  return { success: 'Account created! You can log in right away with a free demo (10 questions per exam). Ask the admin to upgrade you for full access.' }
+  return { success: 'Account created! You can log in right away with 7 days of full access, free -- no card required.' }
 }
 
 export async function logout() {
