@@ -101,8 +101,10 @@ const PLANS: Plan[] = [
     features: ['3 months access', 'Smart heatmaps', 'Forensic security', 'VIP support'],
     cta: 'Instant access',
     ctaHref: buildHref('Elite Pro', 4999, '3 months'),
-    featured: false,
-    badge: null,
+    // "Best value" badge (and the matching highlighted/glowing card
+    // treatment) moved here from Advanced at the owner's request.
+    featured: true,
+    badge: 'Best value',
   },
   ...AZADI_PLANS.map((p) => ({ ...p, azadiOffer: true })),
 ]
