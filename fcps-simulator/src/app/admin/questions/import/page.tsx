@@ -45,6 +45,7 @@ export default function ImportQuestionsPage() {
   const [parseError, setParseError] = useState('')
   const [importing, setImporting] = useState(false)
   const [result, setResult] = useState<ImportResult | null>(null)
+  const [loadedFileNames, setLoadedFileNames] = useState<string[]>([])
   const router = useRouter()
 
   // British/American spelling (and a couple of common shorthand) variants
@@ -90,12 +91,81 @@ export default function ImportQuestionsPage() {
     return 'Miscellaneous'
   }
 
+  // Read one File object as text via FileReader, wrapped in a Promise so a
+  // batch of files can be read with Promise.all instead of nesting callbacks.
+  function readFileAsText(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader()
+      r.onload = (ev) => resolve((ev.target?.result as string) ?? '')
+      r.onerror = () => reject(r.error ?? new Error(`Failed to read ${file.name}`))
+      r.readAsText(file)
+    })
+  }
+
+  // Parse one file's raw text into an array of raw records, tolerating a
+  // top-level object (wrapped into a 1-element array) same as handleParse
+  // does. Returns null if the text isn't valid JSON at all -- the caller
+  // decides how to surface that per-file failure.
+  function parseFileToRecords(text: string): RawImportRecord[] | null {
+    const cleaned = text
+      .trim()
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+    try {
+      const value = JSON.parse(cleaned)
+      return Array.isArray(value) ? value : [value]
+    } catch {
+      return null
+    }
+  }
+
+  async function handleFilesSelected(fileList: FileList) {
+    const files = Array.from(fileList)
+    if (files.length === 0) return
+
+    // Single file: keep the old behaviour exactly (raw text dropped
+    // straight into the textarea, untouched) so Parse Questions' own
+    // "Rescue Mode" regex extraction still gets a shot at malformed JSON
+    // for the one-file case, same as before this change.
+    if (files.length === 1) {
+      const text = await readFileAsText(files[0])
+      setRawText(text)
+      setLoadedFileNames([files[0].name])
+      return
+    }
+
+    // Multiple files: each is expected to hold its own JSON array (or a
+    // single question object) -- merge them into one combined array so
+    // the existing Parse Questions / Save Now flow doesn't need to change
+    // at all. A file that fails to parse on its own is skipped rather than
+    // aborting the whole batch, and reported by name afterwards.
+    const contents = await Promise.all(files.map((f) => readFileAsText(f)))
+    const merged: RawImportRecord[] = []
+    const failed: string[] = []
+    contents.forEach((text, i) => {
+      const records = parseFileToRecords(text)
+      if (records === null) {
+        failed.push(files[i].name)
+      } else {
+        merged.push(...records)
+      }
+    })
+
+    setLoadedFileNames(files.map((f) => f.name))
+    setRawText(JSON.stringify(merged, null, 2))
+    setParseError(
+      failed.length > 0
+        ? `Loaded ${files.length - failed.length} of ${files.length} files. Could not parse as JSON: ${failed.join(', ')}. Fix those files and re-upload them separately.`
+        : ''
+    )
+  }
+
   function handleParse() {
     if (!rawText.trim()) return
     setParsing(true)
     setParseError('')
     setParsed([])
-    
+
     setTimeout(() => {
       try {
         const trimmed = rawText.trim()
@@ -104,8 +174,8 @@ export default function ImportQuestionsPage() {
         // Try standard JSON parse
         try {
           const cleaned = trimmed
-            .replace(/[\u201C\u201D]/g, '"')
-            .replace(/[\u2018\u2019]/g, "'")
+            .replace(/[“”]/g, '"')
+            .replace(/[‘’]/g, "'")
           jsonParsed = JSON.parse(cleaned)
         } catch (e) {
           // If direct parse fails, try extracting blocks (Rescue Mode)
@@ -182,6 +252,7 @@ export default function ImportQuestionsPage() {
       if (!res.error) {
         setParsed([])
         setRawText('')
+        setLoadedFileNames([])
         router.refresh()
       }
     } catch (err: unknown) {
@@ -211,7 +282,7 @@ export default function ImportQuestionsPage() {
       <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#0f172a' }}>Bulk Import</h1>
-          <p style={{ color: '#64748b' }}>Paste JSON or Upload a file to populate your question bank.</p>
+          <p style={{ color: '#64748b' }}>Paste JSON or Upload files to populate your question bank.</p>
         </div>
         <Link href="/admin/questions" className="btn btn-ghost">← Back to Bank</Link>
       </div>
@@ -221,14 +292,20 @@ export default function ImportQuestionsPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div style={{ background: '#1e293b', borderRadius: 16, padding: 24, color: '#f8fafc', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
             <h3 style={{ marginBottom: 16, fontSize: '1rem', fontWeight: 700 }}>Step 1: Input Data</h3>
-            
+
             <label className="btn btn-primary" style={{ width: '100%', padding: '16px', display: 'flex', gap: 10, cursor: 'pointer', marginBottom: 16 }}>
-              <Icon name="library" /> UPLOAD FILE
-              <input type="file" accept=".json,.txt" style={{ display: 'none' }} onChange={(e) => {
-                const file = e.target.files?.[0]; if (!file) return;
-                const r = new FileReader(); r.onload = (ev) => setRawText(ev.target?.result as string); r.readAsText(file);
+              <Icon name="library" /> UPLOAD FILES
+              <input type="file" accept=".json,.txt" multiple style={{ display: 'none' }} onChange={(e) => {
+                const files = e.target.files; if (!files || files.length === 0) return;
+                handleFilesSelected(files);
               }} />
             </label>
+
+            {loadedFileNames.length > 1 && (
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: 16, marginTop: -8 }}>
+                {loadedFileNames.length} files loaded and merged: {loadedFileNames.join(', ')}
+              </div>
+            )}
 
             <button onClick={handleParse} disabled={parsing || !rawText} className="btn btn-ghost" style={{ width: '100%', border: '1px solid #334155', color: '#cbd5e1' }}>
               {parsing ? 'Processing...' : <><Icon name="search" size="sm" /> Parse Questions</>}
@@ -255,11 +332,11 @@ export default function ImportQuestionsPage() {
             value={rawText}
             onChange={(e) => setRawText(e.target.value)}
             style={{ width: '100%', height: 300, background: '#f8fafc', border: '2px solid #e2e8f0', borderRadius: 12, padding: 16, fontFamily: 'monospace', fontSize: '0.85rem' }}
-            placeholder="Paste your JSON here..."
+            placeholder="Paste your JSON here, or upload one or more JSON files..."
           />
 
           {parseError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: 16, borderRadius: 12 }}><Icon name="incorrect" size="sm" /> {parseError}</div>}
-          
+
           {result && (
             <div style={{ background: result.error ? '#fef2f2' : '#f0fdf4', border: `1px solid ${result.error ? '#fecaca' : '#bbf7d0'}`, color: result.error ? '#b91c1c' : '#15803d', padding: 16, borderRadius: 12 }}>
               {result.error ? (
