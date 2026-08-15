@@ -66,6 +66,14 @@ export default function UserManagementClient({ profiles: initial }: Props) {
   const [loading,   setLoading]   = useState<string | null>(null)
   const [filter,    setFilter]    = useState<'all' | 'active' | 'demo' | 'pending' | 'expired' | 'blocked'>('all')
 
+  // Client-side pagination -- same 20-per-page, numbered-buttons look as
+  // the Questions table. Everything needed (profiles, search, filter) is
+  // already loaded up front, so paginating here (vs. a server round trip
+  // per page like /admin/questions) keeps search/filter working across the
+  // FULL user list instead of just whatever page happens to be showing.
+  const [page, setPage] = useState(1)
+  const perPage = 20
+
   // Get search / details from the URL if present (e.g. the dashboard's demo
   // -users table deep-links here with ?details=<id>).
   const [search, setSearch] = useState(() => {
@@ -125,6 +133,10 @@ export default function UserManagementClient({ profiles: initial }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    setPage(1)
+  }, [search, filter])
+
   const filtered = profiles.filter((p) => {
     const matchSearch =
       (p.full_name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -141,6 +153,9 @@ export default function UserManagementClient({ profiles: initial }: Props) {
     if (filter === 'blocked') return matchSearch && isCurrentlyBlocked(p.blocked_until)
     return matchSearch
   })
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
+  const paginated = filtered.slice((page - 1) * perPage, page * perPage)
 
   async function activateUser(userId: string, days: number, label: string) {
     const amountInput = window.prompt(
@@ -304,14 +319,14 @@ export default function UserManagementClient({ profiles: initial }: Props) {
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {paginated.length === 0 ? (
               <tr>
                 <td colSpan={8} style={{ textAlign: 'center', color: '#475569', padding: '32px' }}>
                   No users found.
                 </td>
               </tr>
             ) : (
-              filtered.map((p) => {
+              paginated.map((p) => {
                 const expiry = p.subscription_expires_at
                   ? new Date(p.subscription_expires_at)
                   : null
@@ -455,6 +470,87 @@ export default function UserManagementClient({ profiles: initial }: Props) {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination -- same look as /admin/questions */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', gap: 6, justifyContent: 'center', alignItems: 'center', marginTop: 24, paddingBottom: 16 }}>
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className={`btn btn-sm ${page === 1 ? 'btn-disabled opacity-30' : 'btn-ghost'}`}
+            style={{ minWidth: 32, height: 32, border: '1px solid #e2e8f0', borderRadius: 8, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            ←
+          </button>
+
+          {(() => {
+            const chunkSize = 20
+            const currentChunk = Math.floor((page - 1) / chunkSize)
+            const startPage = currentChunk * chunkSize + 1
+            const endPage = Math.min(startPage + chunkSize - 1, totalPages)
+
+            const pages = []
+            for (let p = startPage; p <= endPage; p++) {
+              pages.push(
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`btn btn-sm ${p === page ? 'btn-primary' : 'btn-ghost'}`}
+                  style={{
+                    minWidth: 32,
+                    height: 32,
+                    padding: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    borderRadius: 8,
+                    border: p === page ? 'none' : '1px solid #e2e8f0'
+                  }}
+                >
+                  {p}
+                </button>
+              )
+            }
+
+            if (endPage < totalPages) {
+              pages.push(<span key="sep" style={{ color: '#94a3b8', fontWeight: 800, margin: '0 2px', fontSize: '0.7rem' }}>...</span>)
+              pages.push(
+                <button
+                  key={totalPages}
+                  onClick={() => setPage(totalPages)}
+                  className="btn btn-sm btn-ghost"
+                  style={{
+                    minWidth: 32,
+                    height: 32,
+                    padding: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    borderRadius: 8,
+                    border: '1px solid #e2e8f0'
+                  }}
+                >
+                  {totalPages}
+                </button>
+              )
+            }
+            return pages
+          })()}
+
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className={`btn btn-sm ${page === totalPages ? 'btn-disabled opacity-30' : 'btn-ghost'}`}
+            style={{ minWidth: 32, height: 32, border: '1px solid #e2e8f0', borderRadius: 8, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            →
+          </button>
+        </div>
+      )}
 
       {/* Details modal — full profile + subscription + payment history.
           Deliberately only reachable from this page (the admin dashboard's
