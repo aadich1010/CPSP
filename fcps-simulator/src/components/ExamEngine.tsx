@@ -19,6 +19,17 @@ export interface Question {
   correct_answer?: string   // absent for exam mode until after grading
   explanation?: string | null
   subject: string
+  // Optional Roman Urdu (Urdu language, English/Latin letters) versions --
+  // supplied by the admin via Bulk Import (see admin/questions/import),
+  // never auto-translated. Null/empty for any question that hasn't been
+  // translated yet -- the UI falls back to the English field whenever so.
+  roman_urdu_question_text?: string | null
+  roman_urdu_option_a?:      string | null
+  roman_urdu_option_b?:      string | null
+  roman_urdu_option_c?:      string | null
+  roman_urdu_option_d?:      string | null
+  roman_urdu_option_e?:      string | null
+  roman_urdu_explanation?:   string | null
 }
 
 interface ExamEngineProps {
@@ -50,7 +61,23 @@ function getOptionText(q: Question, label: string): string | null {
   return map[label] ?? null
 }
 
+// Roman Urdu counterpart of getOptionText() -- same original-letter lookup,
+// just against the roman_urdu_option_* fields instead. Used so shuffling
+// can move the roman text alongside its English pair without the two ever
+// drifting apart (see shuffleOptions() below).
+function getRomanOptionText(q: Question, label: string): string | null {
+  const map: Record<string, string | null | undefined> = {
+    A: q.roman_urdu_option_a, B: q.roman_urdu_option_b, C: q.roman_urdu_option_c,
+    D: q.roman_urdu_option_d, E: q.roman_urdu_option_e,
+  }
+  return map[label] ?? null
+}
+
 const OPTION_FIELDS = ['option_a', 'option_b', 'option_c', 'option_d', 'option_e'] as const
+const ROMAN_OPTION_FIELDS = [
+  'roman_urdu_option_a', 'roman_urdu_option_b', 'roman_urdu_option_c',
+  'roman_urdu_option_d', 'roman_urdu_option_e',
+] as const
 
 function shuffle<T>(input: T[]): T[] {
   const arr = [...input]
@@ -90,6 +117,14 @@ export function shuffleOptions(q: Question): ShuffledQuestion {
     const src = order[i]
     ;(display as unknown as Record<string, string | null>)[field] =
       src ? getOptionText(q, src) : null
+  })
+  // Roman Urdu options must land on the SAME shuffled positions as their
+  // English counterparts, or toggling the language mid-attempt would show
+  // option B's English text next to option D's Roman Urdu text.
+  ROMAN_OPTION_FIELDS.forEach((field, i) => {
+    const src = order[i]
+    ;(display as unknown as Record<string, string | null>)[field] =
+      src ? getRomanOptionText(q, src) : null
   })
 
   const toOriginal: Record<string, string> = {}
@@ -162,6 +197,11 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
   const [submitted,    setSubmitted]    = useState(false)
   const [timeLeft,     setTimeLeft]     = useState(timeLimitSeconds)
   const [showExplain,  setShowExplain]  = useState<boolean[]>(Array(questions.length).fill(false))
+  // Roman Urdu toggle -- persists across questions/navigation within one
+  // attempt (global, not per-question), available in both Practice Mode
+  // and Exam Mode. Falls back to English automatically per-field wherever
+  // a question has no roman_urdu_* text yet (see romanOr() below).
+  const [showRoman,    setShowRoman]    = useState(false)
   const [saving,       setSaving]       = useState(false)
   const [submitError,  setSubmitError]  = useState<string | null>(null)
   // Filled in AFTER the server grades the attempt. Correct answers never
@@ -237,6 +277,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
                   ? (toDisplay[rev.correct_answer] ?? rev.correct_answer)
                   : undefined,
                 explanation: rev.explanation,
+                roman_urdu_explanation: rev.roman_urdu_explanation,
               }
             })
           )
@@ -267,6 +308,14 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
   }, [submitted, handleSubmit])
 
   const currentQ     = questions[currentIndex]
+
+  // Roman Urdu field with graceful English fallback -- a question that
+  // hasn't been translated yet (roman field null/empty) just keeps
+  // showing English even with the toggle on, rather than showing blank.
+  function romanOr(english: string | null | undefined, roman: string | null | undefined): string {
+    if (showRoman && roman && roman.trim() !== '') return roman
+    return english ?? ''
+  }
   const answered     = answers.filter(Boolean).length
   const unanswered   = questions.length - answered
   const allAnswered  = unanswered === 0
@@ -372,6 +421,18 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
             <div style={{ height: '100%', width: `${pctTime}%`, background: timeColor, borderRadius: 2, transition: 'width 1s linear' }} />
           </div>
         </div>
+        <button
+          onClick={() => setShowRoman((v) => !v)}
+          className="btn btn-ghost btn-sm"
+          title="Switch question language between English and Roman Urdu"
+          style={{
+            border: showRoman ? '1.5px solid #0d9488' : '1.5px solid #e2e8f0',
+            color: showRoman ? '#0d9488' : '#64748b',
+            fontWeight: 700,
+          }}
+        >
+          {showRoman ? 'اردو (Roman) ✓' : 'Roman Urdu'}
+        </button>
         <button onClick={handleSubmit} disabled={saving} className="btn btn-primary btn-sm">
           {saving ? <span className="spinner" style={{ width: 13, height: 13 }} /> : 'Submit'}
         </button>
@@ -392,7 +453,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
                 Question {currentIndex + 1}
               </div>
               <p style={{ fontSize: '0.88rem', color: '#0f172a', lineHeight: 1.55, fontWeight: 600, margin: 0 }}>
-                {currentQ.question_text}
+                {romanOr(currentQ.question_text, currentQ.roman_urdu_question_text)}
               </p>
             </div>
 
@@ -406,7 +467,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
                   <span style={{ minWidth: 26, height: 26, background: 'rgba(13,148,136,0.12)', border: '1.5px solid rgba(13,148,136,0.25)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: '#0d9488', flexShrink: 0 }}>
                     {label}
                   </span>
-                  <span style={{ lineHeight: 1.4 }}>{getOptionText(currentQ, label)}</span>
+                  <span style={{ lineHeight: 1.4 }}>{romanOr(getOptionText(currentQ, label), getRomanOptionText(currentQ, label))}</span>
                 </button>
               ))}
             </div>
@@ -415,7 +476,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
               <div style={{ padding: '8px 12px', background: 'rgba(13,148,136,0.07)', border: '1px solid rgba(13,148,136,0.2)', borderRadius: 10, flexShrink: 0 }}>
                 <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#0d9488', marginBottom: 3 }}><Icon name="info" /> Explanation</div>
                 <p style={{ fontSize: '0.74rem', color: '#475569', lineHeight: 1.5, margin: 0 }}>
-                  {currentQ.explanation || 'No explanation provided.'}
+                  {romanOr(currentQ.explanation, currentQ.roman_urdu_explanation) || 'No explanation provided.'}
                 </p>
                 <div style={{ marginTop: 4, fontSize: '0.68rem', color: '#16a34a', fontWeight: 700 }}>✓ Correct Answer: {currentQ.correct_answer}</div>
               </div>

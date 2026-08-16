@@ -21,6 +21,23 @@ interface ParsedQuestion {
   subject: string
   explanation?: string
   difficulty?: string
+  // Roman Urdu (Urdu language, English/Latin letters) versions -- optional.
+  // Populated from the source JSON when present (see field() lookups in
+  // handleParse below), else defaults to '' like explanation/difficulty
+  // above. IMPORTANT: because importQuestionsBulk() upserts the WHOLE row
+  // matched by question_text, re-uploading an English-only batch AFTER a
+  // question already has Roman Urdu saved will overwrite it back to ''
+  // (the app then just falls back to showing English -- nothing breaks --
+  // but the translation is gone). Always re-upload the fully-translated
+  // file, not the original English-only one, once a batch has been
+  // translated.
+  roman_urdu_question_text?: string
+  roman_urdu_option_a?:      string
+  roman_urdu_option_b?:      string
+  roman_urdu_option_c?:      string
+  roman_urdu_option_d?:      string
+  roman_urdu_option_e?:      string
+  roman_urdu_explanation?:   string
 }
 
 // Shape of a single record from arbitrary/untrusted pasted JSON before
@@ -218,6 +235,16 @@ export default function ImportQuestionsPage() {
 
           const subName = normalizeSubject(String(field(q, 'subject', 'Subject') ?? detectSubjectFromText(String(qText))))
 
+          // Roman Urdu fields -- several key-name variants accepted since
+          // the translated JSON is hand-edited, not machine-generated.
+          const romanQ  = field(q, 'roman_urdu_question_text', 'roman_question_text', 'question_text_roman', 'roman_urdu', 'question_roman_urdu') ?? ''
+          const romanA  = field(q, 'roman_urdu_option_a', 'roman_option_a', 'option_a_roman') ?? ''
+          const romanB  = field(q, 'roman_urdu_option_b', 'roman_option_b', 'option_b_roman') ?? ''
+          const romanC  = field(q, 'roman_urdu_option_c', 'roman_option_c', 'option_c_roman') ?? ''
+          const romanD  = field(q, 'roman_urdu_option_d', 'roman_option_d', 'option_d_roman') ?? ''
+          const romanE  = field(q, 'roman_urdu_option_e', 'roman_option_e', 'option_e_roman') ?? ''
+          const romanExp = field(q, 'roman_urdu_explanation', 'roman_explanation', 'explanation_roman') ?? ''
+
           return {
             question_text: String(qText).trim(),
             option_a: String(optA).trim(),
@@ -229,6 +256,13 @@ export default function ImportQuestionsPage() {
             subject: String(subName).trim(),
             explanation: String(field(q, 'explanation', 'exp') ?? '').trim(),
             difficulty: String(field(q, 'difficulty', 'Difficulty') ?? 'Medium').trim(),
+            roman_urdu_question_text: String(romanQ).trim(),
+            roman_urdu_option_a: String(romanA).trim(),
+            roman_urdu_option_b: String(romanB).trim(),
+            roman_urdu_option_c: String(romanC).trim(),
+            roman_urdu_option_d: String(romanD).trim(),
+            roman_urdu_option_e: String(romanE).trim(),
+            roman_urdu_explanation: String(romanExp).trim(),
           }
         }).filter(q => q.question_text && q.option_a && q.correct_answer)
 

@@ -18,6 +18,15 @@ export type QuestionInput = {
   explanation?:   string | null
   subject:        string
   difficulty?:    string | null
+  // Optional Roman Urdu (Urdu language, English/Latin letters) versions --
+  // never required by validation, purely a display-language alternative.
+  roman_urdu_question_text?: string | null
+  roman_urdu_option_a?:      string | null
+  roman_urdu_option_b?:      string | null
+  roman_urdu_option_c?:      string | null
+  roman_urdu_option_d?:      string | null
+  roman_urdu_option_e?:      string | null
+  roman_urdu_explanation?:   string | null
 }
 
 const VALID_DIFFICULTIES = ['Easy', 'Medium', 'Hard']
