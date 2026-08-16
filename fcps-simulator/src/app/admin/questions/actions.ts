@@ -192,7 +192,12 @@ export async function deleteAllQuestions() {
   return { success: true }
 }
 
-export async function backupQuestions() {
+// `subject` matches the same filter the admin has selected in the
+// SubjectDropdown ('all' or an exact subject name) -- passed through from
+// BackupRestoreExport so Backup/Export downloads only the currently
+// filtered subject instead of always dumping the entire bank. Omit it (or
+// pass 'all') to get everything, same as before this parameter existed.
+export async function backupQuestions(subject?: string) {
   try {
     await requireAdmin()
     const adminDb = await createAdminClient()
@@ -201,11 +206,21 @@ export async function backupQuestions() {
     const limit = 1000
 
     while (true) {
-      const { data, error } = await adminDb
+      let query = adminDb
         .from('questions')
-        .select('question_text, option_a, option_b, option_c, option_d, option_e, correct_answer, explanation, subject, difficulty')
+        // Roman Urdu fields included so a backup is a true full-row
+        // snapshot -- without these, Restore-from-backup would silently
+        // wipe any translations already saved (see 20260816000000_roman_
+        // urdu_translation_support.sql).
+        .select('question_text, option_a, option_b, option_c, option_d, option_e, correct_answer, explanation, subject, difficulty, roman_urdu_question_text, roman_urdu_option_a, roman_urdu_option_b, roman_urdu_option_c, roman_urdu_option_d, roman_urdu_option_e, roman_urdu_explanation')
         .order('created_at', { ascending: true })
         .range(from, from + limit - 1)
+
+      if (subject && subject !== 'all') {
+        query = query.eq('subject', subject)
+      }
+
+      const { data, error } = await query
 
       if (error) throw new Error(error.message)
       if (!data || data.length === 0) break

@@ -72,7 +72,7 @@ export default async function AdminQuestionsPage({
         </div>
 
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <BackupRestoreExport />
+          <BackupRestoreExport subject={subject} />
           <div style={{ width: 1, height: 28, background: '#e2e8f0' }} />
           <Link
             href="/admin/questions/add"

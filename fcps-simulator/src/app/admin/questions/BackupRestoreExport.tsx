@@ -4,22 +4,36 @@ import { useState, useRef } from 'react'
 import { backupQuestions, restoreQuestions } from './actions'
 import Icon from '@/design-system/Icon';
 
-export default function BackupRestoreExport() {
+interface BackupRestoreExportProps {
+  /** Current SubjectDropdown filter from the parent page's URL searchParam
+   *  ('all' or an exact subject name). Passed through to backupQuestions()
+   *  so Backup/Export downloads honor whatever subject is selected on
+   *  screen instead of always dumping the entire question bank. */
+  subject?: string
+}
+
+export default function BackupRestoreExport({ subject = 'all' }: BackupRestoreExportProps) {
   const [loading, setLoading] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // A safe filename fragment for the selected subject -- 'all' stays as-is,
+  // a real subject name gets spaces/slashes swapped for underscores so it
+  // never breaks the downloaded filename (e.g. "Obstetrics & Gynecology"
+  // -> "Obstetrics_Gynecology").
+  const subjectSlug = subject === 'all' ? 'All_Subjects' : subject.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '')
 
   // 1. Backup all questions as a JSON download
   async function handleBackup() {
     setLoading(true)
     try {
-      const res = await backupQuestions()
+      const res = await backupQuestions(subject)
       if (res.error) {
         alert('Backup failed: ' + res.error)
         return
       }
       if (!res.data || res.data.length === 0) {
-        alert('No questions to backup!')
+        alert(subject === 'all' ? 'No questions to backup!' : `No questions found for "${subject}"!`)
         return
       }
 
@@ -29,7 +43,7 @@ export default function BackupRestoreExport() {
       )}`
       const downloadAnchor = document.createElement('a')
       downloadAnchor.setAttribute('href', jsonString)
-      downloadAnchor.setAttribute('download', `fcps_questions_backup_${new Date().toISOString().split('T')[0]}.json`)
+      downloadAnchor.setAttribute('download', `fcps_questions_backup_${subjectSlug}_${new Date().toISOString().split('T')[0]}.json`)
       document.body.appendChild(downloadAnchor)
       downloadAnchor.click()
       downloadAnchor.remove()
@@ -95,14 +109,14 @@ export default function BackupRestoreExport() {
     setDropdownOpen(false)
     setLoading(true)
     try {
-      const res = await backupQuestions()
+      const res = await backupQuestions(subject)
       if (res.error) {
         alert('Failed to load questions for export: ' + res.error)
         return
       }
       const questions = res.data || []
       if (questions.length === 0) {
-        alert('No questions to export!')
+        alert(subject === 'all' ? 'No questions to export!' : `No questions found for "${subject}"!`)
         return
       }
 
@@ -148,7 +162,7 @@ export default function BackupRestoreExport() {
         const url = URL.createObjectURL(blob)
         const downloadAnchor = document.createElement('a')
         downloadAnchor.setAttribute('href', url)
-        downloadAnchor.setAttribute('download', `fcps_questions_export_${new Date().toISOString().split('T')[0]}.doc`)
+        downloadAnchor.setAttribute('download', `fcps_questions_export_${subjectSlug}_${new Date().toISOString().split('T')[0]}.doc`)
         document.body.appendChild(downloadAnchor)
         downloadAnchor.click()
         downloadAnchor.remove()
@@ -231,7 +245,7 @@ export default function BackupRestoreExport() {
       <button
         onClick={handleBackup}
         disabled={loading}
-        title="Backup Questions (Download JSON)"
+        title={subject === 'all' ? 'Backup All Questions (Download JSON)' : `Backup "${subject}" Questions (Download JSON)`}
         style={{
           width: 32,
           height: 32,
@@ -288,7 +302,7 @@ export default function BackupRestoreExport() {
         <button
           onClick={() => setDropdownOpen(!dropdownOpen)}
           disabled={loading}
-          title="Export Questions"
+          title={subject === 'all' ? 'Export All Questions' : `Export "${subject}" Questions`}
           style={{
             display: 'flex',
             gap: 5,
