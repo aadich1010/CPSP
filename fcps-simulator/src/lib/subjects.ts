@@ -47,8 +47,12 @@ export const SUBJECTS = [
   'Epidemiology & Biostatistics',
 
   // ── Paper II — Applied & Specialty ────────────────────────────────────
-  'Surgery',
-  'General Surgery',
+  // 'Surgery' and 'General Surgery' used to be two separate entries (and so
+  // two separate dashboard cards for what is one subject). Merged into
+  // 'Surgery & Allied' -- see supabase/migrations/20260817000000_merge_
+  // surgery_subjects.sql, which moved every question from both old names
+  // onto the merged one.
+  'Surgery & Allied',
   'Anesthesia',
   'Applied Physiology',
   'Applied Pathology',
@@ -104,8 +108,7 @@ export const SUBJECT_GROUPS: SubjectGroup[] = [
     name: 'Paper II — Applied & Specialty',
     description: 'Basic science applied to a clinical specialty, tested in FCPS Part 1 Paper II.',
     subjects: [
-      'Surgery',
-      'General Surgery',
+      'Surgery & Allied',
       'Anesthesia',
       'Applied Physiology',
       'Applied Pathology',
