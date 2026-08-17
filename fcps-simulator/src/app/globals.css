@@ -430,7 +430,6 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
    floor, not a fixed height. */
 .subject-pill {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -438,7 +437,9 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   min-height: 46px;
   border-radius: 10px;
   text-decoration: none;
-  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25;
   color: #ffffff;
   white-space: normal;
   overflow-wrap: break-word;
@@ -455,29 +456,6 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   transform: scale(1.03);
   box-shadow: 0 4px 14px var(--pill-glow, rgba(16,185,129,0.4));
 }
-.subject-pill-name {
-  font-size: 0.75rem;
-  font-weight: 700;
-  line-height: 1.25;
-}
-/* Mastery badge -- the student's own accuracy in this subject. Deliberately
-   does NOT show question-bank size (see dashboard/page.tsx). */
-.subject-pill-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.subject-pill-badge {
-  font-size: 0.6rem;
-  font-weight: 800;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.22);
-  color: #ffffff;
-}
-.subject-pill-badge.strong { background: rgba(52,211,153,0.4); }
-.subject-pill-badge.mid    { background: rgba(251,191,36,0.4); }
-.subject-pill-badge.weak   { background: rgba(248,113,113,0.4); }
 
 /* ── BTN CLASSES (legacy pages) ─────────────────────────────── */
 .btn {

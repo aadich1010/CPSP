@@ -199,37 +199,16 @@ export default async function DashboardPage() {
                 gap: 8,
               }}
             >
-              {group.subjects.map((subject) => {
-                // Mastery badge, computed from this student's own attempt
-                // history (subjectMap, from get_user_dashboard_stats) --
-                // null when they haven't attempted this subject yet, so
-                // the badge only ever appears once there's real data to
-                // show. Question-bank size is deliberately NOT surfaced to
-                // students (was briefly shown here, removed per request --
-                // how many questions exist behind a subject isn't
-                // information students should see, e.g. a low count on a
-                // subject could read as "this app is incomplete").
-                const stat = subjectMap[subject]
-                const pct = stat && stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : null
-                return (
-                  <Link
-                    key={subject}
-                    href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
-                    title={pct !== null ? `${pct}% mastery` : undefined}
-                    className="subject-pill"
-                    style={subjectPillStyle(subject)}
-                  >
-                    <span className="subject-pill-name">{subject}</span>
-                    <span className="subject-pill-meta">
-                      {pct !== null && (
-                        <span className={`subject-pill-badge${pct >= 70 ? ' strong' : pct >= 50 ? ' mid' : ' weak'}`}>
-                          {pct}%
-                        </span>
-                      )}
-                    </span>
-                  </Link>
-                )
-              })}
+              {group.subjects.map((subject) => (
+                <Link
+                  key={subject}
+                  href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
+                  className="subject-pill"
+                  style={subjectPillStyle(subject)}
+                >
+                  {subject}
+                </Link>
+              ))}
             </div>
           </div>
         ))}

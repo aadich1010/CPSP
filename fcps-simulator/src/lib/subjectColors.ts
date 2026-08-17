@@ -9,15 +9,14 @@
  * Design system:
  *  - Every subject gets its own unique background (no two colors repeat),
  *    spread around the hue wheel by the golden angle for maximum visual
- *    separation, then rendered at low lightness (~24-28%) and moderate
- *    saturation (~46-52%) so they read as deep, matte, premium tones
- *    (burgundy / forest / navy / plum / bronze / teal) rather than bright
- *    neon.
- *  - White text on every card. Each `bg` was verified programmatically
- *    (WCAG relative-luminance formula) to hit a contrast ratio of at least
- *    7:1 against #FFFFFF -- the AAA threshold for normal-weight text --
- *    lightness was iteratively lowered per-color until it cleared that bar,
- *    so `contrast` below is the actual measured ratio, not an estimate.
+ *    separation, rendered as deep, matte, premium tones (burgundy / forest /
+ *    navy / plum / bronze / teal) rather than bright neon.
+ *  - Lightness was raised by a flat +8 percentage points (same hue/
+ *    saturation, just less dark) from the original "~24-28% L" set -- the
+ *    original was AAA (>=7:1) on every card; students found it too dark.
+ *    White text on every card still holds AA (>=4.5:1) on the worst-case
+ *    color, most sit well above that -- `contrast` below is the actual
+ *    measured ratio, not an estimate.
  *  - `bgDark` is the same hue, a touch deeper and more saturated, for the
  *    card's linear-gradient partner stop (mirrors the site's existing
  *    `linear-gradient(135deg, a, b)` card treatment elsewhere).
@@ -35,49 +34,49 @@ export interface SubjectColor {
 
 export const SUBJECT_COLORS: Record<string, SubjectColor> = {
   // ── Paper I — Basic Sciences ──────────────────────────────────────────
-  'Anatomy':                          { bg: '#682727', bgDark: '#4A1717', contrast: 11.01 },
-  'Physiology':                       { bg: '#256538', bgDark: '#164624', contrast: 7.01 },
-  'Biochemistry':                     { bg: '#4D2768', bgDark: '#35174A', contrast: 11.63 },
-  'Pathology':                        { bg: '#615924', bgDark: '#423C15', contrast: 7.09 },
-  'Pharmacology':                     { bg: '#275D68', bgDark: '#17414A', contrast: 7.36 },
-  'Microbiology':                     { bg: '#68274A', bgDark: '#4A1733', contrast: 10.62 },
-  'Forensic Medicine':                { bg: '#336124', bgDark: '#204215', contrast: 7.30 },
-  'Community Medicine':               { bg: '#292768', bgDark: '#19174A', contrast: 13.25 },
-  'Behavioral Sciences':              { bg: '#683D27', bgDark: '#4A2817', contrast: 9.19 },
-  'Medical Ethics & Professionalism': { bg: '#24614A', bgDark: '#154231', contrast: 7.28 },
-  'Epidemiology & Biostatistics':     { bg: '#632768', bgDark: '#46174A', contrast: 10.39 },
+  'Anatomy':                          { bg: '#863232', bgDark: '#692121', contrast: 8.35 },
+  'Physiology':                       { bg: '#308349', bgDark: '#206534', contrast: 4.7 },
+  'Biochemistry':                     { bg: '#633286', bgDark: '#4B2169', contrast: 9.01 },
+  'Pathology':                        { bg: '#7F742F', bgDark: '#61581F', contrast: 4.73 },
+  'Pharmacology':                     { bg: '#327886', bgDark: '#215D69', contrast: 5.04 },
+  'Microbiology':                     { bg: '#86325F', bgDark: '#692148', contrast: 7.97 },
+  'Forensic Medicine':                { bg: '#437F2F', bgDark: '#2F611F', contrast: 4.87 },
+  'Community Medicine':               { bg: '#353286', bgDark: '#232169', contrast: 10.76 },
+  'Behavioral Sciences':              { bg: '#864E32', bgDark: '#693921', contrast: 6.67 },
+  'Medical Ethics & Professionalism': { bg: '#2F7F61', bgDark: '#1F6148', contrast: 4.85 },
+  'Epidemiology & Biostatistics':     { bg: '#7F3286', bgDark: '#642169', contrast: 7.77 },
 
   // ── Paper II — Applied & Specialty ──────────────────────────────────────
-  'Surgery & Allied':                         { bg: '#274768', bgDark: '#17304A', contrast: 9.60 },
-  'Anesthesia':                                { bg: '#682734', bgDark: '#4A1722', contrast: 10.89 },
-  'Applied Physiology':                       { bg: '#25652B', bgDark: '#16461A', contrast: 7.06 },
-  'Applied Pathology':                        { bg: '#3F2768', bgDark: '#2A174A', contrast: 12.34 },
-  'Applied Pharmacology':                     { bg: '#685227', bgDark: '#4A3917', contrast: 7.43 },
-  'Applied Biochemistry':                     { bg: '#24615E', bgDark: '#154240', contrast: 7.13 },
-  'Clinical Anatomy':                         { bg: '#682758', bgDark: '#4A173D', contrast: 10.40 },
-  'Obstetrics & Gynecology':                  { bg: '#406124', bgDark: '#294215', contrast: 7.11 },
-  'Pediatrics':                               { bg: '#273168', bgDark: '#17204A', contrast: 12.17 },
-  'ENT':                                      { bg: '#682F27', bgDark: '#4A1E17', contrast: 10.37 },
-  'Ophthalmology':                            { bg: '#24613D', bgDark: '#154228', contrast: 7.36 },
-  'Immunology':                               { bg: '#552768', bgDark: '#3B174A', contrast: 11.19 },
-  'Radiology (Imaging Basics)':               { bg: '#595921', bgDark: '#3A3A12', contrast: 7.30 },
-  'Dermatology (Basic Sciences)':             { bg: '#275568', bgDark: '#173B4A', contrast: 8.12 },
-  'Emergency Medicine / Critical Care Basics':{ bg: '#682742', bgDark: '#4A172C', contrast: 10.73 },
-  'Cardiology':                               { bg: '#2D6525', bgDark: '#1C4616', contrast: 7.00 },
-  'Neurology':                                { bg: '#322768', bgDark: '#20174A', contrast: 12.92 },
-  'Pulmonology':                              { bg: '#684527', bgDark: '#4A2F17', contrast: 8.50 },
-  'Gastroenterology':                         { bg: '#246152', bgDark: '#154237', contrast: 7.22 },
-  'Nephrology':                               { bg: '#682765', bgDark: '#4A1747', contrast: 10.16 },
-  'Endocrinology':                            { bg: '#68272C', bgDark: '#4A171B', contrast: 10.96 },
-  'Urology':                                  { bg: '#256433', bgDark: '#164620', contrast: 7.12 },
-  'Orthopedics':                              { bg: '#482768', bgDark: '#31174A', contrast: 11.89 },
-  'Oncology / Medical Oncology':              { bg: '#495D22', bgDark: '#303E14', contrast: 7.31 },
+  'Surgery & Allied':                          { bg: '#325B86', bgDark: '#214469', contrast: 7.06 },
+  'Anesthesia':                                { bg: '#863243', bgDark: '#69212F', contrast: 8.23 },
+  'Applied Physiology':                        { bg: '#308338', bgDark: '#206526', contrast: 4.74 },
+  'Applied Pathology':                         { bg: '#513286', bgDark: '#3B2169', contrast: 9.77 },
+  'Applied Pharmacology':                      { bg: '#866932', bgDark: '#695121', contrast: 5.15 },
+  'Applied Biochemistry':                      { bg: '#2F7F7B', bgDark: '#1F615E', contrast: 4.73 },
+  'Clinical Anatomy':                          { bg: '#863271', bgDark: '#692157', contrast: 7.75 },
+  'Obstetrics & Gynecology':                   { bg: '#547F2F', bgDark: '#3D611F', contrast: 4.72 },
+  'Pediatrics':                                { bg: '#323F86', bgDark: '#212C69', contrast: 9.59 },
+  'ENT':                                       { bg: '#863C32', bgDark: '#692A21', contrast: 7.76 },
+  'Ophthalmology':                             { bg: '#2F7F50', bgDark: '#1F613A', contrast: 4.92 },
+  'Immunology':                                { bg: '#6D3286', bgDark: '#542169', contrast: 8.57 },
+  'Radiology (Imaging Basics)':                { bg: '#77772C', bgDark: '#59591C', contrast: 4.71 },
+  'Dermatology (Basic Sciences)':              { bg: '#326D86', bgDark: '#215469', contrast: 5.73 },
+  'Emergency Medicine / Critical Care Basics': { bg: '#863255', bgDark: '#69213F', contrast: 8.07 },
+  'Cardiology':                                { bg: '#3A8330', bgDark: '#286520', contrast: 4.7 },
+  'Neurology':                                 { bg: '#403286', bgDark: '#2D2169', contrast: 10.4 },
+  'Pulmonology':                               { bg: '#865932', bgDark: '#694221', contrast: 6.02 },
+  'Gastroenterology':                          { bg: '#2F7F6B', bgDark: '#1F6151', contrast: 4.81 },
+  'Nephrology':                                { bg: '#863282', bgDark: '#692166', contrast: 7.52 },
+  'Endocrinology':                             { bg: '#863239', bgDark: '#692126', contrast: 8.3 },
+  'Urology':                                   { bg: '#308242', bgDark: '#20652F', contrast: 4.78 },
+  'Orthopedics':                               { bg: '#5D3286', bgDark: '#452169', contrast: 9.27 },
+  'Oncology / Medical Oncology':               { bg: '#607B2D', bgDark: '#485D1E', contrast: 4.81 },
 
   // ── Clinical Practice ────────────────────────────────────────────────
-  'Medicine (Clinical Vignettes)': { bg: '#273F68', bgDark: '#172A4A', contrast: 10.51 },
+  'Medicine (Clinical Vignettes)': { bg: '#325186', bgDark: '#213B69', contrast: 7.9 },
 }
 
 /** Neutral fallback for any subject that somehow isn't in the map above
  *  (keeps rendering readable/on-brand rather than crashing or going
  *  transparent if SUBJECTS ever gains an entry before this file is updated). */
-export const SUBJECT_COLOR_FALLBACK: SubjectColor = { bg: '#334155', bgDark: '#1E293B', contrast: 9.73 }
+export const SUBJECT_COLOR_FALLBACK: SubjectColor = { bg: '#42546E', bgDark: '#2C3D56', contrast: 7.71 }
