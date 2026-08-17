@@ -52,18 +52,11 @@ export default async function DashboardPage() {
     p_user_id: user.id,
   }) as { data: SubjectStat[] | null }
 
-  // Total size of the question bank per subject (not this user's attempt
-  // history -- see get_subject_question_counts() migration). questions has
-  // no SELECT policy for students at all, so this has to go through a
-  // SECURITY DEFINER RPC that only ever returns subject + a count, never
-  // question_text/correct_answer/explanation.
-  const { data: subjectCountsRaw } = await supabase.rpc('get_subject_question_counts') as {
-    data: { subject: string; question_count: number }[] | null
-  }
-  const subjectCountMap: Record<string, number> = {}
-  subjectCountsRaw?.forEach((s) => {
-    subjectCountMap[s.subject] = s.question_count
-  })
+  // NOTE: this used to also fetch get_subject_question_counts() (total
+  // size of the question bank per subject) to show a "N questions" badge
+  // on each subject card. Removed deliberately -- students should not see
+  // how many questions exist behind a subject (a low count can read as
+  // "this app is incomplete"), and the RPC call served no other purpose.
 
   const totalAttempts = totalAttemptsCount ?? 0
   const totalCorrectAll = subjectStats?.reduce((acc, s) => acc + s.total_correct, 0) ?? 0
@@ -211,23 +204,23 @@ export default async function DashboardPage() {
                 // history (subjectMap, from get_user_dashboard_stats) --
                 // null when they haven't attempted this subject yet, so
                 // the badge only ever appears once there's real data to
-                // show. Previously the question count was ONLY visible via
-                // the title="" hover tooltip, which never shows on a touch
-                // device -- both are now shown directly on the card.
+                // show. Question-bank size is deliberately NOT surfaced to
+                // students (was briefly shown here, removed per request --
+                // how many questions exist behind a subject isn't
+                // information students should see, e.g. a low count on a
+                // subject could read as "this app is incomplete").
                 const stat = subjectMap[subject]
                 const pct = stat && stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : null
-                const qCount = subjectCountMap[subject] ?? 0
                 return (
                   <Link
                     key={subject}
                     href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
-                    title={`${qCount} questions${pct !== null ? ` · ${pct}% mastery` : ''}`}
+                    title={pct !== null ? `${pct}% mastery` : undefined}
                     className="subject-pill"
                     style={subjectPillStyle(subject)}
                   >
                     <span className="subject-pill-name">{subject}</span>
                     <span className="subject-pill-meta">
-                      <span className="subject-pill-count">{qCount} Qs</span>
                       {pct !== null && (
                         <span className={`subject-pill-badge${pct >= 70 ? ' strong' : pct >= 50 ? ' mid' : ' weak'}`}>
                           {pct}%

@@ -460,19 +460,12 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   font-weight: 700;
   line-height: 1.25;
 }
-/* Question count + mastery badge -- previously only available via the
-   title="" hover tooltip, which is invisible on touch devices. Now shown
-   directly on every card so mobile students can see it too. */
+/* Mastery badge -- the student's own accuracy in this subject. Deliberately
+   does NOT show question-bank size (see dashboard/page.tsx). */
 .subject-pill-meta {
   display: flex;
   align-items: center;
   gap: 6px;
-}
-.subject-pill-count {
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.75);
-  letter-spacing: 0.02em;
 }
 .subject-pill-badge {
   font-size: 0.6rem;
