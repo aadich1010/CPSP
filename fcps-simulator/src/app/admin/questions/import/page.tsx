@@ -77,7 +77,13 @@ export default function ImportQuestionsPage() {
     'anaesthesia': 'Anesthesia',
     'anaesthesiology': 'Anesthesia',
     'anesthesiology': 'Anesthesia',
-    'general surgery': 'General Surgery',
+    // 'Surgery' and 'General Surgery' were merged into one subject
+    // ('Surgery & Allied'); both legacy spellings are kept as aliases so an
+    // older JSON batch tagged with either one still lands on the merged card
+    // instead of silently re-creating an orphaned subject.
+    'surgery': 'Surgery & Allied',
+    'general surgery': 'Surgery & Allied',
+    'surgery and allied': 'Surgery & Allied',
     'paediatrics': 'Pediatrics',
     'gynaecology': 'Obstetrics & Gynecology',
     'obstetrics & gynaecology': 'Obstetrics & Gynecology',
@@ -104,7 +110,7 @@ export default function ImportQuestionsPage() {
     if (lower.includes('cancer') || lower.includes('tumor') || lower.includes('malignant')) return 'Pathology'
     if (lower.includes('enzyme') || lower.includes('protein') || lower.includes('glucose')) return 'Biochemistry'
     if (lower.includes('anesthesia') || lower.includes('anaesthesia') || lower.includes('intubation') || lower.includes('sedation')) return 'Anesthesia'
-    if (lower.includes('surgery') || lower.includes('surgical') || lower.includes('operative') || lower.includes('incision')) return 'General Surgery'
+    if (lower.includes('surgery') || lower.includes('surgical') || lower.includes('operative') || lower.includes('incision')) return 'Surgery & Allied'
     return 'Miscellaneous'
   }
 

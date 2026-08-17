@@ -31,40 +31,6 @@
  * 'Medicine (Clinical Vignettes)' (see 20260811240000_rename_medicine_to_
  * clinical_vignettes.sql) and placed in their own "Clinical Practice" group
  * rather than forced into a Paper I/II basic-science card.
- *
- * 2026-08-15 cleanup: a second, larger 'General' bucket (809 questions, same
- * shape as the old 'Medicine' bucket -- an unsorted grab-bag spanning every
- * specialty) was read question-by-question and reassigned to the subject its
- * content actually matches. Six severely OCR-garbled rows were left tagged
- * 'General' because their text is unreadable, not because they lack a
- * subject -- see the admin question list filtered to 'General' to find and
- * fix/delete them by hand.
- *
- * The same pass found ~20 near-duplicate/typo'd subject strings already
- * sitting in the questions table that never matched any entry in this file
- * (e.g. 'Oncology' and 'Oncology/Medical Oncology' next to this file's
- * 'Oncology / Medical Oncology', or 'Obstetrics' next to 'Obstetrics &
- * Gynecology') -- because get_exam_questions() and every dropdown/card here
- * match on the *exact* string, those questions were invisible to students no
- * matter which subject they picked. All were folded into their matching
- * canonical entry below (narrow anaesthesia-subspecialty tags folded into
- * 'Anesthesia', narrow basic-science splits like Histology/Embryology/
- * Neuroanatomy folded into 'Anatomy', Cell Biology/Genetics into
- * 'Biochemistry', Neurophysiology into 'Physiology', Trauma into 'Emergency
- * Medicine / Critical Care Basics', Vascular Surgery into 'General Surgery').
- * Endocrinology, Urology, and Orthopedics had real, substantial question
- * banks (120-150+ each) with no reasonable existing home -- comparable in
- * size to Cardiology/Neurology/ENT/Ophthalmology, which already have their
- * own cards -- so they were added below as first-class subjects instead of
- * being force-merged into an unrelated bucket.
- *
- * TAKEAWAY FOR FUTURE IMPORTS: any question inserted with a `subject` value
- * that is not byte-for-byte one of the strings in SUBJECTS below will render
- * nowhere in the student-facing app (not on the dashboard cards, not in the
- * exam-setup subject picker, not in get_subject_question_counts()) even
- * though it's sitting in the database. Validate new `subject` values against
- * this file at insert time -- see validate-question.ts -- rather than
- * discovering the mismatch later as a phantom 'General' bucket.
  */
 export const SUBJECTS = [
   // ── Paper I — General Basic Sciences ──────────────────────────────────
@@ -81,10 +47,11 @@ export const SUBJECTS = [
   'Epidemiology & Biostatistics',
 
   // ── Paper II — Applied & Specialty ────────────────────────────────────
-  // 'Surgery' and 'General Surgery' were originally two separate cards --
-  // merged into one per explicit request (they were confusingly similar
-  // on the dashboard). See 20260817000000_merge_surgery_subjects.sql for
-  // the matching DB migration that moved every existing question over.
+  // 'Surgery' and 'General Surgery' used to be two separate entries (and so
+  // two separate dashboard cards for what is one subject). Merged into
+  // 'Surgery & Allied' -- see supabase/migrations/20260817000000_merge_
+  // surgery_subjects.sql, which moved every question from both old names
+  // onto the merged one.
   'Surgery & Allied',
   'Anesthesia',
   'Applied Physiology',

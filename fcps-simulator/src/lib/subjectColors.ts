@@ -48,7 +48,7 @@ export const SUBJECT_COLORS: Record<string, SubjectColor> = {
   'Epidemiology & Biostatistics':     { bg: '#632768', bgDark: '#46174A', contrast: 10.39 },
 
   // ── Paper II — Applied & Specialty ──────────────────────────────────────
-  'Surgery & Allied':                         { bg: '#515D22', bgDark: '#353E14', contrast: 7.15 },
+  'Surgery & Allied':                         { bg: '#274768', bgDark: '#17304A', contrast: 9.60 },
   'Anesthesia':                                { bg: '#682734', bgDark: '#4A1722', contrast: 10.89 },
   'Applied Physiology':                       { bg: '#25652B', bgDark: '#16461A', contrast: 7.06 },
   'Applied Pathology':                        { bg: '#3F2768', bgDark: '#2A174A', contrast: 12.34 },
