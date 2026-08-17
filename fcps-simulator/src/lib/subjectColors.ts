@@ -48,8 +48,7 @@ export const SUBJECT_COLORS: Record<string, SubjectColor> = {
   'Epidemiology & Biostatistics':     { bg: '#632768', bgDark: '#46174A', contrast: 10.39 },
 
   // ── Paper II — Applied & Specialty ──────────────────────────────────────
-  'Surgery':                                  { bg: '#515D22', bgDark: '#353E14', contrast: 7.15 },
-  'General Surgery':                          { bg: '#274768', bgDark: '#17304A', contrast: 9.60 },
+  'Surgery & Allied':                         { bg: '#515D22', bgDark: '#353E14', contrast: 7.15 },
   'Anesthesia':                                { bg: '#682734', bgDark: '#4A1722', contrast: 10.89 },
   'Applied Physiology':                       { bg: '#25652B', bgDark: '#16461A', contrast: 7.06 },
   'Applied Pathology':                        { bg: '#3F2768', bgDark: '#2A174A', contrast: 12.34 },
@@ -69,6 +68,9 @@ export const SUBJECT_COLORS: Record<string, SubjectColor> = {
   'Pulmonology':                              { bg: '#684527', bgDark: '#4A2F17', contrast: 8.50 },
   'Gastroenterology':                         { bg: '#246152', bgDark: '#154237', contrast: 7.22 },
   'Nephrology':                               { bg: '#682765', bgDark: '#4A1747', contrast: 10.16 },
+  'Endocrinology':                            { bg: '#68272C', bgDark: '#4A171B', contrast: 10.96 },
+  'Urology':                                  { bg: '#256433', bgDark: '#164620', contrast: 7.12 },
+  'Orthopedics':                              { bg: '#482768', bgDark: '#31174A', contrast: 11.89 },
   'Oncology / Medical Oncology':              { bg: '#495D22', bgDark: '#303E14', contrast: 7.31 },
 
   // ── Clinical Practice ────────────────────────────────────────────────

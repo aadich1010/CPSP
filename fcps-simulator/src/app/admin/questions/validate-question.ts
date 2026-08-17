@@ -7,6 +7,8 @@
 // it's split into its own ordinary module, which also makes it trivially
 // unit-testable without mocking Supabase or Next.js internals.
 
+import { SUBJECTS } from '@/lib/subjects'
+
 export type QuestionInput = {
   question_text:  string
   option_a:       string
@@ -46,6 +48,21 @@ export function validateQuestion(q: QuestionInput, index?: number): string | nul
     return `${where}: options A-D are all required.`
   }
   if (!q.subject?.trim()) return `${where}: subject is required.`
+  // Every screen that lists/filters/counts questions (dashboard cards, exam
+  // setup, admin list, get_subject_question_counts()) matches `subject`
+  // against this exact list of strings. A subject that's almost right --
+  // extra/missing whitespace, a typo, a slash instead of ' / ', a name that
+  // isn't on the list at all -- doesn't error here or anywhere downstream;
+  // it just silently never appears to a student under any subject. That's
+  // exactly how ~1,860 questions (an 'Oncology' vs 'Oncology / Medical
+  // Oncology' split, a whole untagged 'General' bucket, several subjects
+  // like 'Endocrinology' with no matching card at all, ...) went missing
+  // from the app in August 2026 despite being in the database the whole
+  // time. Reject anything that isn't byte-for-byte one of SUBJECTS instead
+  // of letting it through and failing invisibly later.
+  if (!(SUBJECTS as readonly string[]).includes(q.subject.trim())) {
+    return `${where}: "${q.subject}" is not a recognized subject. Pick one from the subject dropdown, or add it to src/lib/subjects.ts first if it's a genuinely new subject.`
+  }
 
   const answer = q.correct_answer?.trim().toUpperCase()
   if (!answer || !['A', 'B', 'C', 'D', 'E'].includes(answer)) {

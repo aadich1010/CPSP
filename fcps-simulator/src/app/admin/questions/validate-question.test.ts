@@ -50,6 +50,34 @@ describe('validateQuestion', () => {
     expect(validateQuestion(validQuestion({ subject: '' }))).toMatch(/subject is required/i)
   })
 
+  // Regression coverage for the August 2026 incident: ~1,860 questions were
+  // sitting in the database under subject strings that didn't byte-for-byte
+  // match src/lib/subjects.ts (typos, missing spaces around '/', genuinely
+  // new subjects never added to the list, or a plain 'General' catch-all),
+  // and every one of them was invisible to students on every subject
+  // card/filter despite being fully graded, explained content. This gate is
+  // what stops that from happening again silently.
+  it.each([
+    'Oncology',                    // missing '/ Medical Oncology' half
+    'Oncology/Medical Oncology',   // missing spaces around the slash
+    'Obstetrics',                  // missing '& Gynecology'
+    'General',                     // not a real subject at all
+    'Anaesthesia',                 // British spelling, not the canonical entry
+  ])('rejects a subject not in the canonical list: %j', (bad) => {
+    expect(validateQuestion(validQuestion({ subject: bad }))).toMatch(/not a recognized subject/i)
+  })
+
+  it('trims incidental whitespace before checking the subject, same as other fields', () => {
+    expect(validateQuestion(validQuestion({ subject: '  Anatomy  ' }))).toBeNull()
+  })
+
+  it('accepts every subject in the canonical list, including the newly added specialty ones', () => {
+    expect(validateQuestion(validQuestion({ subject: 'Endocrinology' }))).toBeNull()
+    expect(validateQuestion(validQuestion({ subject: 'Urology' }))).toBeNull()
+    expect(validateQuestion(validQuestion({ subject: 'Orthopedics' }))).toBeNull()
+    expect(validateQuestion(validQuestion({ subject: 'Oncology / Medical Oncology' }))).toBeNull()
+  })
+
   it.each(['', 'F', '1', 'AA'])(
     'rejects correct_answer %j when it is not A-E',
     (bad) => {
