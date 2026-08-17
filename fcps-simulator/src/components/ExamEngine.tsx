@@ -392,10 +392,11 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
 
   return (
     <div className="h-screen w-screen overflow-hidden no-select" style={{ display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
-      {/* Only mounted for the ACTIVE exam, not the result screen -- the
-          result screen's PrintableReport deliberately needs printing to
-          keep working, and these unmount/clean up automatically once
-          `submitted` flips and this branch stops rendering. */}
+      {/* Mounted here for the ACTIVE exam; unmounts automatically once
+          `submitted` flips and this branch stops rendering. The review
+          screen isn't left unprotected after that -- PremiumResultScreen
+          mounts its own <AntiTheft allowPrint /> so its "Print Result"
+          button keeps working. */}
       <AntiTheft />
       <ForensicWatermark userEmail={candidateEmail || ''} userName={candidateName || ''} />
       <header className="exam-header" style={{ flexShrink: 0, background: '#ffffff', borderBottom: '2px solid #10B981', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 2px 12px rgba(13,148,136,0.08)' }}>

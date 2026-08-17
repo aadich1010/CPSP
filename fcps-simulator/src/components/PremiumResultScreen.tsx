@@ -5,6 +5,8 @@ import { BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer, Tooltip, LineCh
 import { createClient } from "@/lib/supabase/client";
 import PrintableReport from "./PrintableReport";
 import CelebrationFx from "./vvip/CelebrationFx";
+import AntiTheft from "./AntiTheft";
+import ForensicWatermark from "./ForensicWatermark";
 
 /* ── Types ─────────────────────────────────────── */
 import Icon from '@/design-system/Icon';
@@ -326,6 +328,18 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
       />
 
       <div className="rs-root">
+        {/* ExamEngine's own <AntiTheft /> unmounts the instant `submitted`
+            flips and this screen takes over, so review was previously left
+            completely unprotected -- copy/right-click/screenshot-adjacent
+            shortcuts all worked again the moment a student saw their
+            answers. allowPrint skips only the blanket print-hiding rule
+            (PrintableReport already handles print visibility on its own);
+            everything else (copy, right-click, keydown, blur-shield,
+            text-select) stays active through review same as during the
+            exam itself. ForensicWatermark makes any capture that still
+            gets through traceable to this candidate. */}
+        <AntiTheft allowPrint />
+        <ForensicWatermark userEmail={candidateEmail || ''} userName={candidateName || ''} />
         {showCelebration && <CelebrationFx />}
 
         {/* Header */}

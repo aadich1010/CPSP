@@ -16,8 +16,16 @@ import { useEffect } from 'react'
  * Combined with ForensicWatermark (renders the logged-in user's name/email
  * across the screen), any capture that DOES get through is traceable back
  * to the account that took it -- deterrence, not prevention.
+ *
+ * Mounted in three places: dashboard/layout.tsx (every /dashboard/* page),
+ * ExamEngine.tsx (the active exam screen, which lives outside that layout),
+ * and PremiumResultScreen.tsx (the post-submit review screen -- pass
+ * allowPrint there, since the review screen's "Print Result" button
+ * legitimately needs window.print() to still work; PrintableReport already
+ * hides everything under .rs-root during print on its own, so this is only
+ * about not layering a second, more aggressive print-hiding rule on top).
  */
-export default function AntiTheft() {
+export default function AntiTheft({ allowPrint = false }: { allowPrint?: boolean } = {}) {
   useEffect(() => {
     // Block right-click
     const handleContextMenu = (e: MouseEvent) => e.preventDefault()
@@ -79,8 +87,13 @@ export default function AntiTheft() {
     document.addEventListener('keydown',     handleKeyDown)
     document.addEventListener('dragstart',   handleDragStart)
 
-    // Disable text selection on question area
+    // Disable text selection everywhere this is mounted. webkitTouchCallout
+    // additionally kills the iOS/Android long-press "Copy / Look Up" bubble,
+    // which isn't blocked by user-select alone and previously only applied
+    // in installed-PWA mode (see globals.css) -- so a student in an ordinary
+    // mobile browser tab could still long-press to copy question text.
     document.documentElement.style.webkitUserSelect = 'none'
+    ;(document.documentElement.style as unknown as { webkitTouchCallout: string }).webkitTouchCallout = 'none'
 
     return () => {
       document.removeEventListener('contextmenu', handleContextMenu)
@@ -91,9 +104,15 @@ export default function AntiTheft() {
       window.removeEventListener('focus', hideShield)
       document.removeEventListener('visibilitychange', handleVisibility)
       document.documentElement.style.webkitUserSelect = ''
+      ;(document.documentElement.style as unknown as { webkitTouchCallout: string }).webkitTouchCallout = ''
       shield.remove()
     }
   }, [])
+
+  // allowPrint skips ONLY this blanket print-hiding rule -- every other
+  // protection above (copy/right-click/keydown/drag/blur-shield/select)
+  // still applies. See PremiumResultScreen.tsx.
+  if (allowPrint) return null
 
   return (
     <style>{`
