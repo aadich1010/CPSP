@@ -388,7 +388,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
   }
 
   const pctTime   = (timeLeft / timeLimitSeconds) * 100
-  const timeColor = timeLeft < 300 ? '#ef4444' : timeLeft < 600 ? '#f59e0b' : '#0d9488'
+  const timeColor = timeLeft < 300 ? '#ef4444' : timeLeft < 600 ? '#f59e0b' : '#10B981'
 
   return (
     <div className="h-screen w-screen overflow-hidden no-select" style={{ display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
@@ -398,16 +398,16 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
           `submitted` flips and this branch stops rendering. */}
       <AntiTheft />
       <ForensicWatermark userEmail={candidateEmail || ''} userName={candidateName || ''} />
-      <header className="exam-header" style={{ flexShrink: 0, background: '#ffffff', borderBottom: '2px solid #0d9488', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 2px 12px rgba(13,148,136,0.08)' }}>
+      <header className="exam-header" style={{ flexShrink: 0, background: '#ffffff', borderBottom: '2px solid #10B981', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 2px 12px rgba(13,148,136,0.08)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#0d9488', boxShadow: '0 0 0 3px rgba(13,148,136,0.15)' }} />
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981', boxShadow: '0 0 0 3px rgba(13,148,136,0.15)' }} />
           <div>
             <div style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
               {subject} · {mode === 'practice' ? 'Practice Mode' : 'Exam Mode'}
             </div>
             <div style={{ fontSize: '0.78rem', color: '#0f172a', fontWeight: 800, lineHeight: 1 }}>
               Q{currentIndex + 1} <span style={{ color: '#94a3b8', fontWeight: 500 }}>of {questions.length}</span>
-              &nbsp;·&nbsp;<span style={{ color: '#0d9488' }}>{answered}</span> answered
+              &nbsp;·&nbsp;<span style={{ color: '#10B981' }}>{answered}</span> answered
               &nbsp;·&nbsp;<span style={{ color: '#f59e0b' }}>{unanswered}</span> remaining
             </div>
           </div>
@@ -426,8 +426,8 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
           className="btn btn-ghost btn-sm"
           title="Switch question language between English and Roman Urdu"
           style={{
-            border: showRoman ? '1.5px solid #0d9488' : '1.5px solid #e2e8f0',
-            color: showRoman ? '#0d9488' : '#64748b',
+            border: showRoman ? '1.5px solid #10B981' : '1.5px solid #e2e8f0',
+            color: showRoman ? '#10B981' : '#64748b',
             fontWeight: 700,
           }}
         >
@@ -447,9 +447,9 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
       <div className="exam-layout">
         <div className="exam-main">
           <div className="animate-fade-in" key={currentIndex} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', gap: 6 }}>
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderLeft: '4px solid #0d9488', borderRadius: 12, padding: '12px 16px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', flexShrink: 0, maxHeight: '34vh', overflowY: 'auto' }}>
-              <div style={{ fontSize: '0.58rem', fontWeight: 800, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#0d9488', display: 'inline-block' }} />
+            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderLeft: '4px solid #10B981', borderRadius: 12, padding: '12px 16px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', flexShrink: 0, maxHeight: '34vh', overflowY: 'auto' }}>
+              <div style={{ fontSize: '0.58rem', fontWeight: 800, color: '#10B981', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
                 Question {currentIndex + 1}
               </div>
               <p style={{ fontSize: '0.88rem', color: '#0f172a', lineHeight: 1.55, fontWeight: 600, margin: 0 }}>
@@ -464,7 +464,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
               }).map((label) => (
                 <button key={label} className={getOptionClass(label)} onClick={() => selectAnswer(label)} disabled={submitted}
                   style={{ padding: '8px 14px', fontSize: '0.83rem', minHeight: 'unset', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ minWidth: 26, height: 26, background: 'rgba(13,148,136,0.12)', border: '1.5px solid rgba(13,148,136,0.25)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: '#0d9488', flexShrink: 0 }}>
+                  <span style={{ minWidth: 26, height: 26, background: 'rgba(13,148,136,0.12)', border: '1.5px solid rgba(13,148,136,0.25)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: '#10B981', flexShrink: 0 }}>
                     {label}
                   </span>
                   <span style={{ lineHeight: 1.4 }}>{romanOr(getOptionText(currentQ, label), getRomanOptionText(currentQ, label))}</span>
@@ -474,7 +474,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
 
             {(mode === 'practice' && showExplain[currentIndex] && answers[currentIndex]) && (
               <div style={{ padding: '8px 12px', background: 'rgba(13,148,136,0.07)', border: '1px solid rgba(13,148,136,0.2)', borderRadius: 10, flexShrink: 0 }}>
-                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#0d9488', marginBottom: 3 }}><Icon name="info" /> Explanation</div>
+                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#10B981', marginBottom: 3 }}><Icon name="info" /> Explanation</div>
                 <p style={{ fontSize: '0.74rem', color: '#475569', lineHeight: 1.5, margin: 0 }}>
                   {romanOr(currentQ.explanation, currentQ.roman_urdu_explanation) || 'No explanation provided.'}
                 </p>

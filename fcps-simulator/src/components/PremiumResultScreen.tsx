@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid, PieChart, Pie } from "recharts";
 import { createClient } from "@/lib/supabase/client";
 import PrintableReport from "./PrintableReport";
+import CelebrationFx from "./vvip/CelebrationFx";
 
 /* ── Types ─────────────────────────────────────── */
 import Icon from '@/design-system/Icon';
@@ -36,20 +37,20 @@ interface Props {
 
 /* ── Styles (scoped) ────────────────────────────── */
 const S = `
-.rs-root{height:100vh;width:100vw;display:flex;flex-direction:column;background:#f0fdfa;color:#0f172a;font-family:'Inter',system-ui,sans-serif;overflow:hidden}
-.rs-header{flex-shrink:0;height:52px;background:#ffffff;border-bottom:2px solid #0d9488;display:flex;align-items:center;justify-content:space-between;padding:0 28px;box-shadow:0 2px 12px rgba(13,148,136,0.08)}
+.rs-root{position:relative;height:100vh;width:100vw;display:flex;flex-direction:column;background:#f0fdfa;color:#0f172a;font-family:'Inter',system-ui,sans-serif;overflow:hidden}
+.rs-header{flex-shrink:0;height:52px;background:#ffffff;border-bottom:2px solid #10B981;display:flex;align-items:center;justify-content:space-between;padding:0 28px;box-shadow:0 2px 12px rgba(16,185,129,0.08)}
 .rs-logo{font-size:0.78rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#0f172a}
-.rs-logo span{color:#0d9488;margin-right:6px}
+.rs-logo span{color:#10B981;margin-right:6px}
 .rs-logo-wrap{display:flex;flex-direction:column;gap:1px}
 .rs-print-meta{font-size:0.6rem;font-weight:600;letter-spacing:0.02em;text-transform:none;color:#64748b}
-.rs-tabs{display:flex;gap:2px;background:rgba(13,148,136,0.08);border-radius:8px;padding:3px}
+.rs-tabs{display:flex;gap:2px;background:rgba(16,185,129,0.08);border-radius:8px;padding:3px}
 .rs-tab{padding:5px 16px;border-radius:6px;font-size:0.72rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#64748b;transition:all 0.2s}
-.rs-tab.active{background:#ffffff;color:#0d9488;box-shadow:0 1px 4px rgba(13,148,136,0.15)}
+.rs-tab.active{background:#ffffff;color:#10B981;box-shadow:0 1px 4px rgba(16,185,129,0.15)}
 .rs-hbtns{display:flex;gap:8px}
 .rs-btn{padding:6px 16px;border-radius:8px;font-size:0.7rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:1px solid #e2e8f0;background:#f8fafc;color:#64748b;transition:all 0.2s;text-decoration:none;display:flex;align-items:center}
-.rs-btn:hover{background:#f0fdfa;border-color:#0d9488;color:#0d9488}
-.rs-btn.primary{background:linear-gradient(135deg,#0f766e,#0d9488);border-color:#0d9488;color:white;box-shadow:0 4px 14px rgba(13,148,136,0.3)}
-.rs-btn.primary:hover{background:linear-gradient(135deg,#0d9488,#14b8a6);box-shadow:0 6px 20px rgba(13,148,136,0.4)}
+.rs-btn:hover{background:#f0fdfa;border-color:#10B981;color:#10B981}
+.rs-btn.primary{background:linear-gradient(135deg,#059669,#10B981);border-color:#10B981;color:white;box-shadow:0 4px 14px rgba(16,185,129,0.3)}
+.rs-btn.primary:hover{background:linear-gradient(135deg,#10B981,#34D399);box-shadow:0 6px 20px rgba(16,185,129,0.4)}
 .rs-btn.print{background:linear-gradient(135deg,#7c3aed,#ec4899);border-color:transparent;color:white;box-shadow:0 4px 14px rgba(124,58,237,0.3)}
 .rs-btn.print:hover{background:linear-gradient(135deg,#6d28d9,#db2777);box-shadow:0 6px 20px rgba(124,58,237,0.4)}
 /* Printing is handled entirely by PrintableReport, which renders its own
@@ -63,25 +64,31 @@ const S = `
 .rs-pie-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;justify-content:center}
 .rs-pie-legend-item{display:flex;align-items:center;gap:4px;font-size:0.6rem;font-weight:700;color:#475569}
 .rs-pie-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.rs-card{background:#ffffff;border:1px solid rgba(13,148,136,0.12);border-radius:14px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.04);transition:transform 0.2s,box-shadow 0.2s}
-.rs-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(13,148,136,0.1)}
-.rs-label{font-size:0.58rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#0d9488;margin-bottom:4px}
+.rs-card{background:#ffffff;border:1px solid rgba(16,185,129,0.12);border-radius:14px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.04);transition:transform 0.2s,box-shadow 0.2s}
+.rs-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(16,185,129,0.1)}
+.rs-label{font-size:0.58rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#10B981;margin-bottom:4px}
 .rs-val{font-size:1.8rem;font-weight:900;line-height:1;color:#0f172a}
 .rs-sub{font-size:0.65rem;color:#64748b;margin-top:2px;font-weight:500}
-/* Score card */
-.rs-score-card{grid-row:1/3;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px 16px;background:radial-gradient(ellipse at top,rgba(13,148,136,0.08) 0%,rgba(255,255,255,0) 70%),#ffffff}
-.rs-ring-wrap{position:relative;width:140px;height:140px;flex-shrink:0}
+/* Score card -- carries a permanent, subtle "VVIP" gold accent (hairline
+   top edge + serif gold-gradient percentage) borrowed from the paid-member
+   welcome modal's metal palette, see vvip/vvip-welcome-modal.css. Kept to
+   chrome/typography only -- the ring stroke and verdict pill below stay on
+   the ordinary green/red pass-fail colors so the result itself is never
+   less legible than before, just framed more richly. */
+.rs-score-card{position:relative;grid-row:1/3;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px 16px;background:radial-gradient(ellipse at top,rgba(16,185,129,0.08) 0%,rgba(255,255,255,0) 70%),#ffffff}
+.rs-score-card::before{content:'';position:absolute;top:0;left:22px;right:22px;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(217,180,91,0) 0%,#D9B45B 22%,#F5E3B3 50%,#D9B45B 78%,rgba(217,180,91,0) 100%)}
+.rs-ring-wrap{position:relative;width:140px;height:140px;flex-shrink:0;filter:drop-shadow(0 0 10px rgba(217,180,91,0.3))}
 .rs-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.rs-pct{font-size:2.2rem;font-weight:900;color:#0f172a;line-height:1}
+.rs-pct{font-family:var(--font-playfair),'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:700;font-size:2.3rem;line-height:1;background:linear-gradient(96deg,#8A6A2C 0%,#D9B45B 45%,#F5E3B3 62%,#D9B45B 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent}
 .rs-frac{font-size:0.72rem;color:#64748b;font-weight:600;margin-top:2px}
 .rs-verdict{padding:5px 14px;border-radius:20px;font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase}
-.rs-pass{background:rgba(13,148,136,0.1);color:#0f766e;border:1px solid rgba(13,148,136,0.25)}
+.rs-pass{background:rgba(16,185,129,0.1);color:#059669;border:1px solid rgba(16,185,129,0.25)}
 .rs-fail{background:rgba(239,68,68,0.08);color:#dc2626;border:1px solid rgba(239,68,68,0.2)}
 .rs-kpis{width:100%;display:flex;flex-direction:column;gap:5px}
 .rs-kpi{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f8fafc;border-radius:8px;border:1px solid #f1f5f9}
 .rs-kpi-k{font-size:0.6rem;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em}
 .rs-kpi-v{font-size:0.8rem;font-weight:800;color:#0f172a}
-.rs-kpi-v.green{color:#0f766e}.rs-kpi-v.red{color:#dc2626}.rs-kpi-v.amber{color:#d97706}.rs-kpi-v.blue{color:#0d9488}
+.rs-kpi-v.green{color:#059669}.rs-kpi-v.red{color:#dc2626}.rs-kpi-v.amber{color:#d97706}.rs-kpi-v.blue{color:#10B981}
 /* Breakdown row */
 .rs-bk{display:flex;gap:6px;width:100%}
 .rs-bk-item{flex:1;text-align:center;padding:8px 4px;border-radius:8px}
@@ -97,26 +104,26 @@ const S = `
 .rs-review{height:100%;display:flex;flex-direction:column}
 .rs-filters{flex-shrink:0;display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid #f1f5f9;background:#ffffff}
 .rs-filter{padding:4px 12px;border-radius:20px;font-size:0.65rem;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;background:#f8fafc;color:#64748b;transition:all 0.18s}
-.rs-filter.active{border-color:#0d9488;color:#0f766e;background:rgba(13,148,136,0.08)}
+.rs-filter.active{border-color:#10B981;color:#059669;background:rgba(16,185,129,0.08)}
 .rs-qlist{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:10px;background:#f0fdfa}
 .rs-qcard{background:#ffffff;border-radius:12px;padding:14px 16px;border-left:3px solid transparent;box-shadow:0 1px 6px rgba(0,0,0,0.04)}
-.rs-qcard.correct{border-left-color:#0d9488;background:#f0fdfa}
+.rs-qcard.correct{border-left-color:#10B981;background:#f0fdfa}
 .rs-qcard.wrong{border-left-color:#ef4444;background:#fff8f8}
 .rs-qcard.skipped{border-left-color:#d97706;background:#fffbeb}
 .rs-q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .rs-q-num{font-size:0.6rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em}
 .rs-q-badge{font-size:0.55rem;font-weight:800;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:0.08em}
-.rs-badge-c{background:rgba(13,148,136,0.1);color:#0f766e}
+.rs-badge-c{background:rgba(16,185,129,0.1);color:#059669}
 .rs-badge-w{background:rgba(239,68,68,0.1);color:#dc2626}
 .rs-badge-s{background:rgba(217,119,6,0.1);color:#d97706}
 .rs-q-text{font-size:0.82rem;font-weight:600;color:#1e293b;line-height:1.55;margin-bottom:10px}
 .rs-opts{display:flex;flex-direction:column;gap:4px}
 .rs-opt{display:flex;gap:8px;align-items:flex-start;padding:5px 8px;border-radius:7px;font-size:0.75rem;color:#64748b;background:#f8fafc;width:100%}
-.rs-opt.oc{background:rgba(13,148,136,0.08);color:#0f766e}.rs-opt.ow{background:rgba(239,68,68,0.08);color:#dc2626}
+.rs-opt.oc{background:rgba(16,185,129,0.08);color:#059669}.rs-opt.ow{background:rgba(239,68,68,0.08);color:#dc2626}
 .rs-opt-l{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:0.62rem;font-weight:800;flex-shrink:0;background:#e2e8f0;color:#64748b}
-.rs-opt-l.lc{background:#0d9488;color:#fff}.rs-opt-l.lw{background:#ef4444;color:#fff}
-.rs-explain{margin-top:8px;padding:8px 10px;background:rgba(13,148,136,0.05);border-radius:8px;border-left:2px solid #0d9488}
-.rs-explain-h{font-size:0.55rem;font-weight:800;color:#0d9488;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px}
+.rs-opt-l.lc{background:#10B981;color:#fff}.rs-opt-l.lw{background:#ef4444;color:#fff}
+.rs-explain{margin-top:8px;padding:8px 10px;background:rgba(16,185,129,0.05);border-radius:8px;border-left:2px solid #10B981}
+.rs-explain-h{font-size:0.55rem;font-weight:800;color:#10B981;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px}
 .rs-explain-t{font-size:0.72rem;color:#475569;line-height:1.5}
 `;
 
@@ -141,6 +148,11 @@ function calcSubjects(questions: Question[], answers: (string|null)[]) {
 
 const RING_R = 52;
 const RING_C = 2*Math.PI*RING_R;
+// A strong-enough score gets a one-time confetti/balloon burst (shared
+// CelebrationFx component, also used by the paid-member welcome modal) --
+// 85% deliberately sits well above the 60% pass mark so it reads as "you
+// did great", not just "you passed".
+const CELEBRATION_THRESHOLD = 85;
 
 /* ── Component ──────────────────────────────────── */
 export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, userId, candidateName, candidateEmail, sessionId, submittedAt }: Props) {
@@ -207,6 +219,22 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
   const wrong   = Math.max(0, total - skipped - correct);
   const pct = Math.round((correct/total)*100);
   const pass = pct >= 60;
+
+  // One-shot celebration burst for a strong score. PremiumResultScreen is
+  // mounted fresh per attempt (ExamEngine only renders it once submitted),
+  // so an empty dependency array is correct here -- pct is fixed for the
+  // lifetime of this mount, this is deliberately "fire once when this
+  // result first appears", not "re-fire whenever pct changes".
+  const [showCelebration, setShowCelebration] = useState(false);
+  useEffect(() => {
+    if (pct < CELEBRATION_THRESHOLD) return;
+    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    setShowCelebration(true);
+    const t = window.setTimeout(() => setShowCelebration(false), 4500);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const printDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const subjectData = calcSubjects(questions, answers);
   // The per-subject correct counts above come from comparing answers against
@@ -240,7 +268,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
     { name: 'Wrong',   value: wrong,   color: '#ef4444' },
     { name: 'Skipped', value: skipped, color: '#f59e0b' },
   ].filter(d => d.value > 0);
-  const RAINBOW = ['#0d9488','#6366f1','#ec4899','#f59e0b','#22c55e','#06b6d4','#a855f7','#ef4444'];
+  const RAINBOW = ['#10B981','#6366f1','#ec4899','#f59e0b','#22c55e','#06b6d4','#a855f7','#ef4444'];
 
   const historyData = history.length > 0 ? history : [{ name: 'E1', score: pct }];
   const personalAvg = historyData.length > 0
@@ -298,6 +326,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
       />
 
       <div className="rs-root">
+        {showCelebration && <CelebrationFx />}
 
         {/* Header */}
         <header className="rs-header">
@@ -332,9 +361,9 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
 
                   <div className="rs-ring-wrap">
                     <svg width={140} height={140} viewBox="0 0 140 140" style={{transform:'rotate(-90deg)'}}>
-                      <circle cx={70} cy={70} r={RING_R} fill="none" stroke="rgba(13,148,136,0.1)" strokeWidth={10}/>
+                      <circle cx={70} cy={70} r={RING_R} fill="none" stroke="rgba(16,185,129,0.1)" strokeWidth={10}/>
                       <motion.circle cx={70} cy={70} r={RING_R} fill="none"
-                        stroke={pass?'#0d9488':'#ef4444'} strokeWidth={10} strokeLinecap="round"
+                        stroke={pass?'#10B981':'#ef4444'} strokeWidth={10} strokeLinecap="round"
                         initial={{strokeDasharray:`0 ${RING_C}`}}
                         animate={{strokeDasharray:`${dashAspect} ${RING_C}`}}
                         transition={{duration:1.4,ease:'easeOut'}}/>
@@ -393,7 +422,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                             initial={{width:0}}
                             animate={{width:`${subjectDataReliable?s.pct:0}%`}}
                             transition={{delay:0.2+idx*0.07,duration:0.8}}
-                            style={{background: s===strongest?'#0d9488': s===weakest?'#ef4444': idx%2===0?'#14b8a6':'#0f766e'}}
+                            style={{background: s===strongest?'#10B981': s===weakest?'#ef4444': idx%2===0?'#34D399':'#059669'}}
                           />
                         </div>
                         <div className="rs-bar-pct">{subjectDataReliable?`${s.pct}%`:'—'}</div>
@@ -406,13 +435,13 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                     </div>
                   )}
                   {/* Personal progress insight -- based only on this student's own real data */}
-                  <div style={{marginTop:12,padding:'8px 10px',background:'rgba(13,148,136,0.06)',borderRadius:9,border:'1px solid rgba(13,148,136,0.15)'}}>
+                  <div style={{marginTop:12,padding:'8px 10px',background:'rgba(16,185,129,0.06)',borderRadius:9,border:'1px solid rgba(16,185,129,0.15)'}}>
                     <div className="rs-label" style={{marginBottom:4}}>Study Insight</div>
                     <div style={{fontSize:'0.7rem',color:'#475569',lineHeight:1.5}}>
                       {!subjectDataReliable ? (
-                        <>Your overall score is <strong style={{color:'#0d9488'}}>{pct}%</strong> ({correct}/{total} correct). Subject-level detail isn&apos;t available for this attempt.</>
+                        <>Your overall score is <strong style={{color:'#10B981'}}>{pct}%</strong> ({correct}/{total} correct). Subject-level detail isn&apos;t available for this attempt.</>
                       ) : strongest ? (
-                        <>Your strongest subject is <strong style={{color:'#0d9488'}}>{strongest.name}</strong> at <strong style={{color:'#0d9488'}}>{strongest.pct}%</strong>.</>
+                        <>Your strongest subject is <strong style={{color:'#10B981'}}>{strongest.name}</strong> at <strong style={{color:'#10B981'}}>{strongest.pct}%</strong>.</>
                       ) : (
                         <>You haven&apos;t answered any questions correctly yet — no subject can be called a strength.</>
                       )}
@@ -440,7 +469,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                         >
                           {pieData.map((d)=>(<Cell key={d.name} fill={d.color}/>))}
                         </Pie>
-                        <Tooltip contentStyle={{background:'#ffffff',border:'1px solid rgba(13,148,136,0.2)',borderRadius:8,fontSize:'0.72rem'}}/>
+                        <Tooltip contentStyle={{background:'#ffffff',border:'1px solid rgba(16,185,129,0.2)',borderRadius:8,fontSize:'0.72rem'}}/>
                       </PieChart>
                     </ResponsiveContainer>
                     <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',pointerEvents:'none'}}>
@@ -463,17 +492,17 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                   <div style={{flex:1,marginTop:8}}>
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={historyChartData} margin={{top:4,right:8,left:-24,bottom:0}}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(13,148,136,0.1)" vertical={false}/>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(16,185,129,0.1)" vertical={false}/>
                         <XAxis dataKey="name" tick={{fontSize:10,fill:'#64748b'}} axisLine={false} tickLine={false}/>
                         <YAxis tick={{fontSize:10,fill:'#64748b'}} axisLine={false} tickLine={false} domain={[0,100]}/>
-                        <Tooltip contentStyle={{background:'#ffffff',border:'1px solid rgba(13,148,136,0.2)',borderRadius:8,fontSize:'0.72rem',color:'#0f172a'}}/>
-                        <Line type="monotone" dataKey="score" stroke="#0d9488" strokeWidth={2.5} dot={{r:3,fill:'#0d9488'}} activeDot={{r:5}}/>
+                        <Tooltip contentStyle={{background:'#ffffff',border:'1px solid rgba(16,185,129,0.2)',borderRadius:8,fontSize:'0.72rem',color:'#0f172a'}}/>
+                        <Line type="monotone" dataKey="score" stroke="#10B981" strokeWidth={2.5} dot={{r:3,fill:'#10B981'}} activeDot={{r:5}}/>
                         <Line type="monotone" dataKey="avg" stroke="#475569" strokeWidth={1.5} strokeDasharray="4 4" dot={false}/>
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
                   <div style={{display:'flex',gap:12,marginTop:6}}>
-                    {[{c:'#0d9488',l:'Your Score'},{c:'#94a3b8',l:`Your Average (${personalAvg}%)`}].map(d=>(
+                    {[{c:'#10B981',l:'Your Score'},{c:'#94a3b8',l:`Your Average (${personalAvg}%)`}].map(d=>(
                       <div key={d.l} style={{display:'flex',alignItems:'center',gap:5}}>
                         <div style={{width:16,height:2,background:d.c,borderRadius:2}}/>
                         <span style={{fontSize:'0.58rem',color:'#64748b',fontWeight:600}}>{d.l}</span>
@@ -489,11 +518,11 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                     <div style={{flex:1,marginTop:4,minHeight:0}}>
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={subjectData} margin={{top:6,right:6,left:-24,bottom:0}}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(13,148,136,0.1)" vertical={false}/>
+                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(16,185,129,0.1)" vertical={false}/>
                           <XAxis dataKey="name" tick={{fontSize:9,fill:'#64748b'}} axisLine={false} tickLine={false} interval={0}
                             tickFormatter={(v:string)=>v.length>8?v.slice(0,8)+'…':v}/>
                           <YAxis tick={{fontSize:10,fill:'#64748b'}} axisLine={false} tickLine={false} domain={[0,100]}/>
-                          <Tooltip contentStyle={{background:'#ffffff',border:'1px solid rgba(13,148,136,0.2)',borderRadius:8,fontSize:'0.72rem'}}
+                          <Tooltip contentStyle={{background:'#ffffff',border:'1px solid rgba(16,185,129,0.2)',borderRadius:8,fontSize:'0.72rem'}}
                             formatter={((v: number, _n: string, p: { payload: { correct: number; total: number } }) =>
                               [`${v}% (${p.payload.correct}/${p.payload.total})`, 'Accuracy']) as never}/>
                           <Bar dataKey="pct" radius={[6,6,0,0]}>

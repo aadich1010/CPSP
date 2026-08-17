@@ -31,10 +31,15 @@ const subjectPerformance = [
   { subject: "Microbiology",  correct: 74, total: 100 },
 ];
 
+// Brand-emerald family (matches --emerald:#10B981 in globals.css) -- this
+// file used to run its own separate teal palette (#1D9E75 / #0F6E56 /
+// #9FE1CB), which read as a visibly different "brand color" from the rest
+// of the app when a student moved from the dashboard/exam screens into
+// Analytics.
 const DIFFICULTY_COLORS: Record<string, string> = {
-  Easy:   "#1D9E75",
-  Medium: "#0F6E56",
-  Hard:   "#9FE1CB",
+  Easy:   "#10B981",
+  Medium: "#059669",
+  Hard:   "#6EE7B7",
 };
 
 const radarData = subjectPerformance.map(s => ({
@@ -67,14 +72,18 @@ const radarData = subjectPerformance.map(s => ({
 */
 
 // ─── THEME ───────────────────────────────────────────────────────────────────
+// Same emerald family as DIFFICULTY_COLORS above -- kept the `teal*` key
+// names (renaming them would touch every usage below for no behavioural
+// gain) but the values now match the site-wide --emerald brand color
+// instead of this file's old standalone teal.
 const T = {
-  teal:      "#1D9E75",
-  tealDark:  "#0F6E56",
-  tealLight: "#9FE1CB",
-  tealBg:    "#E1F5EE",
+  teal:      "#10B981",
+  tealDark:  "#059669",
+  tealLight: "#6EE7B7",
+  tealBg:    "#D1FAE5",
   white:     "#FFFFFF",
   gray:      "#F7F9F8",
-  border:    "#D4EDE5",
+  border:    "#BBF0D8",
   text:      "#0B2D22",
   muted:     "#5A8A78",
 };
@@ -257,7 +266,7 @@ export default function AnalyticsDashboard({
       name:  r.difficulty,
       value: Math.round((r.correct / r.total) * 100),
       count: r.total,
-      color: DIFFICULTY_COLORS[r.difficulty] || "#0F6E56",
+      color: DIFFICULTY_COLORS[r.difficulty] || "#059669",
     }))
     .sort((a, b) => DIFF_ORDER.indexOf(a.name) - DIFF_ORDER.indexOf(b.name));
 
@@ -278,7 +287,7 @@ export default function AnalyticsDashboard({
         <div style={{ display: "flex", gap: 10, marginBottom: 10, flexShrink: 0 }}>
           <StatCard label="Total Attempts"  value={totalAttempts} sub="All time"        accent={T.teal}      />
           <StatCard label="Average Score"   value={`${avgScore}%`} sub="Last 10 quizzes" accent={T.tealDark}  />
-          <StatCard label="Pass Rate"        value={`${passRate}%`} sub="≥60% threshold"  accent="#0B8A62"     />
+          <StatCard label="Pass Rate"        value={`${passRate}%`} sub="≥60% threshold"  accent="#047857"     />
           <StatCard label="Overall Accuracy" value={`${accuracy}%`} sub="Correct answers" accent={T.tealLight} />
         </div>
 
@@ -378,7 +387,7 @@ export default function AnalyticsDashboard({
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="correct" name="Accuracy" radius={[6, 6, 0, 0]}>
                   {subjectPerformance.map((entry, i) => (
-                    <Cell key={i} fill={entry.correct >= 70 ? T.teal : entry.correct >= 60 ? "#0B8A62" : T.tealLight} />
+                    <Cell key={i} fill={entry.correct >= 70 ? T.teal : entry.correct >= 60 ? "#047857" : T.tealLight} />
                   ))}
                 </Bar>
               </BarChart>
@@ -386,7 +395,7 @@ export default function AnalyticsDashboard({
             {/* Legend */}
             <div style={{ display: "flex", gap: 14, marginTop: 6, fontSize: 11, color: T.muted, flexShrink: 0, flexWrap: "wrap" }}>
               <span><span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: T.teal, marginRight: 5 }} />≥70% Strong</span>
-              <span><span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: "#0B8A62", marginRight: 5 }} />60–69% OK</span>
+              <span><span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: "#047857", marginRight: 5 }} />60–69% OK</span>
               <span><span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: T.tealLight, marginRight: 5 }} />Below 60% — Needs work</span>
             </div>
           </Card>

@@ -4,11 +4,25 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Play, ChevronDown, ArrowLeft, ArrowRight, Check, Shuffle, X } from 'lucide-react'
+import { Play, ArrowLeft, ArrowRight, Check, Shuffle, X } from 'lucide-react'
 import Icon from '@/design-system/Icon';
 import { SUBJECT_GROUPS } from '@/lib/subjects'
 
 const MIXED_ALL = 'Mixed (All Subjects)'
+
+// Step 3 choice-cards (replaces the old native <select> dropdowns, which
+// looked out of place next to the tactile card pickers used everywhere
+// else in this wizard).
+const COUNT_CHOICES = [
+  { value: '25',  sub: '~30 min' },
+  { value: '50',  sub: '~60 min' },
+  { value: '100', sub: 'Full Mock' },
+  { value: '200', sub: 'Grand Mock' },
+]
+const MODE_CHOICES = [
+  { value: 'exam',     label: 'Exam Mode',     sub: 'No instant feedback' },
+  { value: 'practice', label: 'Practice Mode', sub: 'Instant feedback' },
+]
 
 // Demo accounts now get every subject (see 20260805000000 migration) --
 // only the 10-question cap and the fixed (non-shuffled) question set
@@ -362,49 +376,64 @@ export default function ExamSetupPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {/* Questions */}
+                {/* Questions -- tactile choice-cards instead of a native
+                    <select>, matching the card-picker feel of Steps 1/2/4. */}
                 <div>
-                  <label htmlFor="count" className="mb-2 block text-sm font-bold text-slate-700">
+                  <span className="mb-2 block text-sm font-bold text-slate-700">
                     Questions
-                  </label>
-                  <div className="relative">
-                    <select
-                      id="count"
-                      value={count}
-                      onChange={e => setCount(e.target.value)}
-                      className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 pr-10 text-sm text-slate-800 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)] cursor-pointer"
-                    >
-                      {!isPremium ? (
-                        <option value="10">10 Questions (Demo Limit)</option>
-                      ) : (
-                        <>
-                          <option value="25">25 Questions (~30 min)</option>
-                          <option value="50">50 Questions (~60 min)</option>
-                          <option value="100">100 Questions (Full Mock)</option>
-                          <option value="200">200 Questions (Grand Mock)</option>
-                        </>
-                      )}
-                    </select>
-                    <ChevronDown size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  </div>
+                  </span>
+                  {!isPremium ? (
+                    <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-2.5 text-center text-sm font-bold text-emerald-700">
+                      10 Questions <span className="font-semibold text-emerald-600/70">(Demo Limit)</span>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {COUNT_CHOICES.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setCount(opt.value)}
+                          aria-pressed={count === opt.value}
+                          className={`rounded-xl border px-3 py-2 text-center transition-all ${
+                            count === opt.value
+                              ? 'border-transparent bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_2px_10px_rgba(16,185,129,0.35)]'
+                              : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/50'
+                          }`}
+                        >
+                          <div className="text-sm font-black">{opt.value}</div>
+                          <div className={`text-[10px] font-semibold ${count === opt.value ? 'text-white/80' : 'text-slate-400'}`}>
+                            {opt.sub}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Mode */}
                 <div>
-                  <label htmlFor="mode" className="mb-2 block text-sm font-bold text-slate-700">
+                  <span className="mb-2 block text-sm font-bold text-slate-700">
                     Exam Mode
-                  </label>
-                  <div className="relative">
-                    <select
-                      id="mode"
-                      value={mode}
-                      onChange={e => setMode(e.target.value)}
-                      className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 pr-10 text-sm text-slate-800 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)] cursor-pointer"
-                    >
-                      <option value="exam">Exam Mode (no instant feedback)</option>
-                      <option value="practice">Practice Mode (instant feedback)</option>
-                    </select>
-                    <ChevronDown size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  </span>
+                  <div className="grid grid-cols-1 gap-1.5">
+                    {MODE_CHOICES.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setMode(opt.value)}
+                        aria-pressed={mode === opt.value}
+                        className={`flex items-center justify-between rounded-xl border px-4 py-2.5 text-left transition-all ${
+                          mode === opt.value
+                            ? 'border-transparent bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_2px_10px_rgba(16,185,129,0.35)]'
+                            : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/50'
+                        }`}
+                      >
+                        <span className="text-sm font-bold">{opt.label}</span>
+                        <span className={`text-[10px] font-semibold ${mode === opt.value ? 'text-white/80' : 'text-slate-400'}`}>
+                          {opt.sub}
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>

@@ -36,7 +36,12 @@
   --vvip-ink: #ece7dc;
   --vvip-muted: #948e7f;
   --vvip-hairline: rgba(217, 180, 91, 0.26);
-  --vvip-display: 'Cormorant Garamond', 'Cormorant', 'Hoefler Text', Garamond, Georgia, serif;
+  /* 'Cormorant Garamond' was never actually loaded anywhere (no next/font
+     or stylesheet @import for it), so this was silently falling back to
+     Georgia for every user. var(--font-playfair) is Playfair Display,
+     loaded app-wide via next/font/google in src/app/layout.tsx -- same
+     "premium display serif" register, and guaranteed to actually render. */
+  --vvip-display: var(--font-playfair), 'Cormorant Garamond', 'Hoefler Text', Garamond, Georgia, serif;
   --vvip-hold: 5000ms;
   --vvip-exit: 620ms;
   --vvip-timer-play: running;

@@ -78,16 +78,16 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
 
       <aside className={`sidebar shadow-lg ${mobileOpen ? 'mobile-open' : ''}`}>
       {/* Logo Section */}
-      <div className="p-6 border-b border-teal-500/10">
+      <div className="p-6 border-b border-emerald-500/10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+          <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
             <BrandMark size={22} />
           </div>
           <div>
             <div className="text-[14px] font-black text-slate-900 leading-tight uppercase tracking-tight">
               FCPS Simulator
             </div>
-            <div className="text-[9px] font-bold text-teal-600 uppercase tracking-widest">
+            <div className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">
               Part 1 CBT
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
             className={`rounded-xl p-4 border ${
               daysLeft <= 7 
                 ? 'bg-amber-50 border-amber-200 text-amber-800' 
-                : 'bg-teal-50 border-teal-100 text-teal-800'
+                : 'bg-emerald-50 border-emerald-100 text-emerald-800'
             }`}
           >
             <div className="flex items-center gap-2 mb-1">
@@ -172,7 +172,7 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
       {/* User Identity Section */}
       <div className="p-4 bg-slate-50 border-t border-slate-100">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 bg-teal-600 rounded-lg flex items-center justify-center text-white text-xs font-black">
+          <div className="w-9 h-9 bg-emerald-600 rounded-lg flex items-center justify-center text-white text-xs font-black">
             {initials}
           </div>
           <div className="overflow-hidden">

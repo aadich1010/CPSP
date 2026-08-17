@@ -140,6 +140,18 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   to   { opacity: 1; transform: translateY(0);    }
 }
 
+/* ─── FADE-IN ─────────────────────────────────────────────────
+   .animate-fade-in is referenced across 16+ pages/components (dashboard,
+   analytics, admin screens, exam engine) but no matching @keyframes ever
+   existed, so every one of those elements was hard-cutting into view with
+   no animation at all. Kept short/subtle since it fires on route-level
+   containers, not decorative elements. */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.animate-fade-in { animation: fade-in 0.35s ease-out both; }
+
 /* ─── COUNTER PING ────────────────────────────────────────────── */
 @keyframes ping-once {
   0%   { transform: scale(1);    opacity: 0.8; }
@@ -346,6 +358,13 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
 }
 .palette-btn:hover        { border-color: #10B981; color: #10B981; }
 .palette-btn.answered     { background: #f0fdf9; border-color: #10B981; color: #059669; }
+/* .answered-v2 is what ExamEngine actually applies to answered questions
+   (see the palette grid in ExamEngine.tsx) -- this class never had a rule
+   of its own, so answered questions in an active exam silently rendered
+   as plain unanswered buttons with zero visual feedback. Filled instead of
+   outlined so "answered" reads as a clearly different state from the
+   plain hover/idle button at a glance. */
+.palette-btn.answered-v2  { background: linear-gradient(135deg, #10B981, #059669); border-color: #059669; color: #ffffff; box-shadow: 0 2px 6px rgba(16,185,129,0.35); }
 .palette-btn.current      { background: #0f172a; border-color: #0f172a; color: white; box-shadow: 0 0 12px rgba(16,185,129,0.4); transform: scale(1.12); }
 .palette-btn.correct      { background: #f0fdf4; border-color: #22c55e; color: #166534; }
 .palette-btn.wrong        { background: #fef2f2; border-color: #ef4444; color: #991b1b; }
@@ -411,6 +430,7 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
    floor, not a fixed height. */
 .subject-pill {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -418,9 +438,7 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   min-height: 46px;
   border-radius: 10px;
   text-decoration: none;
-  font-size: 0.75rem;
-  font-weight: 700;
-  line-height: 1.25;
+  gap: 5px;
   color: #ffffff;
   white-space: normal;
   overflow-wrap: break-word;
@@ -437,6 +455,36 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   transform: scale(1.03);
   box-shadow: 0 4px 14px var(--pill-glow, rgba(16,185,129,0.4));
 }
+.subject-pill-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+/* Question count + mastery badge -- previously only available via the
+   title="" hover tooltip, which is invisible on touch devices. Now shown
+   directly on every card so mobile students can see it too. */
+.subject-pill-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.subject-pill-count {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.75);
+  letter-spacing: 0.02em;
+}
+.subject-pill-badge {
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+}
+.subject-pill-badge.strong { background: rgba(52,211,153,0.4); }
+.subject-pill-badge.mid    { background: rgba(251,191,36,0.4); }
+.subject-pill-badge.weak   { background: rgba(248,113,113,0.4); }
 
 /* ── BTN CLASSES (legacy pages) ─────────────────────────────── */
 .btn {
@@ -455,7 +503,7 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   white-space: nowrap;
 }
 .btn-primary {
-  background: linear-gradient(135deg, #10B981, #0d9488);
+  background: linear-gradient(135deg, #10B981, #059669);
   color: white;
   box-shadow: 0 4px 14px rgba(16,185,129,0.35);
 }

@@ -206,17 +206,37 @@ export default async function DashboardPage() {
                 gap: 8,
               }}
             >
-              {group.subjects.map((subject) => (
-                <Link
-                  key={subject}
-                  href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
-                  title={`${subjectCountMap[subject] ?? 0} questions`}
-                  className="subject-pill"
-                  style={subjectPillStyle(subject)}
-                >
-                  {subject}
-                </Link>
-              ))}
+              {group.subjects.map((subject) => {
+                // Mastery badge, computed from this student's own attempt
+                // history (subjectMap, from get_user_dashboard_stats) --
+                // null when they haven't attempted this subject yet, so
+                // the badge only ever appears once there's real data to
+                // show. Previously the question count was ONLY visible via
+                // the title="" hover tooltip, which never shows on a touch
+                // device -- both are now shown directly on the card.
+                const stat = subjectMap[subject]
+                const pct = stat && stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : null
+                const qCount = subjectCountMap[subject] ?? 0
+                return (
+                  <Link
+                    key={subject}
+                    href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
+                    title={`${qCount} questions${pct !== null ? ` · ${pct}% mastery` : ''}`}
+                    className="subject-pill"
+                    style={subjectPillStyle(subject)}
+                  >
+                    <span className="subject-pill-name">{subject}</span>
+                    <span className="subject-pill-meta">
+                      <span className="subject-pill-count">{qCount} Qs</span>
+                      {pct !== null && (
+                        <span className={`subject-pill-badge${pct >= 70 ? ' strong' : pct >= 50 ? ' mid' : ' weak'}`}>
+                          {pct}%
+                        </span>
+                      )}
+                    </span>
+                  </Link>
+                )
+              })}
             </div>
           </div>
         ))}
