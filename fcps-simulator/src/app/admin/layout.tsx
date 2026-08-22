@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { logout } from '@/app/auth/actions'
 import Icon from '@/design-system/Icon';
-import type { IconName } from '@/design-system/icon-registry';
+import AdminSidebarNav from '@/components/AdminSidebarNav'
 
 export default async function AdminLayout({
   children,
@@ -78,38 +78,10 @@ export default async function AdminLayout({
           </div>
         </div>
 
-        {/* Nav */}
-        <nav style={{ flex: 1, padding: '14px 0' }}>
-          {[
-            { href: '/admin',          label: 'Dashboard',  icon: 'analytics' },
-            { href: '/admin/analytics', label: 'Analytics', icon: 'trendUp' },
-            { href: '/admin/users',    label: 'Users',      icon: 'community' },
-            { href: '/admin/questions',label: 'Questions',  icon: 'practice' },
-            { href: '/admin/income',   label: 'Income',     icon: 'wallet' },
-            { href: '/admin/settings/payment', label: 'Payment Settings', icon: 'billing' },
-          ].map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                padding: '10px 18px',
-                color: '#64748b',
-                textDecoration: 'none',
-                fontSize: '0.87rem',
-                fontWeight: 500,
-                transition: 'all 0.2s',
-                margin: '2px 8px',
-                borderRadius: 8,
-              }}
-            >
-              <Icon name={item.icon as IconName} size="md" />
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </nav>
+        {/* Nav -- client component so it can highlight the active tab from
+            the current pathname; shares the same .sidebar-link / .active
+            "card + flash-glow" styling as the student Sidebar. */}
+        <AdminSidebarNav />
 
         {/* User */}
         <div style={{ padding: '14px 12px', borderTop: '1px solid rgba(139,92,246,0.1)' }}>

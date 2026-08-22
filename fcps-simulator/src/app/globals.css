@@ -219,26 +219,26 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   align-items: center;
   gap: 12px;
   padding: 10px 18px;
-  border-radius: 10px;
-  margin: 2px 10px;
+  border-radius: 12px;
+  margin: 4px 10px;
   color: #475569;
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s ease;
+  border: 1.5px solid rgba(148, 163, 184, 0.22);
 }
 
 .sidebar-link:hover {
   background: rgba(16, 185, 129, 0.08);
   color: #10B981;
+  border-color: rgba(16, 185, 129, 0.4);
 }
 
 .sidebar-link.active {
   background: rgba(16, 185, 129, 0.1);
   color: #059669;
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  border-left: 3px solid #10B981;
-  padding-left: 15px;
+  border: 1.5px solid rgba(16, 185, 129, 0.45);
   font-weight: 700;
   animation: flash-glow 2.2s ease-in-out infinite;
 }
