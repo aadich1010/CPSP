@@ -85,6 +85,22 @@ interface ExamEngineProps {
    *  "1 mark per correct answer, out of {questionCount}" wording exactly
    *  as before. */
   totalMarks?: number
+  /** When this attempt is one paper of a multi-paper mock (e.g. FCPS Part
+   *  1's real CPSP pattern: Paper 1 + Paper 2, each graded and passed
+   *  separately -- see exam/setup's "Full FCPS Part 1 Mock" card), this is
+   *  the URL to the next paper's session. Passed straight through to
+   *  PremiumResultScreen, which shows a "Start {nextExamLabel}" button
+   *  when set. Undefined for every normal single-paper exam, which keeps
+   *  the result screen's existing New Attempt/Exit buttons unchanged. */
+  nextExamHref?: string
+  /** Button label paired with nextExamHref, e.g. "Paper 2". */
+  nextExamLabel?: string
+  /** True for either paper of the Full FCPS Part 1 Mock (see nextExamHref
+   *  doc comment) -- adds a one-line note on the result screen that CPSP's
+   *  real exam uses a percentile system (not a fixed % pass mark) and that
+   *  both papers must be passed separately. Purely informational; doesn't
+   *  change this practice attempt's own 60%-pass-mark verdict. */
+  isFullMockPaper?: boolean
 }
 
 type Answer = string | null
@@ -208,7 +224,7 @@ function formatTime(secs: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail, shuffleAnswers = true, examLabel = 'FCPS Part 1', hasNegativeMarking = false, entryModal = false, freeNavigation = false, allowMarkForReview = false, totalMarks }: ExamEngineProps) {
+export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail, shuffleAnswers = true, examLabel = 'FCPS Part 1', hasNegativeMarking = false, entryModal = false, freeNavigation = false, allowMarkForReview = false, totalMarks, nextExamHref, nextExamLabel, isFullMockPaper = false }: ExamEngineProps) {
   // Shuffled ONCE per mount (lazy initialiser), never on re-render -- otherwise
   // the options would jump around under the student's cursor every tick of the
   // timer. Question ORDER is already randomised per attempt server-side by
@@ -501,6 +517,9 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
         submittedAt={submittedAt}
         examLabel={examLabel}
         totalMarks={totalMarks}
+        nextExamHref={nextExamHref}
+        nextExamLabel={nextExamLabel}
+        isFullMockPaper={isFullMockPaper}
       />
     )
   }

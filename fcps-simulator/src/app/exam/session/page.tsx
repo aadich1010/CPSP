@@ -7,7 +7,7 @@ import { SUBJECT_GROUPS } from '@/lib/subjects'
 export default async function ExamSessionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ subject?: string; count?: string; mode?: string; group?: string; examSlug?: string }>
+  searchParams: Promise<{ subject?: string; count?: string; mode?: string; group?: string; examSlug?: string; paper?: string; totalPapers?: string }>
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -204,6 +204,24 @@ export default async function ExamSessionPage({
   const timeLimitSeconds =
     count <= 10 ? 300 : count <= 25 ? 1800 : count <= 50 ? 3600 : count <= 100 ? 7200 : 10800
 
+  // Full CPSP-pattern mock (see exam/setup's "Full FCPS Part 1 Mock" card
+  // and startFullMock()): ?paper=1&totalPapers=2 marks this session as one
+  // of a 2-paper sequence. Each paper is still its own completely separate
+  // exam_sessions row / exam_attempts row / ExamEngine mount -- graded and
+  // passed independently (CPSP's real "each paper must be passed
+  // separately" rule), never combined into one score. This block only
+  // changes what's LABELLED and what button the result screen offers next
+  // -- nothing about grading. Absent for every normal (non-full-mock) FCPS
+  // exam, which keeps showing plain "FCPS Part 1" exactly as before.
+  const paperNum     = parseInt(params.paper || '0', 10) || 0
+  const totalPapers  = parseInt(params.totalPapers || '0', 10) || 0
+  const isFullMockPaper = paperNum > 0 && totalPapers > 0
+  const paperExamLabel = isFullMockPaper ? `FCPS Part 1 — Paper ${paperNum} of ${totalPapers}` : 'FCPS Part 1'
+  const nextExamHref = isFullMockPaper && paperNum < totalPapers
+    ? `/exam/session?${new URLSearchParams({ subject, count: String(count), mode: 'exam', paper: String(paperNum + 1), totalPapers: String(totalPapers) }).toString()}`
+    : undefined
+  const nextExamLabel = nextExamHref ? `Paper ${paperNum + 1}` : undefined
+
   // Server records the START TIME. The RPC that grades the exam re-derives
   // elapsed time from THIS row, never from anything the client claims.
   const { data: session, error: sessionError } = await supabase
@@ -237,7 +255,10 @@ export default async function ExamSessionPage({
       candidateName={candidateName}
       candidateEmail={candidateEmail}
       shuffleAnswers={isPremium}
-      examLabel="FCPS Part 1"
+      examLabel={paperExamLabel}
+      nextExamHref={nextExamHref}
+      nextExamLabel={nextExamLabel}
+      isFullMockPaper={isFullMockPaper}
     />
   )
 }

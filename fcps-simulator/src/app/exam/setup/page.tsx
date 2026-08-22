@@ -200,6 +200,20 @@ export default function ExamSetupPage() {
     setStep(3)
   }
 
+  // Full CPSP-pattern mock (see the Step 1 card above): fixed format --
+  // Mixed (All Subjects), 100 MCQs, Exam Mode -- so it skips straight to
+  // Paper 1's session instead of going through Steps 2-4. ?paper=1&
+  // totalPapers=2 tells exam/session/page.tsx this is part of a 2-paper
+  // sequence, which is what makes the result screen offer a "Start Paper
+  // 2" button instead of just Exit/New Attempt (see nextExamHref there).
+  // Demo accounts are still capped to 10 questions server-side regardless
+  // of the `count=100` requested here -- same safety net as every other
+  // exam start in this app.
+  function startFullMock() {
+    const qs = new URLSearchParams({ subject: MIXED_ALL, count: '100', mode: 'exam', paper: '1', totalPapers: '2' })
+    router.push(`/exam/session?${qs.toString()}`)
+  }
+
   function pickGroup(name: string) {
     setWeightagePopup(null)
     setGroupName(name)
@@ -505,6 +519,34 @@ export default function ExamSetupPage() {
                       </div>
                     </div>
                     <ArrowRight size={14} className="shrink-0 text-emerald-400" />
+                  </div>
+                </button>
+
+                {/* Full CPSP-pattern mock: 2 separate papers (Paper 1, Paper
+                    2), 100 MCQs / 120 minutes each, no negative marking,
+                    single best answer -- taken back-to-back as two
+                    independently graded/passed attempts, matching how CPSP
+                    itself runs the real exam in two shifts the same day.
+                    Bypasses the Subject/Format wizard entirely (both papers
+                    are always Mixed/100/Exam Mode) and goes straight to
+                    Paper 1 -- see startFullMock() and the ?paper=/
+                    &totalPapers= handling in exam/session/page.tsx. */}
+                <button
+                  type="button"
+                  onClick={startFullMock}
+                  className="w-full rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 text-left transition-all hover:border-teal-400 hover:bg-teal-50"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Icon name="mockExam" />
+                      <div>
+                        <div className="text-sm font-bold text-teal-700">Full FCPS Part 1 Mock — Paper 1 + Paper 2</div>
+                        <div className="mt-0.5 text-xs text-teal-600/70">
+                          The real CPSP pattern: 2 papers, 100 MCQs / 120 minutes each, no negative marking. Each paper is graded and passed separately.
+                        </div>
+                      </div>
+                    </div>
+                    <ArrowRight size={14} className="shrink-0 text-teal-400" />
                   </div>
                 </button>
               </div>

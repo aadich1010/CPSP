@@ -54,6 +54,18 @@ interface Props {
    *  are unaffected since the multiplier is constant. Undefined (default)
    *  keeps every exam's existing "correct/total questions" display. */
   totalMarks?: number;
+  /** When this attempt is one paper of a multi-paper mock (FCPS Part 1's
+   *  real CPSP pattern: Paper 1 + Paper 2, each graded/passed separately),
+   *  shows a "Start {nextExamLabel}" button in the header alongside New
+   *  Attempt/Exit. Undefined for every normal single-paper exam -- the
+   *  header keeps its existing two buttons exactly as before. */
+  nextExamHref?: string;
+  nextExamLabel?: string;
+  /** True for either paper of the Full FCPS Part 1 Mock -- adds a one-line
+   *  note that CPSP's real exam uses a percentile system, not a fixed
+   *  percentage pass mark, and that both papers must be passed separately.
+   *  Purely informational; doesn't change this attempt's own verdict. */
+  isFullMockPaper?: boolean;
 }
 
 /* ── Styles (scoped) ────────────────────────────── */
@@ -176,7 +188,7 @@ const RING_C = 2*Math.PI*RING_R;
 const CELEBRATION_THRESHOLD = 85;
 
 /* ── Component ──────────────────────────────────── */
-export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, finalScore, userId, candidateName, candidateEmail, sessionId, submittedAt, examLabel = 'FCPS Part 1', totalMarks }: Props) {
+export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, finalScore, userId, candidateName, candidateEmail, sessionId, submittedAt, examLabel = 'FCPS Part 1', totalMarks, nextExamHref, nextExamLabel, isFullMockPaper = false }: Props) {
   const [tab, setTab] = useState<'dash'|'review'>('dash');
   const [filter, setFilter] = useState<'all'|'correct'|'wrong'|'skipped'>('all');
   // Real attempt history (replaces previous hardcoded mock numbers). Each
@@ -391,7 +403,11 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
           </div>
           <div className="rs-hbtns">
             <button className="rs-btn print" onClick={handlePrint}><Icon name="print" /> Print Result</button>
-            <a href="/exam/setup" className="rs-btn primary">New Attempt</a>
+            {nextExamHref ? (
+              <a href={nextExamHref} className="rs-btn primary">Start {nextExamLabel} →</a>
+            ) : (
+              <a href="/exam/setup" className="rs-btn primary">New Attempt</a>
+            )}
             <a href="/dashboard" className="rs-btn">Exit</a>
           </div>
         </header>
@@ -433,6 +449,11 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                     </div>
                   ) : (
                     <div style={{fontSize:'0.6rem',color:'#94a3b8',fontWeight:600,marginTop:4}}>No negative marking — score reflects correct answers only</div>
+                  )}
+                  {isFullMockPaper && (
+                    <div style={{fontSize:'0.58rem',color:'#94a3b8',fontWeight:500,marginTop:4,lineHeight:1.4,textAlign:'center'}}>
+                      CPSP uses a percentile system on the real exam, not a fixed pass %. Paper 1 and Paper 2 must each be passed separately.
+                    </div>
                   )}
 
                   {/* Breakdown */}
