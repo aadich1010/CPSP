@@ -109,7 +109,7 @@ const S = `
 .rs-bk-l{font-size:0.55rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-top:2px}
 /* Subject bars */
 .rs-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-.rs-bar-name{font-size:0.62rem;font-weight:600;color:#64748b;width:80px;flex-shrink:0;text-align:right}
+.rs-bar-name{font-size:0.6rem;font-weight:600;color:#64748b;width:98px;flex-shrink:0;text-align:right;white-space:normal;line-height:1.15;word-break:break-word}
 .rs-bar-track{flex:1;height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden}
 .rs-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
 .rs-bar-pct{font-size:0.6rem;font-weight:700;color:#0f172a;width:30px;text-align:right}
@@ -454,7 +454,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                   <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:4}}>
                     {subjectData.map((s,idx)=>(
                       <div key={s.name} className="rs-bar-row">
-                        <div className="rs-bar-name">{s.name.length>11?s.name.slice(0,11)+'…':s.name}</div>
+                        <div className="rs-bar-name">{s.name}</div>
                         <div className="rs-bar-track">
                           <motion.div className="rs-bar-fill"
                             initial={{width:0}}
