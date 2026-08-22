@@ -115,8 +115,14 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 py-2 md:py-6 space-y-1">
+      {/* Navigation -- scrolls internally (overflow-y-auto + min-h-0) so
+          that however many items land here (Quick Actions, a future Admin
+          item, etc.) can never push the footer below (Unlock CTA,
+          myResidency link, subscription card, account/Sign Out) off the
+          bottom of the mobile drawer. Those footer sections keep
+          flex-shrink-0 and are always fully visible, no scrolling needed
+          to reach Sign Out. */}
+      <nav className="flex-1 min-h-0 overflow-y-auto py-2 md:py-6 space-y-1">
         <div className="px-6 mb-1 md:mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
           Main Menu
         </div>

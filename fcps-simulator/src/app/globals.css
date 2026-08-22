@@ -278,16 +278,17 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
     transform: translateX(-100%);
     transition: transform 0.25s ease;
     z-index: 60;
-    /* Full drawer content (logo, nav, CTA, subscription card, account
-       row) must fit in one screen with no scrolling on a normal phone --
-       height:100dvh (rather than the base rule's min-height:100vh) caps
-       it to the actual visible viewport, and overflow-y:auto is only a
-       safety net for unusually short screens/zoom levels; the spacing
-       below is tightened specifically so that fallback is never needed
-       in practice. */
+    /* height:100dvh (rather than the base rule's min-height:100vh) caps
+       the drawer to the actual visible viewport. The sidebar itself does
+       NOT scroll (overflow hidden) -- only its <nav> (Main Menu / Quick
+       Actions / Admin) does, via flex-1 + min-h-0 + overflow-y-auto in
+       Sidebar.tsx. That guarantees the footer sections below the nav
+       (Unlock CTA, myResidency link, subscription card, account/Sign Out)
+       are ALWAYS fully visible and reachable with zero scrolling, no
+       matter how many nav items a future change adds. */
     height: 100dvh;
     min-height: 0;
-    overflow-y: auto;
+    overflow: hidden;
   }
   .sidebar.mobile-open { transform: translateX(0); }
 
