@@ -53,6 +53,28 @@ interface ExamEngineProps {
    *  report. Defaults to 'FCPS Part 1' -- see that component's Props for
    *  the full explanation. */
   examLabel?:       string
+  /** Used only to word the entry modal's marking line correctly (e.g. MS/MD
+   *  JCAT has none, so it says so explicitly). Does not affect scoring --
+   *  submit_exam_attempt() decides that server-side from the session's own
+   *  exam_configuration. Default false matches every exam except MS/MD's
+   *  now-corrected config (see 20260822030000_msmd_jcat_no_negative_
+   *  marking.sql) and any other exam still shipped with weight 0. */
+  hasNegativeMarking?: boolean
+  /** Shows a mandatory pre-exam rules popup (question count, time limit,
+   *  marking scheme, examLabel) with a "Start Exam" button before the
+   *  question view and countdown timer appear at all. Default false --
+   *  FCPS keeps its existing "drop straight into the exam" behaviour;
+   *  opt in per exam type from exam/session/page.tsx. */
+  entryModal?:       boolean
+  /** Lets the candidate move to ANY question at any time via Next,
+   *  Previous, or the palette -- no "must answer before advancing" gate
+   *  and no one-time Skip limit. Default false keeps FCPS's existing
+   *  forced-linear-progress flow completely unchanged. */
+  freeNavigation?:   boolean
+  /** Adds a "Mark for Review" toggle per question, highlighted distinctly
+   *  in the side palette. Default false -- palette keeps its current/
+   *  answered-only colouring for every exam that doesn't opt in. */
+  allowMarkForReview?: boolean
 }
 
 type Answer = string | null
@@ -176,7 +198,7 @@ function formatTime(secs: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail, shuffleAnswers = true, examLabel = 'FCPS Part 1' }: ExamEngineProps) {
+export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail, shuffleAnswers = true, examLabel = 'FCPS Part 1', hasNegativeMarking = false, entryModal = false, freeNavigation = false, allowMarkForReview = false }: ExamEngineProps) {
   // Shuffled ONCE per mount (lazy initialiser), never on re-render -- otherwise
   // the options would jump around under the student's cursor every tick of the
   // timer. Question ORDER is already randomised per attempt server-side by
@@ -192,8 +214,13 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
   // effect (handleSubmit depends on it) on every single tick.
   const questions  = useMemo(() => shuffled.map((s) => s.display), [shuffled])
 
+  // When entryModal is on, the exam (and its countdown) doesn't begin until
+  // the candidate dismisses the rules popup via "Start Exam". Exams that
+  // don't opt in (entryModal=false) start immediately, exactly as before.
+  const [started,      setStarted]      = useState(!entryModal)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers,      setAnswers]      = useState<Answer[]>(Array(questions.length).fill(null))
+  const [markedForReview, setMarkedForReview] = useState<boolean[]>(Array(questions.length).fill(false))
   // A question can be skipped without answering exactly ONCE. Once true,
   // the Skip button is disabled for that question -- the only way past it
   // on a second visit is to actually answer it.
@@ -305,7 +332,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
   }, [answers, sessionId, userId, mode, questions, shuffled, submitted])
 
   useEffect(() => {
-    if (submitted) return
+    if (submitted || !started) return
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) { handleSubmit(); return 0 }
@@ -313,7 +340,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
       })
     }, 1000)
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, handleSubmit])
+  }, [submitted, started, handleSubmit])
 
   const currentQ     = questions[currentIndex]
 
@@ -375,6 +402,63 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
   const handleNext = () => {
     if (submitted || answers[currentIndex] === null) return
     advanceToNextUnanswered()
+  }
+
+  // Free-navigation variants (used only when freeNavigation=true, e.g.
+  // MS/MD JCAT): no "must answer first" gate, no forward-scan-then-wrap --
+  // just move one question at a time, in either direction.
+  const handleNextFree = () => {
+    if (submitted || currentIndex >= questions.length - 1) return
+    setCurrentIndex(currentIndex + 1)
+  }
+  const handlePrevious = () => {
+    if (submitted || currentIndex <= 0) return
+    setCurrentIndex(currentIndex - 1)
+  }
+  const toggleMarkForReview = () => {
+    if (submitted) return
+    const next = [...markedForReview]
+    next[currentIndex] = !next[currentIndex]
+    setMarkedForReview(next)
+  }
+
+  if (entryModal && !started) {
+    const timeLimitMinutes = Math.round(timeLimitSeconds / 60)
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(15,23,42,0.72)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+        <div style={{ background: '#ffffff', borderRadius: 16, padding: '28px 28px 24px', maxWidth: 440, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.35)' }}>
+          <h1 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', margin: '0 0 14px' }}>
+            Welcome to the {examLabel} Practice Examination.
+          </h1>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <li style={{ display: 'flex', gap: 10, fontSize: '0.9rem', color: '#334155' }}>
+              <Icon name="questionBank" />
+              <span><strong>Total Number of Questions:</strong> {questions.length} MCQs</span>
+            </li>
+            <li style={{ display: 'flex', gap: 10, fontSize: '0.9rem', color: '#334155' }}>
+              <Icon name="schedule" />
+              <span><strong>Total Time Allowed:</strong> {timeLimitMinutes} Minutes</span>
+            </li>
+            <li style={{ display: 'flex', gap: 10, fontSize: '0.9rem', color: '#334155' }}>
+              <Icon name="info" />
+              <span>
+                <strong>Marking System:</strong> 1 Mark per correct answer.{' '}
+                {hasNegativeMarking
+                  ? 'Negative marking applies for incorrect answers.'
+                  : <>There is <strong>NO negative marking</strong> for wrong answers.</>}
+              </span>
+            </li>
+          </ul>
+          <button
+            className="btn btn-primary btn-full"
+            style={{ marginTop: 22, fontWeight: 800 }}
+            onClick={() => setStarted(true)}
+          >
+            Start Exam
+          </button>
+        </div>
+      </div>
+    )
   }
 
   if (submitted && gradedQuestions && result) {
@@ -493,31 +577,70 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
               </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', flexShrink: 0, marginTop: '10px' }}>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={handleSkip}
-                disabled={submitted || answers[currentIndex] !== null || skippedOnce[currentIndex]}
-                style={{
-                  minWidth: '80px',
-                  opacity: (answers[currentIndex] !== null || skippedOnce[currentIndex]) ? 0.4 : 1,
-                  cursor: (answers[currentIndex] !== null || skippedOnce[currentIndex]) ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {skippedOnce[currentIndex] && answers[currentIndex] === null ? 'Already Skipped' : 'Skip'}
-              </button>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={handleNext}
-                disabled={submitted || answers[currentIndex] === null || allAnswered}
-                style={{
-                  minWidth: '80px',
-                  opacity: (answers[currentIndex] === null || allAnswered) ? 0.4 : 1,
-                  cursor: (answers[currentIndex] === null || allAnswered) ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {allAnswered ? 'All Answered' : 'Next →'}
-              </button>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', flexShrink: 0, marginTop: '10px', flexWrap: 'wrap' }}>
+              {freeNavigation ? (
+                <>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={handlePrevious}
+                    disabled={submitted || currentIndex === 0}
+                    style={{ minWidth: '80px', opacity: currentIndex === 0 ? 0.4 : 1, cursor: currentIndex === 0 ? 'not-allowed' : 'pointer' }}
+                  >
+                    ← Previous
+                  </button>
+                  {allowMarkForReview && (
+                    <button
+                      className="btn btn-sm"
+                      onClick={toggleMarkForReview}
+                      disabled={submitted}
+                      style={{
+                        minWidth: '140px',
+                        background: markedForReview[currentIndex] ? '#7c3aed' : 'transparent',
+                        color: markedForReview[currentIndex] ? '#ffffff' : '#7c3aed',
+                        border: '1.5px solid #7c3aed',
+                        fontWeight: 700,
+                      }}
+                    >
+                      {markedForReview[currentIndex] ? '★ Marked for Review' : '☆ Mark for Review'}
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={handleNextFree}
+                    disabled={submitted || currentIndex === questions.length - 1}
+                    style={{ minWidth: '80px', opacity: currentIndex === questions.length - 1 ? 0.4 : 1, cursor: currentIndex === questions.length - 1 ? 'not-allowed' : 'pointer' }}
+                  >
+                    Next →
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={handleSkip}
+                    disabled={submitted || answers[currentIndex] !== null || skippedOnce[currentIndex]}
+                    style={{
+                      minWidth: '80px',
+                      opacity: (answers[currentIndex] !== null || skippedOnce[currentIndex]) ? 0.4 : 1,
+                      cursor: (answers[currentIndex] !== null || skippedOnce[currentIndex]) ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {skippedOnce[currentIndex] && answers[currentIndex] === null ? 'Already Skipped' : 'Skip'}
+                  </button>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={handleNext}
+                    disabled={submitted || answers[currentIndex] === null || allAnswered}
+                    style={{
+                      minWidth: '80px',
+                      opacity: (answers[currentIndex] === null || allAnswered) ? 0.4 : 1,
+                      cursor: (answers[currentIndex] === null || allAnswered) ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {allAnswered ? 'All Answered' : 'Next →'}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -527,14 +650,21 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
             <Icon name="schedule" /> Question Palette
           </div>
           <div className="exam-palette-grid">
-            {questions.map((_, i) => (
-              <button key={i}
-                className={i === currentIndex ? 'palette-btn current' : answers[i] ? 'palette-btn answered-v2' : 'palette-btn'}
-                onClick={() => { if (mode !== 'exam') setCurrentIndex(i) }}
-                style={{ width: '100%', aspectRatio: '1', borderRadius: 5, fontSize: questions.length > 75 ? '0.42rem' : questions.length > 50 ? '0.5rem' : '0.58rem', fontWeight: 700, padding: 0, minWidth: 0, cursor: mode === 'exam' ? 'not-allowed' : 'pointer', opacity: mode === 'exam' ? 0.9 : 1 }}>
-                {i + 1}
-              </button>
-            ))}
+            {questions.map((_, i) => {
+              const canJump = freeNavigation || mode !== 'exam'
+              let cls = 'palette-btn'
+              if (i === currentIndex) cls = 'palette-btn current'
+              else if (allowMarkForReview && markedForReview[i]) cls = answers[i] ? 'palette-btn marked-answered' : 'palette-btn marked'
+              else if (answers[i]) cls = 'palette-btn answered-v2'
+              return (
+                <button key={i}
+                  className={cls}
+                  onClick={() => { if (canJump) setCurrentIndex(i) }}
+                  style={{ width: '100%', aspectRatio: '1', borderRadius: 5, fontSize: questions.length > 75 ? '0.42rem' : questions.length > 50 ? '0.5rem' : '0.58rem', fontWeight: 700, padding: 0, minWidth: 0, cursor: canJump ? 'pointer' : 'not-allowed', opacity: canJump ? 1 : 0.9 }}>
+                  {i + 1}
+                </button>
+              )
+            })}
           </div>
           <button onClick={handleSubmit} disabled={saving} className="btn btn-primary btn-full" style={{ fontSize: '0.68rem', padding: '7px', marginTop: 8 }}>
             {saving ? 'Submitting...' : `Submit (${unanswered} left)`}

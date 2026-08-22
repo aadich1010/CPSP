@@ -411,6 +411,12 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
 .palette-btn.correct      { background: #f0fdf4; border-color: #22c55e; color: #166534; }
 .palette-btn.wrong        { background: #fef2f2; border-color: #ef4444; color: #991b1b; }
 .palette-btn.omit         { background: #fffbeb; border-color: #f59e0b; color: #92400e; }
+/* "Mark for Review" states (ExamEngine.tsx, allowMarkForReview) -- purple
+   so it reads as its own distinct category, never confused with the
+   green "answered" or amber "omitted" states above. .marked-answered is
+   a review-marked question the candidate has ALSO already answered. */
+.palette-btn.marked         { background: #f5f3ff; border-color: #7c3aed; color: #6d28d9; box-shadow: 0 0 0 2px rgba(124,58,237,0.15); }
+.palette-btn.marked-answered { background: linear-gradient(135deg, #7c3aed, #5b21b6); border-color: #5b21b6; color: #ffffff; box-shadow: 0 2px 6px rgba(124,58,237,0.4); }
 
 /* ── EXAM LAYOUT ─────────────────────────────────────────────── */
 .exam-layout { display: flex; flex: 1; overflow: hidden; }

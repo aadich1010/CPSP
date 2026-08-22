@@ -48,7 +48,7 @@ export default async function ExamSessionPage({
 
     const { data: config } = await supabase
       .from('exam_configurations')
-      .select('id, questions_per_block, minutes_per_block')
+      .select('id, questions_per_block, minutes_per_block, evaluation_logic')
       .eq('exam_type_id', examType.id)
       .eq('is_live', true)
       .single()
@@ -104,6 +104,14 @@ export default async function ExamSessionPage({
       )
     }
 
+    // MS/MD (JCAT) gets the modernised exam experience explicitly requested
+    // for it: a mandatory pre-exam rules popup, free Next/Previous/palette
+    // navigation instead of the FCPS forced-linear flow, and a "Mark for
+    // Review" toggle. Scoped to this one exam slug on purpose -- every
+    // other exam (FCPS included) keeps its exact existing ExamEngine
+    // behaviour untouched until explicitly opted in the same way.
+    const isJcat = params.examSlug === 'ms-md'
+
     return (
       <ExamEngine
         sessionId={examSession.id}
@@ -116,6 +124,10 @@ export default async function ExamSessionPage({
         candidateEmail={candidateEmail}
         shuffleAnswers={isPremium}
         examLabel={examType.display_name}
+        hasNegativeMarking={config.evaluation_logic === 'negative_marking'}
+        entryModal={isJcat}
+        freeNavigation={isJcat}
+        allowMarkForReview={isJcat}
       />
     )
   }
