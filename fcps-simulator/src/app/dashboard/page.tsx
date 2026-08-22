@@ -61,6 +61,65 @@ interface SubjectStat {
   attempt_count: number
 }
 
+/** MS/MD (JCAT) has its own paper structure -- one combined paper split
+ *  across Basic Sciences / Medicine & Allied / Surgery & Allied, not
+ *  FCPS's Paper I / Paper II / Clinical Practice split. Rendered instead
+ *  of SUBJECT_GROUPS (src/lib/subjects.ts) only for candidates whose
+ *  target exam is 'ms-md' -- every FCPS candidate (and every other exam)
+ *  keeps seeing the existing SUBJECT_GROUPS grid untouched.
+ *
+ *  `href` uses the app's existing canonical subject strings (SUBJECTS in
+ *  src/lib/subjects.ts) -- the same values already stored in
+ *  questions.subject and the ones the admin's "Tag ALL <subject>" tool
+ *  (src/app/admin/questions/actions.ts) tags against -- so a card here
+ *  starts working the moment the admin tags that subject's questions for
+ *  ms-md, with zero further code changes. `label` is the wording the
+ *  candidate actually sees, which for a few cards differs slightly from
+ *  the canonical string (British spelling, or a closer real-world JCAT
+ *  name) purely for display.
+ */
+const JCAT_CATEGORIES: { name: string; weight: string; description: string; subjects: { label: string; href: string }[] }[] = [
+  {
+    name: 'Basic Sciences',
+    weight: 'Approx. 50%',
+    description: 'Anatomy, Physiology, Biochemistry, Pathology, Pharmacology, and Microbiology.',
+    subjects: [
+      { label: 'Anatomy', href: 'Anatomy' },
+      { label: 'Physiology', href: 'Physiology' },
+      { label: 'Biochemistry', href: 'Biochemistry' },
+      { label: 'Pathology', href: 'Pathology' },
+      { label: 'Pharmacology', href: 'Pharmacology' },
+      { label: 'Microbiology', href: 'Microbiology' },
+    ],
+  },
+  {
+    name: 'Medicine & Allied',
+    weight: 'Approx. 25%',
+    description: 'Internal Medicine, Paediatrics, Psychiatry, Dermatology, Radiology, Cardiology, and allied specialties.',
+    subjects: [
+      { label: 'Internal Medicine', href: 'Medicine (Clinical Vignettes)' },
+      { label: 'Paediatrics', href: 'Pediatrics' },
+      { label: 'Psychiatry', href: 'Behavioral Sciences' },
+      { label: 'Dermatology', href: 'Dermatology (Basic Sciences)' },
+      { label: 'Radiology', href: 'Radiology (Imaging Basics)' },
+      { label: 'Cardiology', href: 'Cardiology' },
+    ],
+  },
+  {
+    name: 'Surgery & Allied',
+    weight: 'Approx. 25%',
+    description: 'General Surgery, Obstetrics & Gynaecology, Ophthalmology, ENT, Orthopaedics, Anaesthesia, and allied specialties.',
+    subjects: [
+      { label: 'General Surgery', href: 'Surgery & Allied' },
+      { label: 'Obstetrics & Gynaecology', href: 'Obstetrics & Gynecology' },
+      { label: 'Ophthalmology', href: 'Ophthalmology' },
+      { label: 'ENT', href: 'ENT' },
+      { label: 'Orthopaedics', href: 'Orthopedics' },
+      { label: 'Anaesthesia', href: 'Anesthesia' },
+    ],
+  },
+]
+
 export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -68,9 +127,20 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, email, subscription_expires_at, subscription_status, role, allowed_subjects')
+    .select('full_name, email, subscription_expires_at, subscription_status, role, allowed_subjects, exam_types!profiles_target_exam_type_id_fkey(slug, display_name)')
     .eq('id', user.id)
     .single()
+
+  // Every pre-existing account (target_exam_type_id null) and anyone who
+  // registered for FCPS falls back to fcps-part1/'FCPS Part 1' -- the
+  // whole dashboard (referral copy, VVIP banner, subject grid below) is
+  // unchanged for them. See dashboard/layout.tsx's Sidebar wiring for the
+  // same pattern.
+  const examTypeRow = profile?.exam_types as { slug: string; display_name: string } | { slug: string; display_name: string }[] | null
+  const examTypeResolved = Array.isArray(examTypeRow) ? examTypeRow[0] : examTypeRow
+  const examSlug  = examTypeResolved?.slug ?? 'fcps-part1'
+  const examLabel = examTypeResolved?.display_name ?? 'FCPS Part 1'
+  const isJcat = examSlug === 'ms-md'
 
   // Admins and demo accounts are never subject-gated -- mirrors the same
   // short-circuit inside get_exam_questions() (see supabase/migrations/
@@ -174,7 +244,7 @@ export default async function DashboardPage() {
           />
         </div>
         <div style={{ flex: '1 1 260px', minWidth: 0, display: 'flex', alignItems: 'center' }}>
-          <ReferralWidget referralLink={referralLink} compact />
+          <ReferralWidget referralLink={referralLink} compact examLabel={examLabel} />
         </div>
       </div>
       <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: -4, marginBottom: 12 }} className="break-words">
@@ -268,13 +338,60 @@ export default async function DashboardPage() {
             pricingHref="/#pricing"
             joinedCount={joinedCount}
             offerDeadline={isAzadiOfferActive() ? AZADI_OFFER_DEADLINE : undefined}
+            examLabel={examLabel}
           />
         </div>
       )}
 
-      {/* Subject Grid, grouped by paper */}
+      {/* Subject Grid -- MS/MD (JCAT) candidates get their own paper
+          structure (Basic Sciences / Medicine & Allied / Surgery & Allied);
+          every other exam (FCPS included) keeps the existing SUBJECT_GROUPS
+          grid exactly as it was. */}
       <div style={{ marginTop: 20 }}>
-        {SUBJECT_GROUPS.map((group) => (
+        {isJcat ? (
+          <>
+            <h2 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0f172a', marginBottom: 2 }}>
+              MS/MD JCAT Exam Categories
+            </h2>
+            <p style={{ fontSize: '0.72rem', color: '#94a3b8', marginBottom: 14 }}>
+              Comprehensive distribution covering Basic Sciences, Medicine, and Surgery as per JCAT layout.
+            </p>
+            {JCAT_CATEGORIES.map((cat) => (
+              <div key={cat.name} style={{ marginBottom: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
+                  <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                    {cat.name}
+                  </h3>
+                  <span style={{ fontSize: '0.66rem', fontWeight: 700, color: '#0d9488', background: 'rgba(13,148,136,0.1)', padding: '1px 8px', borderRadius: 999 }}>
+                    {cat.weight}
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.72rem', color: '#94a3b8', marginBottom: 10 }}>
+                  {cat.description}
+                </p>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(155px, 1fr))',
+                    gap: 8,
+                  }}
+                >
+                  {cat.subjects.map((s) => (
+                    <Link
+                      key={s.label}
+                      href={`/exam/session?examSlug=ms-md&subject=${encodeURIComponent(s.href)}&mode=practice`}
+                      className="subject-pill"
+                      style={subjectPillStyle(s.href)}
+                    >
+                      {s.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </>
+        ) : (
+          SUBJECT_GROUPS.map((group) => (
           <div key={group.name} style={{ marginBottom: 20 }}>
             <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', marginBottom: 2 }}>
               {group.name}
@@ -324,7 +441,8 @@ export default async function DashboardPage() {
               })}
             </div>
           </div>
-        ))}
+          ))
+        )}
       </div>
       </div>
     </div>

@@ -58,10 +58,15 @@ export default async function ExamSessionPage({
     let examCount = config.questions_per_block
     if (!isPremium) examCount = Math.min(examCount, 10)
 
+    // Optional per-subject drill (e.g. the MS/MD dashboard's Basic Sciences
+    // / Medicine & Allied / Surgery & Allied category pills) -- omitted
+    // entirely (undefined) for the normal "Begin Exam" full mixed-pool
+    // flow, which keeps calling this RPC exactly as it always has.
     const { data: examQuestions, error: examFetchError } = await supabase.rpc('get_exam_questions_for_exam', {
       p_exam_slug: params.examSlug,
       p_count: examCount,
       p_mode: mode,
+      p_subject: params.subject || undefined,
     })
 
     if (examFetchError?.message?.includes('DEMO_ATTEMPTS_EXHAUSTED')) {

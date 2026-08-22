@@ -18,6 +18,11 @@ export interface VvipUpgradeBannerProps {
    *  date to hide the countdown entirely -- a countdown with no real
    *  expiring offer behind it is a dark pattern, not urgency. */
   offerDeadline?: Date
+  /** Defaults to 'FCPS Part 1' so every pre-existing/FCPS candidate sees
+   *  exactly the same banner copy as before. Pass the candidate's own
+   *  target exam name (dashboard/page.tsx) for anyone registered for a
+   *  different exam (e.g. MS/MD (JCAT)). */
+  examLabel?: string
 }
 
 const FEATURES = [
@@ -50,6 +55,7 @@ export default function VvipUpgradeBanner({
   pricingHref = '/#pricing',
   joinedCount,
   offerDeadline,
+  examLabel = 'FCPS Part 1',
 }: VvipUpgradeBannerProps) {
   const countdown = useCountdown(offerDeadline)
 
@@ -74,7 +80,7 @@ export default function VvipUpgradeBanner({
           </div>
 
           <h2 className="mt-2 break-words text-lg font-extrabold text-white sm:text-xl">
-            Unlock the full FCPS Part 1 question bank
+            Unlock the full {examLabel} question bank
           </h2>
           <p className="mt-1 max-w-full break-words text-xs text-slate-300 sm:text-sm">
             Timed mock exams, performance analytics, and every subject — no limits.

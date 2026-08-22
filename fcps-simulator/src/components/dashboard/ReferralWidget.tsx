@@ -16,9 +16,14 @@ export interface ReferralWidgetProps {
    *  side with HeroBanner in a single row below the dashboard's
    *  SocialProofTicker. */
   compact?: boolean
+  /** Defaults to 'FCPS Part 1' so every pre-existing/FCPS candidate sees
+   *  exactly the same share text as before. Pass the candidate's own
+   *  target exam name (dashboard/page.tsx) for anyone registered for a
+   *  different exam (e.g. MS/MD (JCAT)). */
+  examLabel?: string
 }
 
-export default function ReferralWidget({ referralLink, compact = false }: ReferralWidgetProps) {
+export default function ReferralWidget({ referralLink, compact = false, examLabel = 'FCPS Part 1' }: ReferralWidgetProps) {
   const [copied, setCopied] = useState(false)
 
   async function handleCopy() {
@@ -36,7 +41,7 @@ export default function ReferralWidget({ referralLink, compact = false }: Referr
   async function handleShare() {
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'FCPS Simulator', text: 'Practice for FCPS Part 1 with me:', url: referralLink })
+        await navigator.share({ title: `${examLabel} Simulator`, text: `Practice for ${examLabel} with me:`, url: referralLink })
       } catch {
         // User cancelled the native share sheet -- not an error.
       }
@@ -92,7 +97,7 @@ export default function ReferralWidget({ referralLink, compact = false }: Referr
         <div className="min-w-0">
           <h3 className="text-sm font-extrabold text-slate-900 sm:text-base">Invite &amp; Earn</h3>
           <p className="mt-0.5 break-words text-xs text-slate-500 sm:text-sm">
-            Share your link with classmates preparing for FCPS Part 1.
+            Share your link with classmates preparing for {examLabel}.
           </p>
         </div>
 
