@@ -1,0 +1,22 @@
+-- 20260822070000_fix_get_exam_questions_for_exam_overload_ambiguity.sql
+-- -----------------------------------------------------------------------------
+-- BUG FIX: 20260822040000 used CREATE OR REPLACE to add an optional
+-- p_subject parameter to get_exam_questions_for_exam, assuming that was
+-- safe the same way changing a function BODY is. It is not: adding a new
+-- parameter (even with a default) does not replace the original 3-arg
+-- function in Postgres -- it creates a SECOND overloaded function
+-- alongside it. PostgREST then can't unambiguously resolve which
+-- overload a plain .rpc('get_exam_questions_for_exam', {...}) call means,
+-- which is exactly why the MS/MD "Begin Exam" flow started failing
+-- (surfacing as the app's own "no questions tagged" fallback, even
+-- though question_exam_tags genuinely has thousands of rows for ms-md --
+-- see 20260822050000 and 20260822060000).
+--
+-- Fix: drop the old 3-arg overload entirely, leaving the 4-arg version
+-- (p_subject text default null) as the ONLY get_exam_questions_for_exam
+-- function. Every existing call site -- the full-exam "Begin Exam" flow
+-- (which never passes p_subject) and the dashboard's subject-filtered
+-- practice pills (which do) -- both resolve unambiguously to this one
+-- function from here on.
+
+drop function if exists public.get_exam_questions_for_exam(text, integer, text);
