@@ -7,7 +7,7 @@ import { SUBJECT_GROUPS } from '@/lib/subjects'
 export default async function ExamSessionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ subject?: string; count?: string; mode?: string; group?: string }>
+  searchParams: Promise<{ subject?: string; count?: string; mode?: string; group?: string; examSlug?: string }>
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -28,6 +28,96 @@ export default async function ExamSessionPage({
   const subject = params.subject || 'Mixed (All Subjects)'
   let   count   = Math.min(Math.max(parseInt(params.count || '50') || 50, 1), 200)
   const mode    = params.mode === 'practice' ? 'practice' : 'exam'
+
+  // ── MULTI-EXAM PATH (non-FCPS) ────────────────────────────────────────
+  // A completely separate branch, not a modification of the FCPS logic
+  // below it -- get_exam_questions_for_exam() draws from question_exam_tags
+  // instead of the subject/subject_list system, and the session this
+  // creates carries exam_configuration_id so submit_exam_attempt() (see
+  // supabase/migrations/20260822000000_multi_exam_platform_foundation.sql)
+  // applies negative marking when the exam calls for it.
+  if (params.examSlug && params.examSlug !== 'fcps-part1') {
+    const { data: examType } = await supabase
+      .from('exam_types')
+      .select('id, display_name')
+      .eq('slug', params.examSlug)
+      .eq('is_active', true)
+      .single()
+
+    if (!examType) redirect('/exam/setup')
+
+    const { data: config } = await supabase
+      .from('exam_configurations')
+      .select('id, questions_per_block, minutes_per_block')
+      .eq('exam_type_id', examType.id)
+      .eq('is_live', true)
+      .single()
+
+    if (!config) redirect('/exam/setup')
+
+    let examCount = config.questions_per_block
+    if (!isPremium) examCount = Math.min(examCount, 10)
+
+    const { data: examQuestions, error: examFetchError } = await supabase.rpc('get_exam_questions_for_exam', {
+      p_exam_slug: params.examSlug,
+      p_count: examCount,
+      p_mode: mode,
+    })
+
+    if (examFetchError?.message?.includes('DEMO_ATTEMPTS_EXHAUSTED')) {
+      redirect('/subscription-expired')
+    }
+
+    if (examFetchError || !examQuestions?.length) {
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', gap: 16, padding: 24, textAlign: 'center' }}>
+          <div style={{ fontSize: '3rem' }}><Icon name="empty" /></div>
+          <p style={{ fontSize: '1rem', fontWeight: 500, maxWidth: 380 }}>
+            No {examType.display_name} questions are tagged yet — check back soon, or contact support.
+          </p>
+          <a href="/dashboard" className="btn btn-ghost">← Back to Dashboard</a>
+        </div>
+      )
+    }
+
+    const examQuestionIds = examQuestions.map((q: { id: string }) => q.id)
+    const examTimeLimitSeconds = config.minutes_per_block * 60
+
+    const { data: examSession, error: examSessionError } = await supabase
+      .from('exam_sessions')
+      .insert({
+        user_id: user.id,
+        subject: examType.display_name,
+        mode,
+        question_ids: examQuestionIds,
+        time_limit_seconds: examTimeLimitSeconds,
+        exam_configuration_id: config.id,
+      })
+      .select('id, started_at')
+      .single()
+
+    if (examSessionError || !examSession) {
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626' }}>
+          Could not start exam session. Please try again.
+        </div>
+      )
+    }
+
+    return (
+      <ExamEngine
+        sessionId={examSession.id}
+        questions={examQuestions}
+        subject={examType.display_name}
+        mode={mode}
+        userId={user.id}
+        timeLimitSeconds={examTimeLimitSeconds}
+        candidateName={candidateName}
+        candidateEmail={candidateEmail}
+        shuffleAnswers={isPremium}
+      />
+    )
+  }
 
   // A "Start Mixed Exam" pick scoped to one paper (from the exam setup
   // wizard's weightage popup) arrives as ?group=<paper name> alongside a

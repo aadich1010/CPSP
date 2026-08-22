@@ -21,6 +21,11 @@ interface Props {
    *  these are trusted over the locally-recomputed stats (which can be wrong
    *  if the post-submit answer-key reveal degrades gracefully). */
   score?: number; total?: number;
+  /** Non-null only for exams with negative marking (e.g. MS/MD, -0.5/wrong
+   *  answer) -- see supabase/migrations/20260822000000_multi_exam_platform_
+   *  foundation.sql. Every FCPS attempt gets null/undefined here and this
+   *  screen behaves exactly as it did before this prop existed. */
+  finalScore?: number | null;
   /** Needed to fetch this student's real past-attempt history for the
    *  Learning Curve chart -- previously this was hardcoded mock data. */
   userId?: string;
@@ -157,7 +162,7 @@ const RING_C = 2*Math.PI*RING_R;
 const CELEBRATION_THRESHOLD = 85;
 
 /* ── Component ──────────────────────────────────── */
-export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, userId, candidateName, candidateEmail, sessionId, submittedAt }: Props) {
+export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, finalScore, userId, candidateName, candidateEmail, sessionId, submittedAt }: Props) {
   const [tab, setTab] = useState<'dash'|'review'>('dash');
   const [filter, setFilter] = useState<'all'|'correct'|'wrong'|'skipped'>('all');
   // Real attempt history (replaces previous hardcoded mock numbers). Each
@@ -219,7 +224,12 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
   // reveal_exam_answers() call).
   const skipped = answers.filter(a => !a).length;
   const wrong   = Math.max(0, total - skipped - correct);
-  const pct = Math.round((correct/total)*100);
+  // Negative-marking exams (MS/MD today) score off `finalScore`, not the
+  // raw correct count -- the ring, percentage, and pass/fail verdict all
+  // need to reflect the actual deducted score, not just how many were right.
+  const hasNegativeMarking = finalScore !== undefined && finalScore !== null;
+  const displayScore = hasNegativeMarking ? finalScore! : correct;
+  const pct = total > 0 ? Math.round((displayScore/total)*100) : 0;
   const pass = pct >= 60;
 
   // One-shot celebration burst for a strong score. PremiumResultScreen is
@@ -384,12 +394,18 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                     </svg>
                     <div className="rs-ring-center">
                       <div className="rs-pct">{pct}%</div>
-                      <div className="rs-frac">{correct}/{total}</div>
+                      <div className="rs-frac">{hasNegativeMarking ? finalScore : correct}/{total}</div>
                     </div>
                   </div>
 
                   <div className={`rs-verdict ${pass?'rs-pass':'rs-fail'}`}>{pass?'PASS — ELIGIBLE':'FAIL — PRACTICE MORE'}</div>
-                  <div style={{fontSize:'0.6rem',color:'#94a3b8',fontWeight:600,marginTop:4}}>No negative marking — score reflects correct answers only</div>
+                  {hasNegativeMarking ? (
+                    <div style={{fontSize:'0.6rem',color:'#94a3b8',fontWeight:600,marginTop:4}}>
+                      {correct} correct − {(correct - finalScore!).toFixed(2)} negative marking = {finalScore} final score
+                    </div>
+                  ) : (
+                    <div style={{fontSize:'0.6rem',color:'#94a3b8',fontWeight:600,marginTop:4}}>No negative marking — score reflects correct answers only</div>
+                  )}
 
                   {/* Breakdown */}
                   <div className="rs-bk">
@@ -411,7 +427,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                   <div className="rs-kpis">
                     {[
                       {k:'Accuracy (Attempted)',v:`${accuracy}%`,cls:'blue'},
-                      {k:'FCPS Percentile',v:fcpsPct,cls:'blue'},
+                      {k:'Percentile',v:fcpsPct,cls:'blue'},
                       {k:'Strength',v:strongest?.name||'—',cls:'green'},
                       {k:'Weakness',v:weakest?.name||'—',cls:'amber'},
                       {k:'Avg Speed',v:'~42s / Q',cls:''},

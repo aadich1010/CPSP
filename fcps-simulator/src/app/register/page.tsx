@@ -3,14 +3,42 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { register } from '@/app/auth/actions'
-import { ArrowRight, Loader2, UserPlus, Mail, Lock, User, ShieldCheck, CheckCircle2, Phone, BadgeCheck, GraduationCap } from 'lucide-react'
+import { ArrowRight, Loader2, UserPlus, Mail, Lock, User, ShieldCheck, CheckCircle2, Phone, BadgeCheck, GraduationCap, ClipboardList, Stethoscope, Landmark, Globe2 } from 'lucide-react'
 import Icon from '@/design-system/Icon';
 import { MEDICAL_COLLEGE_GROUPS } from '@/lib/medicalColleges'
+
+// Target exam picker -- see supabase/migrations/20260822000000_multi_exam_
+// platform_foundation.sql for the exam_types this must stay in sync with.
+// Kept as a plain client-side list (not fetched from the DB) since this is
+// a fixed, rarely-changing set of 5 exams and a registration form shouldn't
+// have an extra network round-trip just to render its own dropdown.
+const EXAM_OPTIONS = [
+  { slug: 'fcps-part1',  label: 'FCPS Part 1' },
+  { slug: 'mcps',        label: 'MCPS' },
+  { slug: 'ms-md',       label: 'MS / MD (JCAT)' },
+  { slug: 'mrcp-part1',  label: 'MRCP Part 1' },
+  { slug: 'usmle-step1', label: 'USMLE Step 1' },
+]
+const SPECIALTIES = ['Medicine', 'Surgery', 'Gynae & Obs', 'Paediatrics', 'Anaesthesia', 'Radiology', 'Pathology', 'Other']
+const UNIVERSITIES = ['UHS', 'SZABMU', 'KEMU', 'DUHS', 'Aga Khan University', 'Other']
+
+/** Which conditional field this exam needs, if any -- mirrors the
+ *  handle_new_user() trigger's exam_metadata shape. Adding exam #6 to the
+ *  registration flow is a one-line addition here, not a new branch
+ *  scattered through the JSX below. */
+function fieldGroupFor(slug: string): 'specialty' | 'university' | 'international' | null {
+  if (slug === 'fcps-part1' || slug === 'mcps') return 'specialty'
+  if (slug === 'ms-md') return 'university'
+  if (slug === 'mrcp-part1' || slug === 'usmle-step1') return 'international'
+  return null
+}
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState('')
   const [success, setSuccess] = useState('')
+  const [targetExam, setTargetExam] = useState('')
+  const fieldGroup = fieldGroupFor(targetExam)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -147,6 +175,78 @@ export default function RegisterPage() {
                   </datalist>
                 </div>
               </div>
+
+              {/* ── TARGET EXAM ── */}
+              <div>
+                <label htmlFor="targetExamSlug" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                  <ClipboardList size={11} className="text-emerald-400" /> Select Your Target Exam
+                </label>
+                <select
+                  id="targetExamSlug"
+                  name="targetExamSlug"
+                  required
+                  value={targetExam}
+                  onChange={(e) => setTargetExam(e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
+                >
+                  <option value="" disabled>Choose an exam…</option>
+                  {EXAM_OPTIONS.map((opt) => (
+                    <option key={opt.slug} value={opt.slug}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {fieldGroup === 'specialty' && (
+                <div>
+                  <label htmlFor="specialty" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <Stethoscope size={11} className="text-emerald-400" /> Select Specialty
+                  </label>
+                  <select
+                    id="specialty"
+                    name="specialty"
+                    required
+                    defaultValue=""
+                    className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
+                  >
+                    <option value="" disabled>Choose your specialty…</option>
+                    {SPECIALTIES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              )}
+
+              {fieldGroup === 'university' && (
+                <div>
+                  <label htmlFor="university" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <Landmark size={11} className="text-emerald-400" /> Select Target University
+                  </label>
+                  <select
+                    id="university"
+                    name="university"
+                    required
+                    defaultValue=""
+                    className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
+                  >
+                    <option value="" disabled>Choose your university…</option>
+                    {UNIVERSITIES.map((u) => <option key={u} value={u}>{u}</option>)}
+                  </select>
+                </div>
+              )}
+
+              {fieldGroup === 'international' && (
+                <div>
+                  <label htmlFor="targetCountry" className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <Globe2 size={11} className="text-emerald-400" /> Target Country / Board
+                  </label>
+                  <input
+                    id="targetCountry"
+                    name="targetCountry"
+                    type="text"
+                    required
+                    placeholder="e.g. United Kingdom, United States"
+                    className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
+                  />
+                </div>
+              )}
 
               {/* ── EMAIL + PASSWORD ── */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

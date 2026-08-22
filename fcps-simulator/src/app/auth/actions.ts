@@ -97,6 +97,14 @@ export async function register(formData: FormData) {
   const phone          = (formData.get('phone') as string | null)?.trim() || null
   const pmdcNumber     = (formData.get('pmdcNumber') as string | null)?.trim() || null
   const medicalCollege = (formData.get('medicalCollege') as string | null)?.trim() || null
+  // Multi-exam registration (see supabase/migrations/20260822010000_
+  // multi_exam_registration_and_question_rpc.sql) -- targetExamSlug is
+  // optional so an old cached client bundle without the exam picker still
+  // registers fine, just without a target exam set.
+  const targetExamSlug = (formData.get('targetExamSlug') as string | null)?.trim() || null
+  const specialty      = (formData.get('specialty') as string | null)?.trim() || null
+  const university     = (formData.get('university') as string | null)?.trim() || null
+  const targetCountry  = (formData.get('targetCountry') as string | null)?.trim() || null
 
   const { error } = await supabase.auth.signUp({
     email,
@@ -105,12 +113,18 @@ export async function register(formData: FormData) {
       // Picked up by the handle_new_user() trigger (see supabase/migrations/
       // 20260812260000_add_registration_fields_and_blocking.sql), which
       // inserts the profiles row -- the client never inserts into profiles
-      // directly (no INSERT policy for authenticated, by design).
+      // directly (no INSERT policy for authenticated, by design). The
+      // target_exam_slug/specialty/university/target_country fields are
+      // read by that same trigger to set target_exam_type_id/exam_metadata.
       data: {
         full_name: fullName,
         phone,
         pmdc_number: pmdcNumber,
         medical_college: medicalCollege,
+        target_exam_slug: targetExamSlug,
+        specialty,
+        university,
+        target_country: targetCountry,
       },
     },
   })

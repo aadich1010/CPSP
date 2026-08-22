@@ -45,6 +45,21 @@ export default function ExamSetupPage() {
   // through to Step 3 for a subject they can't actually start an exam in.
   const [lockedNotice, setLockedNotice] = useState<string | null>(null)
 
+  // Multi-exam routing: null while unresolved/legacy-FCPS, otherwise the
+  // candidate's target exam slug + its live rule config. A non-null,
+  // non-'fcps-part1' value short-circuits the whole Paper/Subject wizard
+  // below (see the render branch right before Step 1) -- FCPS candidates
+  // (the vast majority today, including everyone who registered before
+  // this feature existed) are completely unaffected.
+  const [targetExamSlug, setTargetExamSlug] = useState<string | null>(null)
+  const [targetExamConfig, setTargetExamConfig] = useState<{
+    totalBlocks: number
+    questionsPerBlock: number
+    minutesPerBlock: number
+    evaluationLogic: string
+    negativeMarkingWeight: number
+  } | null>(null)
+
   const [step, setStep] = useState<Step>(1)
   // groupName is null once "Mixed (All Subjects)" is picked at step 1 --
   // there's no group to drill into, so step 2 is skipped entirely.
@@ -75,7 +90,7 @@ export default function ExamSetupPage() {
       if (!user) { router.push('/login'); return }
       const { data: profile } = await supabase
         .from('profiles')
-        .select('subscription_status, role, allowed_subjects')
+        .select('subscription_status, role, allowed_subjects, target_exam_type_id')
         .eq('id', user.id)
         .single()
       const premium = profile?.subscription_status === 'active'
@@ -89,6 +104,38 @@ export default function ExamSetupPage() {
           ? null
           : ((profile?.allowed_subjects as string[] | null) ?? null)
       )
+
+      // Multi-exam routing -- a candidate with no target_exam_type_id set
+      // (every pre-existing account, plus anyone who picked FCPS at
+      // registration) resolves to null here and falls straight through to
+      // the existing FCPS wizard, completely unchanged.
+      if (profile?.target_exam_type_id) {
+        const { data: examType } = await supabase
+          .from('exam_types')
+          .select('slug')
+          .eq('id', profile.target_exam_type_id)
+          .single()
+
+        if (examType?.slug && examType.slug !== 'fcps-part1') {
+          setTargetExamSlug(examType.slug)
+          const { data: config } = await supabase
+            .from('exam_configurations')
+            .select('total_blocks, questions_per_block, minutes_per_block, evaluation_logic, negative_marking_weight')
+            .eq('exam_type_id', profile.target_exam_type_id)
+            .eq('is_live', true)
+            .single()
+          if (config) {
+            setTargetExamConfig({
+              totalBlocks: config.total_blocks,
+              questionsPerBlock: config.questions_per_block,
+              minutesPerBlock: config.minutes_per_block,
+              evaluationLogic: config.evaluation_logic,
+              negativeMarkingWeight: config.negative_marking_weight,
+            })
+          }
+        }
+      }
+
       setLoading(false)
     })
 
@@ -185,6 +232,92 @@ export default function ExamSetupPage() {
     return (
       <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+      </div>
+    )
+  }
+
+  // ── MULTI-EXAM ROUTING ──────────────────────────────────────────────
+  // A candidate whose target exam isn't FCPS skips the Paper/Subject
+  // wizard entirely. Only MS/MD's single-block format is actually wired
+  // up end to end right now (its exam/session flow, question pool via
+  // question_exam_tags, and negative-marking scoring are all live) -- the
+  // other three exams show an honest "not open yet" notice instead of a
+  // half-working multi-block exam, since the multi-block/break-pool timer
+  // engine (FCPS/MRCP's 2 blocks, USMLE's 14-block + break pool) hasn't
+  // been built yet. This block disappears entirely once that's shipped.
+  if (targetExamSlug && targetExamSlug !== 'fcps-part1') {
+    const examLabels: Record<string, string> = {
+      mcps: 'MCPS',
+      'ms-md': 'MS / MD (JCAT)',
+      'mrcp-part1': 'MRCP Part 1',
+      'usmle-step1': 'USMLE Step 1',
+    }
+    const examLabel = examLabels[targetExamSlug] ?? targetExamSlug
+
+    if (targetExamSlug === 'ms-md' && targetExamConfig) {
+      return (
+        <div className="h-screen bg-[#F9FAFB] flex items-center justify-center px-4 py-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-lg">
+            <h1 className="text-lg font-black text-slate-900">{examLabel} Mock Exam</h1>
+            <p className="mt-1 text-sm text-slate-500">Full block, exactly as it&apos;ll run on exam day.</p>
+
+            <div className="mt-5 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-slate-50">
+              {[
+                { label: 'Questions', value: `${targetExamConfig.questionsPerBlock}` },
+                { label: 'Time limit', value: `${targetExamConfig.minutesPerBlock} minutes` },
+                {
+                  label: 'Negative marking',
+                  value: targetExamConfig.negativeMarkingWeight > 0
+                    ? `−${targetExamConfig.negativeMarkingWeight} per wrong answer`
+                    : 'None',
+                },
+              ].map((row) => (
+                <div key={row.label} className="flex items-center justify-between px-4 py-2.5 text-sm">
+                  <span className="font-semibold text-slate-500">{row.label}</span>
+                  <span className="font-bold text-slate-800">{row.value}</span>
+                </div>
+              ))}
+            </div>
+
+            {!isPremium && (
+              <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-[11px] font-semibold text-amber-700">
+                <Icon name="warning" size="xs" /> Demo access is capped at 10 questions and 3 lifetime attempts.
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={() => router.push(`/exam/session?examSlug=${targetExamSlug}&mode=exam`)}
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all hover:scale-[1.02]"
+            >
+              <Play size={16} fill="white" /> Begin Exam
+            </button>
+
+            <div className="mt-3 text-center">
+              <Link href="/dashboard" className="text-sm text-slate-400 transition hover:text-slate-600">
+                ← Back to Dashboard
+              </Link>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="h-screen bg-[#F9FAFB] flex items-center justify-center px-4 py-4">
+        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 text-center shadow-lg">
+          <h1 className="text-lg font-black text-slate-900">{examLabel} isn't open yet</h1>
+          <p className="mt-2 text-sm text-slate-500">
+            We&apos;re still building the full {examLabel} timing engine. Your account is set up and ready — this will
+            unlock as soon as it ships.
+          </p>
+          <Link
+            href="/dashboard"
+            className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-800 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-slate-700"
+          >
+            ← Back to Dashboard
+          </Link>
+        </div>
       </div>
     )
   }

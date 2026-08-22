@@ -209,7 +209,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
   const [gradedQuestions, setGradedQuestions] = useState<Question[] | null>(
     mode === 'practice' ? questions : null
   )
-  const [result, setResult] = useState<{ score: number; total: number } | null>(null)
+  const [result, setResult] = useState<{ score: number; total: number; finalScore: number | null } | null>(null)
   // Stamped when the server accepts the submission, so the printed report
   // shows when the attempt was actually sat rather than when it was printed.
   const [submittedAt, setSubmittedAt] = useState<Date | undefined>(undefined)
@@ -246,9 +246,13 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
       // back an ARRAY of rows -- reading .score straight off `data` yielded
       // undefined and silently dropped the authoritative server score,
       // making the result screen fall back to its local recount.
+      // final_score is only non-null for exams with negative marking (see
+      // supabase/migrations/20260822000000_multi_exam_platform_foundation.sql)
+      // -- every FCPS attempt still gets null here and PremiumResultScreen
+      // falls back to plain `score`, exactly as before this existed.
       const graded = (Array.isArray(data) ? data[0] : data) as
-        { score: number; total_questions: number } | undefined
-      if (graded) setResult({ score: graded.score, total: graded.total_questions })
+        { score: number; total_questions: number; final_score: number | null } | undefined
+      if (graded) setResult({ score: graded.score, total: graded.total_questions, finalScore: graded.final_score })
 
       if (mode === 'exam') {
         // Safe to reveal correct answers now that grading already happened
@@ -378,6 +382,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
         mode={mode}
         score={result.score}
         total={result.total}
+        finalScore={result.finalScore}
         userId={userId}
         candidateName={candidateName}
         candidateEmail={candidateEmail}
