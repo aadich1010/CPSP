@@ -40,6 +40,12 @@ interface Props {
   sessionId?: string;
   /** When the attempt was actually submitted. Falls back to render time. */
   submittedAt?: Date;
+  /** Shown in the header ("{examLabel} Performance Report") and on the
+   *  printed report. Defaults to 'FCPS Part 1' so any caller that hasn't
+   *  been updated yet keeps showing the FCPS branding it always has.
+   *  Multi-exam attempts pass their own exam_types.display_name instead --
+   *  see supabase/migrations/20260822000000_multi_exam_platform_foundation.sql. */
+  examLabel?: string;
 }
 
 /* ── Styles (scoped) ────────────────────────────── */
@@ -162,7 +168,7 @@ const RING_C = 2*Math.PI*RING_R;
 const CELEBRATION_THRESHOLD = 85;
 
 /* ── Component ──────────────────────────────────── */
-export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, finalScore, userId, candidateName, candidateEmail, sessionId, submittedAt }: Props) {
+export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, finalScore, userId, candidateName, candidateEmail, sessionId, submittedAt, examLabel = 'FCPS Part 1' }: Props) {
   const [tab, setTab] = useState<'dash'|'review'>('dash');
   const [filter, setFilter] = useState<'all'|'correct'|'wrong'|'skipped'>('all');
   // Real attempt history (replaces previous hardcoded mock numbers). Each
@@ -335,6 +341,8 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
         subjectDataReliable={subjectDataReliable}
         strongest={strongest}
         weakest={weakest}
+        examLabel={examLabel}
+        hasNegativeMarking={hasNegativeMarking}
       />
 
       <div className="rs-root">
@@ -355,7 +363,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
         {/* Header */}
         <header className="rs-header">
           <div className="rs-logo-wrap">
-            <div className="rs-logo"><span>FCPS</span>Performance Report</div>
+            <div className="rs-logo"><span>{examLabel}</span>Performance Report</div>
             <div className="rs-print-meta">{candidateName || 'Candidate'} · {subject} · {printDate}</div>
           </div>
           <div className="rs-tabs">

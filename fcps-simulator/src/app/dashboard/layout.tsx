@@ -20,11 +20,19 @@ export default async function DashboardLayout({
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*')
+    .select('*, exam_types!profiles_target_exam_type_id_fkey(display_name)')
     .eq('id', user.id)
     .single()
 
   if (!profile) redirect('/login')
+
+  // Every pre-existing account (target_exam_type_id null) and anyone who
+  // registered for FCPS falls back to 'FCPS Part 1' -- the sidebar branding
+  // is unchanged for them. See supabase/migrations/20260822000000_multi_
+  // exam_platform_foundation.sql / 20260822010000_..._registration_and_
+  // question_rpc.sql for where target_exam_type_id gets set.
+  const examTypeRow = profile.exam_types as { display_name: string } | { display_name: string }[] | null
+  const examName = (Array.isArray(examTypeRow) ? examTypeRow[0]?.display_name : examTypeRow?.display_name) || 'FCPS Part 1'
 
   const expiresAt = profile.subscription_expires_at
     ? new Date(profile.subscription_expires_at)
@@ -108,7 +116,7 @@ export default async function DashboardLayout({
       />
 
       {/* Sidebar */}
-      <Sidebar profile={profile} daysLeft={daysLeft} />
+      <Sidebar profile={profile} daysLeft={daysLeft} examName={examName} />
 
       {/* Main Content */}
       <main

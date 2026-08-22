@@ -115,6 +115,7 @@ export default async function ExamSessionPage({
         candidateName={candidateName}
         candidateEmail={candidateEmail}
         shuffleAnswers={isPremium}
+        examLabel={examType.display_name}
       />
     )
   }
@@ -211,6 +212,7 @@ export default async function ExamSessionPage({
       candidateName={candidateName}
       candidateEmail={candidateEmail}
       shuffleAnswers={isPremium}
+      examLabel="FCPS Part 1"
     />
   )
 }

@@ -49,6 +49,10 @@ interface ExamEngineProps {
    *  demo accounts so the fixed question set also keeps a fixed, unshuffled
    *  option order -- the whole demo attempt looks identical every time. */
   shuffleAnswers?:  boolean
+  /** Passed straight through to PremiumResultScreen's header/printed
+   *  report. Defaults to 'FCPS Part 1' -- see that component's Props for
+   *  the full explanation. */
+  examLabel?:       string
 }
 
 type Answer = string | null
@@ -172,7 +176,7 @@ function formatTime(secs: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail, shuffleAnswers = true }: ExamEngineProps) {
+export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail, shuffleAnswers = true, examLabel = 'FCPS Part 1' }: ExamEngineProps) {
   // Shuffled ONCE per mount (lazy initialiser), never on re-render -- otherwise
   // the options would jump around under the student's cursor every tick of the
   // timer. Question ORDER is already randomised per attempt server-side by
@@ -388,6 +392,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
         candidateEmail={candidateEmail}
         sessionId={sessionId}
         submittedAt={submittedAt}
+        examLabel={examLabel}
       />
     )
   }

@@ -54,6 +54,18 @@ export interface PrintableReportProps {
    *  empty) when the answer key wasn't available, in which case the map is
    *  suppressed rather than printed as a wall of false "wrong" marks. */
   responses?: ('correct' | 'wrong' | 'skipped')[];
+  /** Printed in the report header/subtitle. Defaults to 'FCPS Part-1' so
+   *  every pre-existing caller (which never passed this) keeps its exact
+   *  original wording. Multi-exam attempts (MS/MD, MRCP Part 1, etc. -- see
+   *  supabase/migrations/20260822000000_multi_exam_platform_foundation.sql)
+   *  pass their own exam_types.display_name here instead. */
+  examLabel?: string;
+  /** Non-null/true only for exams that actually deduct marks for wrong
+   *  answers (MS/MD today). Every FCPS report still gets false/undefined
+   *  here and prints exactly the same "No negative marking" copy as before
+   *  -- this only changes what's shown for exams where that claim would be
+   *  factually wrong. */
+  hasNegativeMarking?: boolean;
 }
 
 /* ── Recommendation engine ──────────────────────────────────────────────
@@ -82,7 +94,7 @@ export function buildRecommendation(p: PrintableReportProps): {
   headline: string;
   points: string[];
 } {
-  const { pct, weakest, strongest, skipped, total, accuracy, subjectDataReliable } = p;
+  const { pct, weakest, strongest, skipped, total, accuracy, subjectDataReliable, hasNegativeMarking, examLabel = 'FCPS Part-1' } = p;
   const points: string[] = [];
 
   let band: string;
@@ -132,7 +144,9 @@ export function buildRecommendation(p: PrintableReportProps): {
   const skipRate = total > 0 ? Math.round((skipped / total) * 100) : 0;
   if (skipRate >= 20) {
     points.push(
-      `${skipRate}% of questions were left unattempted. FCPS Part-1 carries no negative marking, so every blank is a discarded mark — always commit to an answer.`,
+      hasNegativeMarking
+        ? `${skipRate}% of questions were left unattempted. This exam deducts marks for wrong answers, so only guess when you can confidently eliminate at least one option — a blind guess has negative expected value here.`
+        : `${skipRate}% of questions were left unattempted. ${examLabel} carries no negative marking, so every blank is a discarded mark — always commit to an answer.`,
     );
   } else if (accuracy > 0 && accuracy - p.pct >= 15) {
     points.push(
@@ -281,6 +295,7 @@ export default function PrintableReport(props: PrintableReportProps) {
     candidateName, candidateEmail, subject, mode, sessionId, submittedAt,
     correct, wrong, skipped, total, pct, pass, accuracy,
     subjectData, subjectDataReliable, strongest, weakest, responses,
+    examLabel = 'FCPS Part-1', hasNegativeMarking = false,
   } = props;
 
   const attempted = correct + wrong;
@@ -313,10 +328,10 @@ export default function PrintableReport(props: PrintableReportProps) {
         <div className="pr-head">
           <div>
             <h1 className="pr-title">
-              FCPS Part-1 <span>Examination Assessment Report</span>
+              {examLabel} <span>Examination Assessment Report</span>
             </h1>
             <div className="pr-sub">
-              Computer-Based Mock Assessment &middot; {mode === 'practice' ? 'Practice Mode' : 'Examination Mode'} &middot; No negative marking
+              Computer-Based Mock Assessment &middot; {mode === 'practice' ? 'Practice Mode' : 'Examination Mode'} &middot; {hasNegativeMarking ? 'Negative marking applies' : 'No negative marking'}
             </div>
           </div>
           <div className="pr-brand">

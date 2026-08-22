@@ -26,9 +26,16 @@ interface SidebarProps {
     subscription_expires_at?: string | null
   }
   daysLeft: number | null
+  /** The candidate's own target exam (exam_types.display_name), e.g.
+   *  "MS / MD (JCAT)" or "MRCP Part 1" -- see supabase/migrations/
+   *  20260822000000_multi_exam_platform_foundation.sql. Defaults to
+   *  'FCPS Part 1' for every pre-existing account (target_exam_type_id
+   *  null) and anyone who registered for FCPS, so the sidebar keeps
+   *  showing exactly what it always has for them. */
+  examName?: string
 }
 
-export default function Sidebar({ profile, daysLeft }: SidebarProps) {
+export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }: SidebarProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [lastPathname, setLastPathname] = useState(pathname)
@@ -85,10 +92,10 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
           </div>
           <div>
             <div className="text-[14px] font-black text-slate-900 leading-tight uppercase tracking-tight">
-              FCPS Simulator
+              {examName}
             </div>
             <div className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">
-              Part 1 CBT
+              Exam Simulator
             </div>
           </div>
         </div>
