@@ -40,7 +40,17 @@ alter table public.profiles
 comment on column public.profiles.allowed_subjects is
   'NULL = every Paper II subject accessible (default). Non-null = only these Paper II subjects may be practiced/examined; Paper I and Clinical Practice are never restricted by this column.';
 
-create or replace function public.get_exam_questions(
+-- Postgres refuses CREATE OR REPLACE when it thinks the OUT-parameter row
+-- type changed, even when the declared column list here is byte-for-byte
+-- identical to 20260811250000_mixed_paper_exam_subject_list.sql -- the
+-- live function's actual catalog entry can drift from what the migration
+-- files describe (e.g. a hotfix run directly in the SQL editor at some
+-- point). Dropping first sidesteps that check entirely; safe, since the
+-- CREATE right below recreates the exact same signature immediately in
+-- the same transaction (nothing else can call it in the gap).
+drop function if exists public.get_exam_questions(text, integer, text, text[]);
+
+create function public.get_exam_questions(
   p_subject      text,
   p_count        integer,
   p_mode         text,
