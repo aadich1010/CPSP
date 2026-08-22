@@ -10,9 +10,14 @@ export default function AddQuestionPage() {
   // wrapper keeps the whole form reachable regardless of screen height.
   // maxHeight (not height) so this box shrinks to the real content instead
   // of always padding out to fill the full viewport with blank scrollable
-  // space when the form is shorter than that.
+  // space when the form is shorter than that. The scroll container spans
+  // the full width of `main` (no maxWidth) so its scrollbar sits flush
+  // against the real right edge of the screen instead of pinned to the
+  // 680px content column -- the 680px cap moves to the inner div, which
+  // only constrains layout width, not where the scrollbar renders.
   return (
-    <div style={{ maxWidth: 680, maxHeight: '100%', overflowY: 'auto', paddingRight: 4, paddingBottom: 16 }}>
+    <div style={{ maxHeight: '100%', overflowY: 'auto', paddingBottom: 16 }}>
+    <div style={{ maxWidth: 680 }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#000000', marginBottom: 4 }}>
           Add Question
@@ -119,6 +124,7 @@ export default function AddQuestionPage() {
           </div>
         </form>
       </div>
+    </div>
     </div>
   )
 }

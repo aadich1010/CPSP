@@ -49,8 +49,16 @@ export default async function EditQuestionPage({
   // widening that gap further). `maxHeight` only ever caps the box; it
   // shrinks to fit the real content and only turns on the scrollbar past
   // that cap, with nothing to scroll into beyond the real form.
+  // The scroll container itself spans the FULL width of `main` (no
+  // maxWidth) so its scrollbar sits flush against the real right edge of
+  // the screen -- putting maxWidth/overflowY on the same element (as
+  // before) pinned the scrollbar to the 760px content column instead,
+  // leaving a dead gap between it and the actual window edge on any
+  // screen wider than that. The 760px cap moves to this inner div, which
+  // only constrains layout width, not where the scrollbar renders.
   return (
-    <div style={{ maxWidth: 760, maxHeight: '100%', overflowY: 'auto', paddingRight: 4, paddingBottom: 16 }}>
+    <div style={{ maxHeight: '100%', overflowY: 'auto', paddingBottom: 16 }}>
+    <div style={{ maxWidth: 760 }}>
       <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#000000', marginBottom: 2 }}>
@@ -267,6 +275,7 @@ export default async function EditQuestionPage({
           </div>
         </form>
       </div>
+    </div>
     </div>
   )
 }
