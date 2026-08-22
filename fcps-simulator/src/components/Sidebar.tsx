@@ -115,14 +115,18 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
         </div>
       </div>
 
-      {/* Navigation -- scrolls internally (overflow-y-auto + min-h-0) so
-          that however many items land here (Quick Actions, a future Admin
-          item, etc.) can never push the footer below (Unlock CTA,
-          myResidency link, subscription card, account/Sign Out) off the
-          bottom of the mobile drawer. Those footer sections keep
-          flex-shrink-0 and are always fully visible, no scrolling needed
-          to reach Sign Out. */}
-      <nav className="flex-1 min-h-0 overflow-y-auto py-2 md:py-6 space-y-1">
+      {/* Navigation. flex-1 (the "stretch to fill the sidebar" behaviour)
+          is DESKTOP-ONLY (md:flex-1) -- that's what pins the footer
+          sections (Unlock CTA, myResidency link, subscription card,
+          account/Sign Out) to the bottom of the desktop sidebar's tall
+          min-height:100vh column. On mobile, nav sizes to its own content
+          instead: forcing it to stretch on a short viewport was creating a
+          large empty gap between "Quick Actions" and the footer, and that
+          empty scrollable area is what rendered as a stray overscroll bar
+          on some Android browsers. Sized to content, the whole drawer
+          naturally comes out well under one screen's height with room to
+          spare, so nothing needs to scroll or stretch at all. */}
+      <nav className="md:flex-1 py-2 md:py-6 space-y-1">
         <div className="px-6 mb-1 md:mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
           Main Menu
         </div>
@@ -204,12 +208,19 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
 
       {/* Unlock Full Access CTA -- links to the Elite pricing plans on the
           landing page so the user can pick a plan and pay. Not shown to
-          admins, who already have full access to everything. */}
+          admins, who already have full access to everything.
+          NOTE: this used to reference a "unlock-cta" class that was never
+          actually defined anywhere in globals.css -- with no background at
+          all, white text on white rendered as a blank, invisible box (the
+          "empty white rectangle" visible in every mobile screenshot this
+          whole thread). Using the same emerald/teal gradient as every
+          other primary CTA in the app (e.g. VvipUpgradeBanner's own
+          "Unlock Full Access" button) instead of a phantom custom class. */}
       {profile.role !== 'admin' && (
         <div className="px-4 mb-1 md:mb-4 flex-shrink-0">
           <Link
             href="/#pricing"
-            className="unlock-cta flex items-center justify-center gap-2 w-full rounded-xl px-4 py-1.5 md:py-3 text-[12px] font-black uppercase tracking-wider text-white shadow-md"
+            className="flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-1.5 md:py-3 text-[12px] font-black uppercase tracking-wider text-white shadow-md transition hover:scale-[1.02]"
           >
             <span className="text-base"><Icon name="unlocked" /></span>
             Unlock Full Access

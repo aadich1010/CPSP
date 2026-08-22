@@ -279,13 +279,17 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
     transition: transform 0.25s ease;
     z-index: 60;
     /* height:100dvh (rather than the base rule's min-height:100vh) caps
-       the drawer to the actual visible viewport. The sidebar itself does
-       NOT scroll (overflow hidden) -- only its <nav> (Main Menu / Quick
-       Actions / Admin) does, via flex-1 + min-h-0 + overflow-y-auto in
-       Sidebar.tsx. That guarantees the footer sections below the nav
-       (Unlock CTA, myResidency link, subscription card, account/Sign Out)
-       are ALWAYS fully visible and reachable with zero scrolling, no
-       matter how many nav items a future change adds. */
+       the drawer to the actual visible viewport, with overflow hidden --
+       there is nothing left to scroll. <nav> is NOT flex-1 on mobile (see
+       Sidebar.tsx: md:flex-1 only), so it sizes to its own content instead
+       of being force-stretched to fill the sidebar. Forcing that stretch
+       previously left a large empty gap between "Quick Actions" and the
+       footer that Android rendered a stray overscroll/scrollbar artifact
+       inside of, even though the content itself never needed to scroll.
+       With every section sized to its real content, the whole drawer
+       (logo, nav, Unlock CTA, myResidency link, subscription card,
+       account/Sign Out) comes out well under one screen's height on a
+       normal phone, with nothing scrollable and nothing to render oddly. */
     height: 100dvh;
     min-height: 0;
     overflow: hidden;
@@ -293,7 +297,7 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   .sidebar.mobile-open { transform: translateX(0); }
 
   /* Tighter tap targets so 5 nav links (incl. Quick Actions) + everything
-     below fits one screen with room to spare -- desktop's .sidebar-link
+     below fits comfortably under one screen -- desktop's .sidebar-link
      (10px 18px padding, 4px margin) is untouched. */
   .sidebar-link {
     padding: 6px 14px;
@@ -301,18 +305,6 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
     font-size: 0.78rem;
     min-height: unset;
   }
-
-  /* The <nav> keeps overflow-y:auto as a safety net for an unusually
-     short device/zoom level, but with the spacing above it should never
-     actually need to scroll on a normal phone. When it doesn't, no
-     scrollbar renders. When it does, hide the scrollbar's own visual
-     track/thumb (still fully swipeable/scrollable) so it never shows up
-     as a stray gray bar cutting across the middle of the drawer. */
-  .sidebar nav {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .sidebar nav::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
   .mobile-menu-toggle {
     display: flex;
