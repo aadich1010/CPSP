@@ -31,8 +31,18 @@ export default async function EditQuestionPage({
   // Difficulty, each option pair, Option E/Correct Answer) are paired up
   // in 2-column grids instead of stacking full-width like the Add Question
   // page does.
+  // The admin layout's <main> is `height: 100vh; overflow: hidden` (see
+  // src/app/admin/layout.tsx) -- it never scrolls itself, so any page
+  // rendered inside it that's taller than the viewport gets its overflow
+  // silently CLIPPED, not scrolled. That's why the Roman Urdu section and
+  // the Update/Cancel buttons were unreachable before, even after the
+  // compacting above -- on a shorter screen there simply wasn't enough
+  // room and nothing let you get to the rest. Every other admin page that
+  // can run long (e.g. the Questions table) works around this the same
+  // way: wrap the page's own content in `height: '100%'; overflowY: auto'`
+  // so IT scrolls internally instead of relying on the fixed-height shell.
   return (
-    <div style={{ maxWidth: 760 }}>
+    <div style={{ maxWidth: 760, height: '100%', overflowY: 'auto', paddingRight: 4, paddingBottom: 16 }}>
       <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#000000', marginBottom: 2 }}>

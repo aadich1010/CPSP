@@ -3,8 +3,13 @@ import Link from 'next/link'
 import { SUBJECT_GROUPS } from '@/lib/subjects'
 
 export default function AddQuestionPage() {
+  // Same fix as the Edit Question page: the admin layout's <main> is
+  // `height: 100vh; overflow: hidden` (src/app/admin/layout.tsx), so it
+  // never scrolls itself -- anything taller than the viewport is silently
+  // clipped rather than scrollable. Scrolling inside this page's own
+  // wrapper keeps the whole form reachable regardless of screen height.
   return (
-    <div style={{ maxWidth: 680 }}>
+    <div style={{ maxWidth: 680, height: '100%', overflowY: 'auto', paddingRight: 4, paddingBottom: 16 }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#000000', marginBottom: 4 }}>
           Add Question
