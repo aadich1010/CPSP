@@ -91,9 +91,26 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
 }
 
 /* ─── BORDER BEAM (Elite Pro card) ────────────────────────────── */
+/* FIX (2026-08-22): this used to animate `transform: rotate()` on the
+   WHOLE ::before box. That spins the already-masked ring as one rigid
+   rectangle -- fine for a perfect square, but every real card here is a
+   wide rounded rectangle, so the rotated ring's corners swing outside the
+   card's own (unrotated) edges and read as diagonal lines slicing across
+   neighbouring cards (exactly the bug reported: "poora box anticlock
+   ghoom raha hai", diagonal lines crossing the Quick Gateway / stats
+   cards). Fixed by never rotating the box at all -- only the conic-
+   gradient's start angle animates, via an animatable custom property
+   (@property below). The mask keeps re-deriving a ring from the CURRENT,
+   perfectly stable border-radius on every frame, so only the light
+   travels around a fixed, unmoving border. */
+@property --border-beam-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
 @keyframes border-beam {
-  0%   { transform: rotate(0deg);   }
-  100% { transform: rotate(360deg); }
+  0%   { --border-beam-angle: 0deg;   }
+  100% { --border-beam-angle: 360deg; }
 }
 .border-beam::before {
   content: '';
@@ -102,7 +119,7 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   border-radius: inherit;
   padding: 1px;
   background: conic-gradient(
-    from 0deg at 50% 50%,
+    from var(--border-beam-angle) at 50% 50%,
     transparent 0deg,
     var(--emerald) 60deg,
     var(--cyan) 120deg,
@@ -117,16 +134,22 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
 
 /* ─── BORDER BEAM, COUNTER-CLOCKWISE (exam gateway cards, feature/pricing
    cards, primary CTA buttons) ──────────────────────────────────
-   Same rotating conic-gradient "flashing light" ring as .border-beam
-   above, just spinning the opposite direction -- 360deg -> 0deg instead of
-   0deg -> 360deg -- per explicit request that these particular cards/
-   buttons read as spinning anticlockwise rather than clockwise. Kept as a
-   SEPARATE class (not a modification of .border-beam) so the existing
+   Same fixed-ring, travelling-light technique as .border-beam above (see
+   its 2026-08-22 fix comment for why the ring itself must never rotate),
+   just sweeping the gradient's start angle the opposite direction --
+   360deg -> 0deg instead of 0deg -> 360deg -- per explicit request that
+   these particular cards/buttons read as spinning anticlockwise. Kept as
+   a SEPARATE class (not a modification of .border-beam) so the existing
    Elite Pro pricing card, which already used .border-beam, keeps its
-   original clockwise spin untouched. */
+   original clockwise direction untouched. */
+@property --border-beam-angle-ccw {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 360deg;
+}
 @keyframes border-beam-ccw {
-  0%   { transform: rotate(360deg); }
-  100% { transform: rotate(0deg);   }
+  0%   { --border-beam-angle-ccw: 360deg; }
+  100% { --border-beam-angle-ccw: 0deg;   }
 }
 .border-beam-ccw::before {
   content: '';
@@ -135,7 +158,7 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   border-radius: inherit;
   padding: 1px;
   background: conic-gradient(
-    from 0deg at 50% 50%,
+    from var(--border-beam-angle-ccw) at 50% 50%,
     transparent 0deg,
     var(--cyan) 60deg,
     var(--emerald) 120deg,
