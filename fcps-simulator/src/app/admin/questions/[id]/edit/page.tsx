@@ -39,10 +39,18 @@ export default async function EditQuestionPage({
   // compacting above -- on a shorter screen there simply wasn't enough
   // room and nothing let you get to the rest. Every other admin page that
   // can run long (e.g. the Questions table) works around this the same
-  // way: wrap the page's own content in `height: '100%'; overflowY: auto'`
-  // so IT scrolls internally instead of relying on the fixed-height shell.
+  // way: wrap the page's own content in a scrollable box.
+  //
+  // maxHeight, not height: a fixed `height: '100%'` forces this box to
+  // always be exactly as tall as `main`'s content area, even when the form
+  // itself is shorter -- padding the page out with a big blank scrollable
+  // gap below the actual content (worse on mobile, where the browser's
+  // address-bar show/hide makes 100vh taller than what's actually visible,
+  // widening that gap further). `maxHeight` only ever caps the box; it
+  // shrinks to fit the real content and only turns on the scrollbar past
+  // that cap, with nothing to scroll into beyond the real form.
   return (
-    <div style={{ maxWidth: 760, height: '100%', overflowY: 'auto', paddingRight: 4, paddingBottom: 16 }}>
+    <div style={{ maxWidth: 760, maxHeight: '100%', overflowY: 'auto', paddingRight: 4, paddingBottom: 16 }}>
       <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#000000', marginBottom: 2 }}>

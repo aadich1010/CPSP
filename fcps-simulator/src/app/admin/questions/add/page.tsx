@@ -8,8 +8,11 @@ export default function AddQuestionPage() {
   // never scrolls itself -- anything taller than the viewport is silently
   // clipped rather than scrollable. Scrolling inside this page's own
   // wrapper keeps the whole form reachable regardless of screen height.
+  // maxHeight (not height) so this box shrinks to the real content instead
+  // of always padding out to fill the full viewport with blank scrollable
+  // space when the form is shorter than that.
   return (
-    <div style={{ maxWidth: 680, height: '100%', overflowY: 'auto', paddingRight: 4, paddingBottom: 16 }}>
+    <div style={{ maxWidth: 680, maxHeight: '100%', overflowY: 'auto', paddingRight: 4, paddingBottom: 16 }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#000000', marginBottom: 4 }}>
           Add Question
