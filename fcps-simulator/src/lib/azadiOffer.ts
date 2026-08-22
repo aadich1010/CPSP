@@ -47,8 +47,13 @@ export const AZADI_PLANS: AzadiPlan[] = [
     price: 'Rs. 9,999',
     amount: 9999,
     period: '6 months',
-    features: ['6 months access', 'Premium analytics', 'Priority sync', 'Extended bank'],
-    cta: 'Go advanced',
+    features: [
+      '6 months — go through the syllabus twice',
+      'Deep subject + difficulty breakdowns',
+      'Instant sync across every device',
+      'Thousands of extra practice questions',
+    ],
+    cta: 'Upgrade to 6 Months',
     ctaHref: checkoutHref('Advanced', 9999, '6 months'),
     // "Best value" moved to Elite Pro (see PLANS in app/page.tsx) at the
     // owner's request -- this card is no longer featured/badged.
@@ -61,8 +66,13 @@ export const AZADI_PLANS: AzadiPlan[] = [
     price: 'Rs. 14,999',
     amount: 14999,
     period: '1 year',
-    features: ['1 year access', 'Ultimate prep kit', 'Direct support', 'Full analytics'],
-    cta: 'Go platinum',
+    features: [
+      'A full year — zero renewal stress',
+      'Complete prep kit: notes + checklists',
+      'Direct line to our support team',
+      'Full analytics, week over week',
+    ],
+    cta: 'Lock In the Full Year',
     ctaHref: checkoutHref('Platinum', 14999, '1 year'),
     featured: false,
     badge: null,

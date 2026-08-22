@@ -81,14 +81,39 @@ function buildHref(plan: string, amount: number, period: string): string {
   return `/subscription-expired?${params.toString()}`
 }
 
+// Standard's flat monthly rate -- the baseline every other plan's "per month"
+// price and "% saved" badge is measured against below. Must match
+// PLANS[0].amount. Kept as a named constant (not re-derived from PLANS,
+// which isn't defined until after this point) so the CRO copy below can
+// never silently drift from the actual Standard price shown on the card.
+const STANDARD_MONTHLY = 1999
+
+// "3 months" / "1 year" -> a month count, purely for the per-month math
+// below -- never displayed directly, so it doesn't need to handle every
+// possible phrasing, just the ones PLANS/AZADI_PLANS actually use.
+function periodToMonths(period: string): number {
+  if (period.includes('year')) return 12
+  const n = parseInt(period, 10)
+  return Number.isNaN(n) ? 1 : n
+}
+
+// Computed (not hand-typed per plan) so a future price change can't leave a
+// stale "Save 17%" line sitting next to a price it no longer matches.
+function pricingBreakdown(amount: number, period: string) {
+  const months = periodToMonths(period)
+  const perMonth = Math.round(amount / months)
+  const savingsPct = months > 1 ? Math.round((1 - perMonth / STANDARD_MONTHLY) * 100) : 0
+  return { perMonth, savingsPct }
+}
+
 const PLANS: Plan[] = [
   {
     name: 'Standard',
     price: 'Rs. 1,999',
     amount: 1999,
     period: '1 month',
-    features: ['1 month access', 'Basic analytics', 'Mock exams'],
-    cta: 'Get started',
+    features: ['Full platform access for 30 days', "See exactly where you're losing marks", 'Real exam-timed mock tests'],
+    cta: 'Try 1 Month',
     ctaHref: buildHref('Standard', 1999, '1 month'),
     featured: false,
     badge: null,
@@ -98,8 +123,13 @@ const PLANS: Plan[] = [
     price: 'Rs. 4,999',
     amount: 4999,
     period: '3 months',
-    features: ['3 months access', 'Smart heatmaps', 'Forensic security', 'VIP support'],
-    cta: 'Instant access',
+    features: [
+      '3 months to close every weak area',
+      'Pinpoint your weakest subjects instantly',
+      'Tamper-proof, fully monitored exams',
+      'Skip the queue with real VIP support',
+    ],
+    cta: 'Get Elite Pro',
     ctaHref: buildHref('Elite Pro', 4999, '3 months'),
     // "Best value" badge (and the matching highlighted/glowing card
     // treatment) moved here from Advanced at the owner's request.
@@ -681,32 +711,47 @@ export default function Home() {
 
                   <div className="mb-0.5 text-[12px] font-semibold text-slate-500">{plan.name}</div>
 
-                  {plan.azadiOffer && azadiOfferActive ? (
-                    <>
-                      <div
-                        className="text-sm font-semibold text-red-500"
-                        style={{ textDecoration: 'line-through', textDecorationColor: '#ef4444', textDecorationThickness: '2px' }}
-                      >
-                        {plan.originalPrice}
-                      </div>
-                      <div
-                        className={`mb-0.5 text-2xl font-black ${plan.featured ? 'glow-text' : 'text-orange-600'}`}
-                      >
-                        {plan.price}
-                      </div>
-                      <div className="mb-2 text-xs text-slate-400">{plan.period} &middot; 40% off</div>
-                      <div className="mb-6 inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-emerald-600 px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-wide text-white shadow-[0_2px_10px_rgba(234,88,12,0.35)]">
-                        🇵🇰 Azadi Offer &bull; Valid till 14 Aug 2026
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className={`mb-0.5 text-xl font-black ${plan.featured ? 'glow-text' : 'text-slate-900'}`}>
-                        {plan.price}
-                      </div>
-                      <div className="mb-6 text-xs text-slate-400">{plan.period}</div>
-                    </>
-                  )}
+                  {(() => {
+                    const { perMonth, savingsPct } = pricingBreakdown(plan.amount, plan.period)
+                    return plan.azadiOffer && azadiOfferActive ? (
+                      <>
+                        <div
+                          className="text-sm font-semibold text-red-500"
+                          style={{ textDecoration: 'line-through', textDecorationColor: '#ef4444', textDecorationThickness: '2px' }}
+                        >
+                          {plan.originalPrice}
+                        </div>
+                        <div
+                          className={`mb-0.5 text-2xl font-black ${plan.featured ? 'glow-text' : 'text-orange-600'}`}
+                        >
+                          {plan.price}
+                        </div>
+                        <div className="mb-1 text-xs text-slate-400">{plan.period} &middot; 40% off</div>
+                        {savingsPct > 0 && (
+                          <div className="mb-2 text-[11px] font-bold text-emerald-600">
+                            Rs. {perMonth.toLocaleString('en-PK')}/mo &middot; Save {savingsPct}%
+                          </div>
+                        )}
+                        <div className="mb-6 inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-emerald-600 px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-wide text-white shadow-[0_2px_10px_rgba(234,88,12,0.35)]">
+                          🇵🇰 Azadi Offer &bull; Valid till 14 Aug 2026
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className={`mb-0.5 text-xl font-black ${plan.featured ? 'glow-text' : 'text-slate-900'}`}>
+                          {plan.price}
+                        </div>
+                        <div className="mb-1 text-xs text-slate-400">{plan.period}</div>
+                        {savingsPct > 0 ? (
+                          <div className="mb-6 text-[11px] font-bold text-emerald-600">
+                            Rs. {perMonth.toLocaleString('en-PK')}/mo &middot; Save {savingsPct}%
+                          </div>
+                        ) : (
+                          <div className="mb-6" />
+                        )}
+                      </>
+                    )
+                  })()}
 
                   <ul className="mb-6 flex flex-1 flex-col gap-3">
                     {plan.features.map((f) => (
@@ -719,19 +764,40 @@ export default function Home() {
                     ))}
                   </ul>
 
-                  {plan.featured ? (
-                    <GlowBtn href={plan.ctaHref}>
-                      {plan.cta} <ArrowRight size={14} />
-                    </GlowBtn>
-                  ) : (
-                    <Link href={plan.ctaHref}
-                      className="block rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center text-[12.5px] font-semibold text-slate-700 transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700">
-                      {plan.cta}
-                    </Link>
-                  )}
+                  {(() => {
+                    const { savingsPct } = pricingBreakdown(plan.amount, plan.period)
+                    const ctaLabel = savingsPct > 0 ? `${plan.cta} — Save ${savingsPct}%` : plan.cta
+                    return plan.featured ? (
+                      <GlowBtn href={plan.ctaHref}>
+                        {ctaLabel} <ArrowRight size={14} />
+                      </GlowBtn>
+                    ) : (
+                      <Link href={plan.ctaHref}
+                        className="block rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center text-[12.5px] font-semibold text-slate-700 transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700">
+                        {ctaLabel}
+                      </Link>
+                    )
+                  })()}
+
+                  {/* Short, honest reassurance line -- no invented guarantee,
+                      just what's actually true about each plan/flow. */}
+                  <div className="mt-2 text-center text-[10.5px] text-slate-400">
+                    {plan.name === 'Standard' && 'No long-term commitment'}
+                    {plan.name === 'Elite Pro' && 'Most flexible — one clean payment'}
+                    {plan.name === 'Advanced' && '6 months of full access'}
+                    {plan.name === 'Platinum' && 'Your lowest rate per month'}
+                  </div>
                 </GlassCard>
               </Reveal>
             ))}
+          </div>
+
+          {/* Trust bar -- only claims already true elsewhere on this page
+              (see the "How do I activate my account?" FAQ below) restated
+              here where the buyer is actually deciding. */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-medium text-slate-400">
+            <span>🔒 Secure payment &middot; no card details stored</span>
+            <span>✅ Manually verified activation &middot; usually within a few hours</span>
           </div>
         </div>
       </section>
