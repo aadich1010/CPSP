@@ -608,12 +608,22 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                 <motion.div className="rs-card" initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{delay:0.3}} style={{display:'flex',flexDirection:'column'}}>
                   <div className="rs-label">Subject Accuracy — By Question</div>
                   {subjectDataReliable ? (
+                    // Angled X-axis labels (was: horizontal, interval={0} --
+                    // fine for FCPS's handful of subjects, but a paper with
+                    // many subjects (JCAT's 18, or a Mixed FCPS attempt)
+                    // packed every label into the same narrow card width
+                    // and they visibly overlapped into unreadable stacked
+                    // text. -60° + textAnchor="end" + extra XAxis height
+                    // gives every label its own diagonal lane regardless of
+                    // subject count -- this is a permanent layout fix, not
+                    // a per-exam tweak.
                     <div style={{flex:1,marginTop:4,minHeight:0}}>
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={subjectData} margin={{top:6,right:6,left:-24,bottom:0}}>
+                        <BarChart data={subjectData} margin={{top:6,right:6,left:-24,bottom:4}}>
                           <CartesianGrid strokeDasharray="3 3" stroke="rgba(16,185,129,0.1)" vertical={false}/>
-                          <XAxis dataKey="name" tick={{fontSize:9,fill:'#64748b'}} axisLine={false} tickLine={false} interval={0}
-                            tickFormatter={(v:string)=>v.length>8?v.slice(0,8)+'…':v}/>
+                          <XAxis dataKey="name" tick={{fontSize:8,fill:'#64748b'}} axisLine={false} tickLine={false} interval={0}
+                            angle={-60} textAnchor="end" height={54}
+                            tickFormatter={(v:string)=>v.length>10?v.slice(0,10)+'…':v}/>
                           <YAxis tick={{fontSize:10,fill:'#64748b'}} axisLine={false} tickLine={false} domain={[0,100]}/>
                           <Tooltip contentStyle={{background:'#ffffff',border:'1px solid rgba(16,185,129,0.2)',borderRadius:8,fontSize:'0.72rem'}}
                             formatter={((v: number, _n: string, p: { payload: { correct: number; total: number } }) =>
