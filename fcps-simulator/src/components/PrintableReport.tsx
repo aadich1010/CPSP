@@ -66,6 +66,12 @@ export interface PrintableReportProps {
    *  -- this only changes what's shown for exams where that claim would be
    *  factually wrong. */
   hasNegativeMarking?: boolean;
+  /** Total marks for the paper when it's not simply "1 mark per question"
+   *  (e.g. MS/MD JCAT: 100 MCQs, 250 total marks, 2.5 marks per correct
+   *  answer). Only rescales the printed score fraction/stat -- pct/pass
+   *  above are already correct. Undefined (default) keeps every existing
+   *  report's "correct/total questions" printing unchanged. */
+  totalMarks?: number;
 }
 
 /* ── Recommendation engine ──────────────────────────────────────────────
@@ -295,8 +301,12 @@ export default function PrintableReport(props: PrintableReportProps) {
     candidateName, candidateEmail, subject, mode, sessionId, submittedAt,
     correct, wrong, skipped, total, pct, pass, accuracy,
     subjectData, subjectDataReliable, strongest, weakest, responses,
-    examLabel = 'FCPS Part-1', hasNegativeMarking = false,
+    examLabel = 'FCPS Part-1', hasNegativeMarking = false, totalMarks,
   } = props;
+
+  const marksPerQuestion = totalMarks && total > 0 ? totalMarks / total : 1;
+  const displayMarks = totalMarks ? Math.round(correct * marksPerQuestion * 100) / 100 : correct;
+  const displayTotal = totalMarks ?? total;
 
   const attempted = correct + wrong;
   const when = submittedAt ?? new Date();
@@ -385,7 +395,7 @@ export default function PrintableReport(props: PrintableReportProps) {
                 transform="rotate(-90 20 20)"
               />
               <text x="20" y="19.5" textAnchor="middle" fontSize="9" fontWeight="900" fill="#0f172a">{pct}%</text>
-              <text x="20" y="25" textAnchor="middle" fontSize="4.2" fontWeight="600" fill="#64748b">{correct}/{total}</text>
+              <text x="20" y="25" textAnchor="middle" fontSize="4.2" fontWeight="600" fill="#64748b">{displayMarks}/{displayTotal}{totalMarks ? ' marks' : ''}</text>
             </svg>
             <div className={`pr-verdict ${pass ? 'pass' : 'fail'}`}>
               {pass ? 'PASS' : 'BELOW PASSING'}
@@ -399,7 +409,14 @@ export default function PrintableReport(props: PrintableReportProps) {
               { n: skipped,   l: 'Unattempted',       c: '#d97706' },
               { n: correct,   l: 'Correct Answers',   c: '#16a34a' },
               { n: wrong,     l: 'Incorrect Answers', c: '#dc2626' },
-              { n: `${pct}%`, l: 'Total Score',       c: '#0d9488' },
+              // Same box as every other report -- when this paper has real
+              // total marks (e.g. MS/MD JCAT's 250), show the marks scored
+              // there instead of a second copy of the percentage (already
+              // shown in the ring above). Keeps the 6-box grid untouched
+              // for every exam that doesn't pass totalMarks.
+              totalMarks
+                ? { n: `${displayMarks}/${totalMarks}`, l: 'Marks Scored', c: '#0d9488' }
+                : { n: `${pct}%`, l: 'Total Score', c: '#0d9488' },
             ].map((s) => (
               <div key={s.l} className="pr-stat">
                 <div className="pr-stat-n" style={{ color: s.c }}>{s.n}</div>

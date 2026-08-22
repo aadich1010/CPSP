@@ -46,6 +46,14 @@ interface Props {
    *  Multi-exam attempts pass their own exam_types.display_name instead --
    *  see supabase/migrations/20260822000000_multi_exam_platform_foundation.sql. */
   examLabel?: string;
+  /** Total marks for the paper when it's not simply "1 mark per question"
+   *  (e.g. MS/MD JCAT: 100 MCQs but 250 total marks, 2.5 marks per correct
+   *  answer -- see ExamEngine's totalMarks prop doc comment). Only changes
+   *  the score fraction shown here (marks scored / total marks instead of
+   *  correct / total questions) -- the percentage and pass/fail verdict
+   *  are unaffected since the multiplier is constant. Undefined (default)
+   *  keeps every exam's existing "correct/total questions" display. */
+  totalMarks?: number;
 }
 
 /* ── Styles (scoped) ────────────────────────────── */
@@ -168,7 +176,7 @@ const RING_C = 2*Math.PI*RING_R;
 const CELEBRATION_THRESHOLD = 85;
 
 /* ── Component ──────────────────────────────────── */
-export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, finalScore, userId, candidateName, candidateEmail, sessionId, submittedAt, examLabel = 'FCPS Part 1' }: Props) {
+export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, finalScore, userId, candidateName, candidateEmail, sessionId, submittedAt, examLabel = 'FCPS Part 1', totalMarks }: Props) {
   const [tab, setTab] = useState<'dash'|'review'>('dash');
   const [filter, setFilter] = useState<'all'|'correct'|'wrong'|'skipped'>('all');
   // Real attempt history (replaces previous hardcoded mock numbers). Each
@@ -237,6 +245,13 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
   const displayScore = hasNegativeMarking ? finalScore! : correct;
   const pct = total > 0 ? Math.round((displayScore/total)*100) : 0;
   const pass = pct >= 60;
+  // Marks-scaled display (e.g. MS/MD JCAT: 100 MCQs -> 250 total marks,
+  // 2.5 marks per correct answer) -- a pure linear rescale of displayScore/
+  // total, so pct/pass above are already correct and untouched. Only the
+  // fraction actually shown to the candidate changes.
+  const marksPerQuestion = totalMarks && total > 0 ? totalMarks / total : 1;
+  const displayMarks = totalMarks ? Math.round(displayScore * marksPerQuestion * 100) / 100 : displayScore;
+  const displayTotal = totalMarks ?? total;
 
   // One-shot celebration burst for a strong score. PremiumResultScreen is
   // mounted fresh per attempt (ExamEngine only renders it once submitted),
@@ -343,6 +358,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
         weakest={weakest}
         examLabel={examLabel}
         hasNegativeMarking={hasNegativeMarking}
+        totalMarks={totalMarks}
       />
 
       <div className="rs-root">
@@ -402,7 +418,7 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                     </svg>
                     <div className="rs-ring-center">
                       <div className="rs-pct">{pct}%</div>
-                      <div className="rs-frac">{hasNegativeMarking ? finalScore : correct}/{total}</div>
+                      <div className="rs-frac">{displayMarks}/{displayTotal}{totalMarks ? ' marks' : ''}</div>
                     </div>
                   </div>
 
@@ -410,6 +426,10 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                   {hasNegativeMarking ? (
                     <div style={{fontSize:'0.6rem',color:'#94a3b8',fontWeight:600,marginTop:4}}>
                       {correct} correct − {(correct - finalScore!).toFixed(2)} negative marking = {finalScore} final score
+                    </div>
+                  ) : totalMarks ? (
+                    <div style={{fontSize:'0.6rem',color:'#94a3b8',fontWeight:600,marginTop:4}}>
+                      {correct} correct × {marksPerQuestion} marks = {displayMarks}/{totalMarks} — no negative marking
                     </div>
                   ) : (
                     <div style={{fontSize:'0.6rem',color:'#94a3b8',fontWeight:600,marginTop:4}}>No negative marking — score reflects correct answers only</div>

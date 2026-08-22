@@ -75,6 +75,16 @@ interface ExamEngineProps {
    *  in the side palette. Default false -- palette keeps its current/
    *  answered-only colouring for every exam that doesn't opt in. */
   allowMarkForReview?: boolean
+  /** Total marks for the paper when it's NOT simply "1 mark per question"
+   *  (e.g. MS/MD JCAT: 100 MCQs but 250 total marks, 2.5 marks per correct
+   *  answer -- see the exam pattern spec in exam/session/page.tsx). Only
+   *  changes the entry-modal wording and the result screen's score
+   *  display; the underlying percentage is identical either way since the
+   *  marks-per-question multiplier is constant, so nothing about grading
+   *  or pass/fail changes. Undefined (default) keeps every exam's existing
+   *  "1 mark per correct answer, out of {questionCount}" wording exactly
+   *  as before. */
+  totalMarks?: number
 }
 
 type Answer = string | null
@@ -198,7 +208,7 @@ function formatTime(secs: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail, shuffleAnswers = true, examLabel = 'FCPS Part 1', hasNegativeMarking = false, entryModal = false, freeNavigation = false, allowMarkForReview = false }: ExamEngineProps) {
+export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail, shuffleAnswers = true, examLabel = 'FCPS Part 1', hasNegativeMarking = false, entryModal = false, freeNavigation = false, allowMarkForReview = false, totalMarks }: ExamEngineProps) {
   // Shuffled ONCE per mount (lazy initialiser), never on re-render -- otherwise
   // the options would jump around under the student's cursor every tick of the
   // timer. Question ORDER is already randomised per attempt server-side by
@@ -424,6 +434,13 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
 
   if (entryModal && !started) {
     const timeLimitMinutes = Math.round(timeLimitSeconds / 60)
+    // When a paper's total marks aren't simply "1 per question" (e.g.
+    // MS/MD JCAT: 100 MCQs, 250 total marks -> 2.5 marks per correct
+    // answer), show that real marks-per-question figure instead of the
+    // generic "1 Mark per correct answer" line. Purely informational --
+    // see the totalMarks prop doc comment above for why this never
+    // touches actual grading.
+    const marksPerQuestion = totalMarks ? totalMarks / questions.length : 1
     return (
       <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(15,23,42,0.72)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
         <div style={{ background: '#ffffff', borderRadius: 16, padding: '28px 28px 24px', maxWidth: 440, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.35)' }}>
@@ -433,19 +450,25 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
           <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
             <li style={{ display: 'flex', gap: 10, fontSize: '0.9rem', color: '#334155' }}>
               <Icon name="questionBank" />
-              <span><strong>Total Number of Questions:</strong> {questions.length} MCQs</span>
+              <span><strong>Total Number of Questions:</strong> {questions.length} MCQs (Single Best Answer)</span>
             </li>
+            {totalMarks ? (
+              <li style={{ display: 'flex', gap: 10, fontSize: '0.9rem', color: '#334155' }}>
+                <Icon name="info" />
+                <span><strong>Total Marks:</strong> {totalMarks} Marks (Each correct answer = {marksPerQuestion} marks)</span>
+              </li>
+            ) : null}
             <li style={{ display: 'flex', gap: 10, fontSize: '0.9rem', color: '#334155' }}>
               <Icon name="schedule" />
-              <span><strong>Total Time Allowed:</strong> {timeLimitMinutes} Minutes</span>
+              <span><strong>Total Time Allowed:</strong> {timeLimitMinutes} Minutes ({Math.round((timeLimitMinutes / 60) * 100) / 100} Hours)</span>
             </li>
             <li style={{ display: 'flex', gap: 10, fontSize: '0.9rem', color: '#334155' }}>
               <Icon name="info" />
               <span>
-                <strong>Marking System:</strong> 1 Mark per correct answer.{' '}
+                <strong>Marking System:</strong> {marksPerQuestion} Mark{marksPerQuestion !== 1 ? 's' : ''} per correct answer.{' '}
                 {hasNegativeMarking
                   ? 'Negative marking applies for incorrect answers.'
-                  : <>There is <strong>NO negative marking</strong> for wrong answers.</>}
+                  : <>There is <strong>NO negative marking</strong> — a wrong answer costs no marks.</>}
               </span>
             </li>
           </ul>
@@ -477,6 +500,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
         sessionId={sessionId}
         submittedAt={submittedAt}
         examLabel={examLabel}
+        totalMarks={totalMarks}
       />
     )
   }

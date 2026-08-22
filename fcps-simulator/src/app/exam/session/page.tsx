@@ -116,6 +116,13 @@ export default async function ExamSessionPage({
     // other exam (FCPS included) keeps its exact existing ExamEngine
     // behaviour untouched until explicitly opted in the same way.
     const isJcat = params.examSlug === 'ms-md'
+    // MS/MD JCAT's real exam pattern: 100 MCQs but 250 total marks (2.5
+    // marks per correct answer), 150 minutes, no negative marking -- see
+    // the entry-modal/result-screen totalMarks prop doc comments for how
+    // this only rescales the DISPLAYED score, never the pass/fail logic.
+    // Hardcoded to this one exam slug on purpose, same pattern as isJcat
+    // above -- every other exam keeps showing "1 mark per question".
+    const jcatTotalMarks = isJcat ? 250 : undefined
 
     return (
       <ExamEngine
@@ -133,6 +140,7 @@ export default async function ExamSessionPage({
         entryModal={isJcat}
         freeNavigation={isJcat}
         allowMarkForReview={isJcat}
+        totalMarks={jcatTotalMarks}
       />
     )
   }
