@@ -23,6 +23,12 @@ export interface VvipUpgradeBannerProps {
    *  target exam name (dashboard/page.tsx) for anyone registered for a
    *  different exam (e.g. MS/MD (JCAT)). */
   examLabel?: string
+  /** Tighter padding/type scale and no feature-pill row -- used on the
+   *  dashboard (dashboard/page.tsx) where this banner is one of several
+   *  stacked sections that all need to fit on one screen without a
+   *  scrollbar. Defaults to false so every other placement (e.g. the
+   *  landing page) keeps the original, larger treatment untouched. */
+  compact?: boolean
 }
 
 const FEATURES = [
@@ -56,6 +62,7 @@ export default function VvipUpgradeBanner({
   joinedCount,
   offerDeadline,
   examLabel = 'FCPS Part 1',
+  compact = false,
 }: VvipUpgradeBannerProps) {
   const countdown = useCountdown(offerDeadline)
 
@@ -65,8 +72,8 @@ export default function VvipUpgradeBanner({
     // container would cut that ring off right at the edge instead of
     // letting it show around the card. The gradient background itself
     // still respects the rounded corners without needing clipping.
-    <div className="border-beam relative w-full max-w-full rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-5 shadow-xl sm:p-7">
-      <div className="flex w-full max-w-full flex-col gap-5 md:flex-row md:items-center md:justify-between">
+    <div className={`border-beam relative w-full max-w-full rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-xl ${compact ? 'p-3' : 'p-5 sm:p-7'}`}>
+      <div className={`flex w-full max-w-full flex-col md:flex-row md:items-center md:justify-between ${compact ? 'gap-2' : 'gap-5'}`}>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="inline-flex min-h-[24px] items-center rounded-full bg-gradient-to-r from-amber-400 to-orange-400 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-slate-900">
@@ -79,27 +86,31 @@ export default function VvipUpgradeBanner({
             )}
           </div>
 
-          <h2 className="mt-2 break-words text-lg font-extrabold text-white sm:text-xl">
+          <h2 className={`break-words font-extrabold text-white ${compact ? 'mt-1 text-sm' : 'mt-2 text-lg sm:text-xl'}`}>
             Unlock the full {examLabel} question bank
           </h2>
-          <p className="mt-1 max-w-full break-words text-xs text-slate-300 sm:text-sm">
-            Timed mock exams, performance analytics, and every subject — no limits.
-          </p>
+          {!compact && (
+            <p className="mt-1 max-w-full break-words text-xs text-slate-300 sm:text-sm">
+              Timed mock exams, performance analytics, and every subject — no limits.
+            </p>
+          )}
 
-          <div className="mt-3 flex flex-wrap gap-2">
-            {FEATURES.map((f) => (
-              <span
-                key={f.label}
-                className="inline-flex min-h-[28px] items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold text-white sm:text-xs"
-              >
-                <f.icon size={13} className="shrink-0 text-emerald-300" />
-                {f.label}
-              </span>
-            ))}
-          </div>
+          {!compact && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {FEATURES.map((f) => (
+                <span
+                  key={f.label}
+                  className="inline-flex min-h-[28px] items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold text-white sm:text-xs"
+                >
+                  <f.icon size={13} className="shrink-0 text-emerald-300" />
+                  {f.label}
+                </span>
+              ))}
+            </div>
+          )}
 
           {countdown && (
-            <div className="mt-3 flex items-center gap-1.5 text-[11px] font-bold text-amber-300">
+            <div className={`flex items-center gap-1.5 text-[11px] font-bold text-amber-300 ${compact ? 'mt-1' : 'mt-3'}`}>
               <span>Offer ends in</span>
               <span className="rounded bg-white/10 px-1.5 py-0.5 tabular-nums">
                 {String(countdown.hours).padStart(2, '0')}:{String(countdown.minutes).padStart(2, '0')}:{String(countdown.seconds).padStart(2, '0')}
@@ -115,7 +126,7 @@ export default function VvipUpgradeBanner({
         >
           <Link
             href={pricingHref}
-            className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-black uppercase tracking-wide text-white transition hover:scale-[1.02] md:w-auto"
+            className={`flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 font-black uppercase tracking-wide text-white transition hover:scale-[1.02] md:w-auto ${compact ? 'min-h-[32px] px-4 py-1.5 text-xs' : 'min-h-[44px] px-6 py-3 text-sm'}`}
           >
             Unlock Full Access
           </Link>

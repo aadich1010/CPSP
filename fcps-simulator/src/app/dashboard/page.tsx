@@ -232,7 +232,7 @@ export default async function DashboardPage() {
       {/* Header / Hero + Referral -- both shown at ~50% size, side by side
           in one row (the SocialProofTicker itself now renders globally
           above the sidebar/main layout, in dashboard/layout.tsx). */}
-      <div style={{ marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 10 }} className="w-full max-w-full">
+      <div style={{ marginBottom: 6, display: 'flex', flexWrap: 'wrap', gap: 8 }} className="w-full max-w-full">
         <div style={{ flex: '1 1 260px', minWidth: 0 }}>
           <HeroBanner
             name={name}
@@ -247,19 +247,25 @@ export default async function DashboardPage() {
           <ReferralWidget referralLink={referralLink} compact examLabel={examLabel} />
         </div>
       </div>
-      <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: -4, marginBottom: 12 }} className="break-words">
+      <p style={{ color: '#64748b', fontSize: '0.68rem', marginTop: -2, marginBottom: 6 }} className="break-words">
         {statusLine}
       </p>
 
-      {/* Scrollable Container */}
-      <div style={{ flex: 1, overflowY: 'auto', paddingRight: 4, paddingBottom: 8 }} className="w-full max-w-full">
+      {/* Compact paddings/font-sizes throughout this block plus the
+          single-row-of-6 JCAT subject grid below are sized to fit the
+          whole MS/MD (JCAT) dashboard on one screen with no scrollbar on a
+          typical desktop viewport. overflowY stays 'auto' as a safety net
+          for FCPS (36 subjects across several groups genuinely can't fit
+          on one screen) and for unusually short viewports -- it just never
+          engages for the JCAT view since that content now fits. */}
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: 4 }} className="w-full max-w-full">
       {/* Stats Row */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-          gap: 10,
-          marginBottom: 16,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+          gap: 8,
+          marginBottom: 8,
         }}
       >
         {/* Same "executive muted jewel-tone" palette as the subject cards
@@ -276,20 +282,20 @@ export default async function DashboardPage() {
             key={stat.label}
             className="flash-glow-border"
             style={{
-              padding: '12px 14px',
-              borderRadius: 14,
+              padding: '7px 10px',
+              borderRadius: 12,
               background: `linear-gradient(135deg, ${stat.bg}, ${stat.bgDark})`,
               boxShadow: `0 2px 8px ${stat.bg}55`,
               color: '#ffffff',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Icon name={stat.icon as IconName} size="lg" />
-              <div style={{ fontSize: '1.3rem', fontWeight: 800, lineHeight: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Icon name={stat.icon as IconName} size="sm" />
+              <div style={{ fontSize: '1.05rem', fontWeight: 800, lineHeight: 1 }}>
                 {stat.value}
               </div>
             </div>
-            <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.82)', marginTop: 2, fontWeight: 600 }}>
+            <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.82)', marginTop: 1, fontWeight: 600 }}>
               {stat.label}
             </div>
           </div>
@@ -302,30 +308,31 @@ export default async function DashboardPage() {
           background: 'rgba(13,148,136,0.06)',
           border: '1px solid rgba(13,148,136,0.2)',
           borderRadius: 10,
-          padding: '12px 16px',
-          marginBottom: 16,
+          padding: '7px 12px',
+          marginBottom: 8,
           display: 'flex',
           alignItems: 'center',
-          gap: 12,
+          gap: 10,
+          flexWrap: 'wrap',
         }}
       >
-        <h2 style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>
+        <h2 style={{ fontSize: '0.74rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>
           Quick Actions
         </h2>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          <Link href="/exam/setup" className="btn btn-primary btn-sm" style={{ padding: '6px 12px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          <Link href="/exam/setup" className="btn btn-primary btn-sm" style={{ padding: '4px 10px', fontSize: '0.7rem' }}>
             Start Mock Exam
           </Link>
-          <Link href="/dashboard/analysis" className="btn btn-ghost btn-sm" style={{ padding: '6px 12px' }}>
+          <Link href="/dashboard/analysis" className="btn btn-ghost btn-sm" style={{ padding: '4px 10px', fontSize: '0.7rem' }}>
             <Icon name="analytics" /> Analysis
           </Link>
-          <Link href="/dashboard/history" className="btn btn-ghost btn-sm" style={{ padding: '6px 12px' }}>
+          <Link href="/dashboard/history" className="btn btn-ghost btn-sm" style={{ padding: '4px 10px', fontSize: '0.7rem' }}>
             <Icon name="mockExam" /> History
           </Link>
-          <Link href="/dashboard/recent" className="btn btn-ghost btn-sm" style={{ padding: '6px 12px' }}>
+          <Link href="/dashboard/recent" className="btn btn-ghost btn-sm" style={{ padding: '4px 10px', fontSize: '0.7rem' }}>
             <Icon name="practice" /> Recent Exams
           </Link>
-          <Link href="/dashboard/weak" className="btn btn-ghost btn-sm" style={{ padding: '6px 12px' }}>
+          <Link href="/dashboard/weak" className="btn btn-ghost btn-sm" style={{ padding: '4px 10px', fontSize: '0.7rem' }}>
             <Icon name="warning" /> Weak Subjects
           </Link>
         </div>
@@ -333,12 +340,13 @@ export default async function DashboardPage() {
 
       {/* VVIP upgrade banner -- premium/admin users never see it */}
       {!isPremium && (
-        <div style={{ marginBottom: 20 }} className="w-full max-w-full">
+        <div style={{ marginBottom: 8, flexShrink: 0 }} className="w-full max-w-full">
           <VvipUpgradeBanner
             pricingHref="/#pricing"
             joinedCount={joinedCount}
             offerDeadline={isAzadiOfferActive() ? AZADI_OFFER_DEADLINE : undefined}
             examLabel={examLabel}
+            compact
           />
         </div>
       )}
@@ -347,33 +355,35 @@ export default async function DashboardPage() {
           structure (Basic Sciences / Medicine & Allied / Surgery & Allied);
           every other exam (FCPS included) keeps the existing SUBJECT_GROUPS
           grid exactly as it was. */}
-      <div style={{ marginTop: 20 }}>
+      <div style={{ marginTop: 4 }}>
         {isJcat ? (
           <>
-            <h2 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0f172a', marginBottom: 2 }}>
+            <h2 style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0f172a', marginBottom: 1 }}>
               MS/MD JCAT Exam Categories
             </h2>
-            <p style={{ fontSize: '0.72rem', color: '#94a3b8', marginBottom: 14 }}>
+            <p style={{ fontSize: '0.64rem', color: '#94a3b8', marginBottom: 6 }}>
               Comprehensive distribution covering Basic Sciences, Medicine, and Surgery as per JCAT layout.
             </p>
+            {/* Each category always has exactly 6 subjects (see
+                JCAT_CATEGORIES above) -- a fixed 6-column grid keeps every
+                category to a single row instead of wrapping, which is what
+                lets all 3 categories + everything above fit on one screen
+                without a scrollbar on a typical desktop viewport. */}
             {JCAT_CATEGORIES.map((cat) => (
-              <div key={cat.name} style={{ marginBottom: 20 }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
-                  <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>
+              <div key={cat.name} style={{ marginBottom: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 1 }}>
+                  <h3 style={{ fontSize: '0.76rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>
                     {cat.name}
                   </h3>
-                  <span style={{ fontSize: '0.66rem', fontWeight: 700, color: '#0d9488', background: 'rgba(13,148,136,0.1)', padding: '1px 8px', borderRadius: 999 }}>
+                  <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#0d9488', background: 'rgba(13,148,136,0.1)', padding: '1px 7px', borderRadius: 999 }}>
                     {cat.weight}
                   </span>
                 </div>
-                <p style={{ fontSize: '0.72rem', color: '#94a3b8', marginBottom: 10 }}>
-                  {cat.description}
-                </p>
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(155px, 1fr))',
-                    gap: 8,
+                    gridTemplateColumns: 'repeat(6, minmax(0, 1fr))',
+                    gap: 6,
                   }}
                 >
                   {cat.subjects.map((s) => (
