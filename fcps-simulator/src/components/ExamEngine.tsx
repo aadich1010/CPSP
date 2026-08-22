@@ -101,6 +101,20 @@ interface ExamEngineProps {
    *  both papers must be passed separately. Purely informational; doesn't
    *  change this practice attempt's own 60%-pass-mark verdict. */
   isFullMockPaper?: boolean
+  /** USMLE-only: how the result screen should present the final score.
+   *  'pass-fail' (Step 1) shows a large PASS/FAIL verdict instead of a
+   *  percentage; 'numeric-usmle' (Step 2 CK) linearly maps the same
+   *  underlying percentage onto the real ~194-300 score scale, clearly
+   *  labelled as an indicative practice estimate. Neither mode changes the
+   *  actual percentage/pass-mark calculation -- purely a display choice.
+   *  Undefined for every non-USMLE exam, which keeps the existing plain
+   *  percentage display exactly as before. */
+  scoreDisplay?: 'pass-fail' | 'numeric-usmle'
+  /** USMLE-only: minutes left in the shared inter-block break pool at the
+   *  moment this block started, shown as an extra entry-modal bullet so the
+   *  candidate knows how much break time they have left overall. Undefined
+   *  for every non-USMLE exam. */
+  breakPoolMinutesRemaining?: number
 }
 
 type Answer = string | null
@@ -224,7 +238,7 @@ function formatTime(secs: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail, shuffleAnswers = true, examLabel = 'FCPS Part 1', hasNegativeMarking = false, entryModal = false, freeNavigation = false, allowMarkForReview = false, totalMarks, nextExamHref, nextExamLabel, isFullMockPaper = false }: ExamEngineProps) {
+export default function ExamEngine({ sessionId, questions: rawQuestions, subject, mode, userId, timeLimitSeconds, candidateName, candidateEmail, shuffleAnswers = true, examLabel = 'FCPS Part 1', hasNegativeMarking = false, entryModal = false, freeNavigation = false, allowMarkForReview = false, totalMarks, nextExamHref, nextExamLabel, isFullMockPaper = false, scoreDisplay, breakPoolMinutesRemaining }: ExamEngineProps) {
   // Shuffled ONCE per mount (lazy initialiser), never on re-render -- otherwise
   // the options would jump around under the student's cursor every tick of the
   // timer. Question ORDER is already randomised per attempt server-side by
@@ -478,6 +492,12 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
               <Icon name="schedule" />
               <span><strong>Total Time Allowed:</strong> {timeLimitMinutes} Minutes ({Math.round((timeLimitMinutes / 60) * 100) / 100} Hours)</span>
             </li>
+            {breakPoolMinutesRemaining !== undefined ? (
+              <li style={{ display: 'flex', gap: 10, fontSize: '0.9rem', color: '#334155' }}>
+                <Icon name="schedule" />
+                <span><strong>Break Time Remaining:</strong> {breakPoolMinutesRemaining} minutes left in your shared break pool for the rest of this exam.</span>
+              </li>
+            ) : null}
             <li style={{ display: 'flex', gap: 10, fontSize: '0.9rem', color: '#334155' }}>
               <Icon name="info" />
               <span>
@@ -517,6 +537,7 @@ export default function ExamEngine({ sessionId, questions: rawQuestions, subject
         submittedAt={submittedAt}
         examLabel={examLabel}
         totalMarks={totalMarks}
+        scoreDisplay={scoreDisplay}
         nextExamHref={nextExamHref}
         nextExamLabel={nextExamLabel}
         isFullMockPaper={isFullMockPaper}

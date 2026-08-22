@@ -66,6 +66,16 @@ interface Props {
    *  percentage pass mark, and that both papers must be passed separately.
    *  Purely informational; doesn't change this attempt's own verdict. */
   isFullMockPaper?: boolean;
+  /** USMLE-only: how to present the final score in the ring/verdict area.
+   *  'pass-fail' (Step 1, which is reported Pass/Fail on the real exam)
+   *  swaps the percentage/verdict pill for a large PASS/FAIL result using
+   *  the same pct>=60 threshold already computed below -- the underlying
+   *  calculation is untouched, only the label changes. 'numeric-usmle'
+   *  (Step 2 CK, which is reported as a 3-digit score) linearly maps pct
+   *  onto the real ~194-300 scale and shows it with a clear "indicative
+   *  practice estimate" disclaimer. Undefined (default) keeps every other
+   *  exam's plain percentage ring exactly as before. */
+  scoreDisplay?: 'pass-fail' | 'numeric-usmle';
 }
 
 /* ── Styles (scoped) ────────────────────────────── */
@@ -195,7 +205,7 @@ const RING_C = 2*Math.PI*RING_R;
 const CELEBRATION_THRESHOLD = 85;
 
 /* ── Component ──────────────────────────────────── */
-export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, finalScore, userId, candidateName, candidateEmail, sessionId, submittedAt, examLabel = 'FCPS Part 1', totalMarks, nextExamHref, nextExamLabel, isFullMockPaper = false }: Props) {
+export default function PremiumResultScreen({ questions, answers, subject, mode, score, total: totalProp, finalScore, userId, candidateName, candidateEmail, sessionId, submittedAt, examLabel = 'FCPS Part 1', totalMarks, nextExamHref, nextExamLabel, isFullMockPaper = false, scoreDisplay }: Props) {
   const [tab, setTab] = useState<'dash'|'review'>('dash');
   const [filter, setFilter] = useState<'all'|'correct'|'wrong'|'skipped'>('all');
   // Real attempt history (replaces previous hardcoded mock numbers). Each
@@ -264,6 +274,14 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
   const displayScore = hasNegativeMarking ? finalScore! : correct;
   const pct = total > 0 ? Math.round((displayScore/total)*100) : 0;
   const pass = pct >= 60;
+  // USMLE Step 2 CK's real score scale runs roughly 194-300 with a ~214
+  // passing mark. This is a linear map of THIS practice attempt's pct onto
+  // that range purely for display -- never a claim of an official score,
+  // hence the disclaimer wherever it's shown. pct/pass above stay the real
+  // source of truth for grading; this is presentation only.
+  const usmleNumericScore = scoreDisplay === 'numeric-usmle'
+    ? Math.round(194 + (pct / 100) * (300 - 194))
+    : undefined;
   // Marks-scaled display (e.g. MS/MD JCAT: 100 MCQs -> 250 total marks,
   // 2.5 marks per correct answer) -- a pure linear rescale of displayScore/
   // total, so pct/pass above are already correct and untouched. Only the
@@ -440,12 +458,33 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                         transition={{duration:1.4,ease:'easeOut'}}/>
                     </svg>
                     <div className="rs-ring-center">
-                      <div className="rs-pct">{pct}%</div>
-                      <div className="rs-frac">{displayMarks}/{displayTotal}{totalMarks ? ' marks' : ''}</div>
+                      {scoreDisplay === 'pass-fail' ? (
+                        <div className="rs-pct" style={{fontSize:'1.5rem'}}>{pass?'PASS':'FAIL'}</div>
+                      ) : scoreDisplay === 'numeric-usmle' ? (
+                        <>
+                          <div className="rs-pct" style={{fontSize:'1.9rem'}}>{usmleNumericScore}</div>
+                          <div className="rs-frac">estimated score</div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="rs-pct">{pct}%</div>
+                          <div className="rs-frac">{displayMarks}/{displayTotal}{totalMarks ? ' marks' : ''}</div>
+                        </>
+                      )}
                     </div>
                   </div>
 
                   <div className={`rs-verdict ${pass?'rs-pass':'rs-fail'}`}>{pass?'PASS — ELIGIBLE':'FAIL — PRACTICE MORE'}</div>
+                  {scoreDisplay === 'numeric-usmle' && (
+                    <div style={{fontSize:'0.58rem',color:'#94a3b8',fontWeight:600,marginTop:4,lineHeight:1.4,textAlign:'center'}}>
+                      Indicative practice estimate only — not an official USMLE score. Real Step 2 CK scores range ~194-300 (passing ~214).
+                    </div>
+                  )}
+                  {scoreDisplay === 'pass-fail' && (
+                    <div style={{fontSize:'0.58rem',color:'#94a3b8',fontWeight:600,marginTop:4,lineHeight:1.4,textAlign:'center'}}>
+                      USMLE Step 1 is reported Pass/Fail on the real exam — this practice attempt uses a 60% pass mark as a benchmark.
+                    </div>
+                  )}
                   {hasNegativeMarking ? (
                     <div style={{fontSize:'0.6rem',color:'#94a3b8',fontWeight:600,marginTop:4}}>
                       {correct} correct − {(correct - finalScore!).toFixed(2)} negative marking = {finalScore} final score

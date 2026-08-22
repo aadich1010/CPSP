@@ -7,7 +7,7 @@ import { SUBJECT_GROUPS } from '@/lib/subjects'
 export default async function ExamSessionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ subject?: string; count?: string; mode?: string; group?: string; examSlug?: string; paper?: string; totalPapers?: string }>
+  searchParams: Promise<{ subject?: string; count?: string; mode?: string; group?: string; examSlug?: string; paper?: string; totalPapers?: string; block?: string; totalBlocks?: string; breakPoolSeconds?: string; track?: string }>
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -48,7 +48,7 @@ export default async function ExamSessionPage({
 
     const { data: config } = await supabase
       .from('exam_configurations')
-      .select('id, questions_per_block, minutes_per_block, evaluation_logic')
+      .select('id, questions_per_block, minutes_per_block, evaluation_logic, total_blocks, global_break_minutes')
       .eq('exam_type_id', examType.id)
       .eq('is_live', true)
       .single()
@@ -124,6 +124,47 @@ export default async function ExamSessionPage({
     // above -- every other exam keeps showing "1 mark per question".
     const jcatTotalMarks = isJcat ? 250 : undefined
 
+    // USMLE Step 1 / Step 2 CK gets its own real-pattern block-chain flow:
+    // 7 blocks of 40 Qs / 60 min each (see exam_configurations, migration
+    // 20260822080000), with a shared 45-minute break pool the candidate can
+    // spend between blocks. Each block is still its own completely separate
+    // exam_sessions row / ExamEngine mount, exactly like FCPS's Full Mock
+    // paper-chain -- never combined into one score. ?block=/&totalBlocks=/
+    // &breakPoolSeconds=/&track= carry the sequence position; ?track=
+    // ('step1' | 'step2ck') only changes how the RESULT is displayed
+    // (Pass/Fail vs a numeric practice-estimate score), never the grading.
+    const isUsmle = params.examSlug === 'usmle-step1'
+    const usmleBlock = parseInt(params.block || '1', 10) || 1
+    const usmleTotalBlocks = parseInt(params.totalBlocks || String(config.total_blocks || 7), 10) || 7
+    const usmleTrack: 'step1' | 'step2ck' = params.track === 'step2ck' ? 'step2ck' : 'step1'
+    const breakPoolSecondsRemaining = isUsmle
+      ? (params.breakPoolSeconds !== undefined
+          ? parseInt(params.breakPoolSeconds, 10) || 0
+          : (config.global_break_minutes || 45) * 60)
+      : undefined
+
+    const usmleTrackLabel = usmleTrack === 'step2ck' ? 'Step 2 CK' : 'Step 1'
+    const examLabel = isUsmle
+      ? `USMLE ${usmleTrackLabel} — Block ${usmleBlock} of ${usmleTotalBlocks}`
+      : examType.display_name
+
+    // Final block has nowhere left to send the candidate but the result
+    // screen (nextExamHref stays undefined, exactly like FCPS's last paper).
+    const nextExamHref = isUsmle && usmleBlock < usmleTotalBlocks
+      ? `/exam/break?${new URLSearchParams({
+          examSlug: params.examSlug,
+          nextBlock: String(usmleBlock + 1),
+          totalBlocks: String(usmleTotalBlocks),
+          breakPoolSeconds: String(breakPoolSecondsRemaining ?? 0),
+          track: usmleTrack,
+        }).toString()}`
+      : undefined
+    const nextExamLabel = nextExamHref ? `Block ${usmleBlock + 1}` : undefined
+
+    const scoreDisplay: 'pass-fail' | 'numeric-usmle' | undefined = isUsmle
+      ? (usmleTrack === 'step2ck' ? 'numeric-usmle' : 'pass-fail')
+      : undefined
+
     return (
       <ExamEngine
         sessionId={examSession.id}
@@ -135,12 +176,16 @@ export default async function ExamSessionPage({
         candidateName={candidateName}
         candidateEmail={candidateEmail}
         shuffleAnswers={isPremium}
-        examLabel={examType.display_name}
+        examLabel={examLabel}
         hasNegativeMarking={config.evaluation_logic === 'negative_marking'}
-        entryModal={isJcat}
-        freeNavigation={isJcat}
-        allowMarkForReview={isJcat}
+        entryModal={isJcat || isUsmle}
+        freeNavigation={isJcat || isUsmle}
+        allowMarkForReview={isJcat || isUsmle}
         totalMarks={jcatTotalMarks}
+        nextExamHref={nextExamHref}
+        nextExamLabel={nextExamLabel}
+        scoreDisplay={scoreDisplay}
+        breakPoolMinutesRemaining={isUsmle ? Math.round((breakPoolSecondsRemaining ?? 0) / 60) : undefined}
       />
     )
   }

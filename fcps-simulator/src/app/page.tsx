@@ -43,7 +43,7 @@ const EXAM_GATEWAY: { slug: string; label: string; short: string; desc: string; 
   { slug: 'mcps',        label: 'MCPS',            short: 'MCPS',   desc: 'College of Physicians & Surgeons Pakistan',                 icon: Stethoscope,   live: false },
   { slug: 'mrcp-part1',  label: 'MRCP (UK)',       short: 'MRCP',   desc: 'Royal College of Physicians, UK',                           icon: Landmark,      live: false },
   { slug: 'ms-md',       label: 'MD / MS (JCAT)',  short: 'JCAT',   desc: '100 MCQs, 150 min, 250 marks, no negative marking',         icon: BookOpen,      live: true  },
-  { slug: 'usmle-step1', label: 'USMLE',           short: 'USMLE',  desc: 'United States Medical Licensing Examination',               icon: Globe2,        live: false },
+  { slug: 'usmle-step1', label: 'USMLE',           short: 'USMLE',  desc: '7 blocks x 40 Qs, 60 min/block, 45-min break pool',         icon: Globe2,        live: true  },
 ]
 
 const GATEWAY = [

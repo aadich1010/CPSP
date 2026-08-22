@@ -44,6 +44,10 @@ export default function ExamSetupPage() {
   // shown as an inline notice on Step 1 instead of silently letting them
   // through to Step 3 for a subject they can't actually start an exam in.
   const [lockedNotice, setLockedNotice] = useState<string | null>(null)
+  // Which USMLE track the candidate is starting -- only relevant on the
+  // usmle-step1 target-exam screen below. Defaults to Step 1 since that's
+  // the more commonly taken exam; the candidate can switch before starting.
+  const [usmleTrack, setUsmleTrack] = useState<'step1' | 'step2ck'>('step1')
 
   // Multi-exam routing: null while unresolved/legacy-FCPS, otherwise the
   // candidate's target exam slug + its live rule config. A non-null,
@@ -252,13 +256,13 @@ export default function ExamSetupPage() {
 
   // ── MULTI-EXAM ROUTING ──────────────────────────────────────────────
   // A candidate whose target exam isn't FCPS skips the Paper/Subject
-  // wizard entirely. Only MS/MD's single-block format is actually wired
-  // up end to end right now (its exam/session flow, question pool via
-  // question_exam_tags, and negative-marking scoring are all live) -- the
-  // other three exams show an honest "not open yet" notice instead of a
-  // half-working multi-block exam, since the multi-block/break-pool timer
-  // engine (FCPS/MRCP's 2 blocks, USMLE's 14-block + break pool) hasn't
-  // been built yet. This block disappears entirely once that's shipped.
+  // wizard entirely. MS/MD's single-block format and USMLE Step 1/Step 2
+  // CK's 7-block + break-pool format are both wired up end to end now
+  // (question pool via question_exam_tags, scoring, and for USMLE the
+  // block-chain via /exam/break) -- MCPS and MRCP Part 1 still show an
+  // honest "not open yet" notice instead of a half-working exam, since
+  // their own timer engines haven't been built. This block shrinks further
+  // once those ship too.
   if (targetExamSlug && targetExamSlug !== 'fcps-part1') {
     const examLabels: Record<string, string> = {
       mcps: 'MCPS',
@@ -305,6 +309,83 @@ export default function ExamSetupPage() {
               className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all hover:scale-[1.02]"
             >
               <Play size={16} fill="white" /> Begin Exam
+            </button>
+
+            <div className="mt-3 text-center">
+              <Link href="/dashboard" className="text-sm text-slate-400 transition hover:text-slate-600">
+                ← Back to Dashboard
+              </Link>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // USMLE Step 1 / Step 2 CK's real block-chain engine is now wired up
+    // end to end (see exam/session's isUsmle branch + the new /exam/break
+    // interstitial) -- 7 blocks x 40 Qs x 60 min each, 45 min pooled break
+    // time shared across all inter-block breaks. Step 1 is reported
+    // Pass/Fail on the real exam; Step 2 CK gets a numeric practice
+    // estimate instead -- track picked here decides which result display
+    // ExamEngine/PremiumResultScreen use, never the grading itself.
+    if (targetExamSlug === 'usmle-step1' && targetExamConfig) {
+      return (
+        <div className="h-screen bg-[#F9FAFB] flex items-center justify-center px-4 py-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-lg">
+            <h1 className="text-lg font-black text-slate-900">USMLE Practice Exam</h1>
+            <p className="mt-1 text-sm text-slate-500">Real block pattern — exactly as it&apos;ll run on exam day.</p>
+
+            <div className="mt-4">
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Which exam?</label>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { value: 'step1', label: 'Step 1', sub: 'Pass / Fail' },
+                  { value: 'step2ck', label: 'Step 2 CK', sub: 'Numeric score' },
+                ] as const).map((t) => (
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() => setUsmleTrack(t.value)}
+                    className={`rounded-xl border px-3 py-2.5 text-left transition ${
+                      usmleTrack === t.value
+                        ? 'border-emerald-500 bg-emerald-50 shadow-[0_0_0_2px_rgba(16,185,129,0.15)]'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="text-sm font-bold text-slate-800">{t.label}</div>
+                    <div className="text-[11px] text-slate-400">{t.sub}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-slate-50">
+              {[
+                { label: 'Blocks', value: `${targetExamConfig.totalBlocks}` },
+                { label: 'Questions per block', value: `${targetExamConfig.questionsPerBlock}` },
+                { label: 'Time per block', value: `${targetExamConfig.minutesPerBlock} minutes` },
+                { label: 'Total break time', value: 'Shared 45 min pool between blocks' },
+                { label: 'Negative marking', value: 'None' },
+              ].map((row) => (
+                <div key={row.label} className="flex items-center justify-between px-4 py-2.5 text-sm">
+                  <span className="font-semibold text-slate-500">{row.label}</span>
+                  <span className="font-bold text-slate-800">{row.value}</span>
+                </div>
+              ))}
+            </div>
+
+            {!isPremium && (
+              <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-[11px] font-semibold text-amber-700">
+                <Icon name="warning" size="xs" /> Demo access is capped at 10 questions and 3 lifetime attempts.
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={() => router.push(`/exam/session?examSlug=usmle-step1&mode=exam&block=1&totalBlocks=${targetExamConfig.totalBlocks}&breakPoolSeconds=2700&track=${usmleTrack}`)}
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all hover:scale-[1.02]"
+            >
+              <Play size={16} fill="white" /> Begin Block 1
             </button>
 
             <div className="mt-3 text-center">
