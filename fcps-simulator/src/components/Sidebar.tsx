@@ -17,6 +17,18 @@ const NAV_ITEMS = [
   { href: '/dashboard/analysis', icon: 'analytics', label: 'Performance' },
 ]
 
+/** Same 5 destinations as the "Quick Actions" toolbar on the dashboard page
+ *  itself (src/app/dashboard/page.tsx) -- this sidebar entry is an
+ *  additional, faster way to reach them, not a replacement, so the
+ *  dashboard toolbar stays exactly as it was. */
+const QUICK_ACTION_ITEMS = [
+  { href: '/exam/setup',         icon: 'practice',  label: 'Start Mock Exam' },
+  { href: '/dashboard/analysis', icon: 'analytics', label: 'Analysis' },
+  { href: '/dashboard/history',  icon: 'mockExam',  label: 'History' },
+  { href: '/dashboard/recent',   icon: 'practice',  label: 'Recent Exams' },
+  { href: '/dashboard/weak',     icon: 'warning',   label: 'Weak Subjects' },
+]
+
 interface SidebarProps {
   profile: {
     full_name?: string | null
@@ -40,6 +52,7 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
   const [mobileOpen, setMobileOpen] = useState(false)
   const [lastPathname, setLastPathname] = useState(pathname)
   const [showBye, setShowBye] = useState(false)
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false)
   const isPaid = isPaidMember(profile)
 
   // Paid accounts get a 3s "goodbye" popup (with the same confetti/balloon
@@ -59,6 +72,7 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
   if (pathname !== lastPathname) {
     setLastPathname(pathname)
     setMobileOpen(false)
+    setQuickActionsOpen(false)
   }
 
   const initials = (profile.full_name || profile.email || 'U')
@@ -122,6 +136,49 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
             </Link>
           )
         })}
+
+        {/* Quick Actions -- hover (or tap, for touch/mobile) to open a
+            sub-list of the same 5 shortcuts as the dashboard page's own
+            Quick Actions toolbar. Clicking a sub-item navigates straight
+            there. */}
+        <div
+          className="relative"
+          onMouseEnter={() => setQuickActionsOpen(true)}
+          onMouseLeave={() => setQuickActionsOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setQuickActionsOpen((v) => !v)}
+            aria-expanded={quickActionsOpen}
+            className={`sidebar-link w-full ${quickActionsOpen ? 'active' : ''}`}
+          >
+            <Icon name="bolt" size="lg" />
+            <span className="font-semibold flex-1 text-left">Quick Actions</span>
+            <span
+              className="text-[10px] transition-transform"
+              style={{ transform: quickActionsOpen ? 'rotate(180deg)' : 'none' }}
+            >
+              ▾
+            </span>
+          </button>
+
+          {quickActionsOpen && (
+            <div className="pl-4 pr-2 py-1 space-y-0.5">
+              {QUICK_ACTION_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setQuickActionsOpen(false)}
+                  className={`sidebar-link ${pathname.startsWith(item.href) ? 'active' : ''}`}
+                  style={{ padding: '6px 12px', fontSize: '0.8em' }}
+                >
+                  <Icon name={item.icon as IconName} size="sm" />
+                  <span className="font-semibold">{item.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
 
         {profile.role === 'admin' && (
           <div className="mt-4 md:mt-8">

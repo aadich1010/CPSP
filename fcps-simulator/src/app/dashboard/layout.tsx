@@ -7,6 +7,7 @@ import DeviceSessionGuard from '@/components/DeviceSessionGuard'
 import VvipWelcomeGate from '@/components/vvip'
 import { isPaidMember } from '@/lib/subscription'
 import Icon from '@/design-system/Icon';
+import SocialProofTicker from '@/components/dashboard/SocialProofTicker'
 
 export default async function DashboardLayout({
   children,
@@ -75,7 +76,14 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      {/* News-ticker strip -- above absolutely everything (sidebar + main
+          content), on every dashboard-scoped screen, per explicit request. */}
+      <div style={{ padding: '6px 10px 0', flexShrink: 0 }}>
+        <SocialProofTicker />
+      </div>
+
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
       <AntiTheft />
       {/* Admins are exempt from the 1-device rule, so they never hold an
           active_sessions row. Mounting the guard for them (they reach this
@@ -124,7 +132,8 @@ export default async function DashboardLayout({
         style={{
           flex: 1,
           padding: '16px 20px',
-          height: '100vh',
+          height: '100%',
+          minHeight: 0,
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
@@ -166,6 +175,7 @@ export default async function DashboardLayout({
         )}
         {children}
       </main>
+      </div>
     </div>
   )
 }

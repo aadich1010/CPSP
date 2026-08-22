@@ -9,7 +9,6 @@ import { SUBJECT_COLORS, SUBJECT_COLOR_FALLBACK } from '@/lib/subjectColors'
 import { isAzadiOfferActive, AZADI_OFFER_DEADLINE } from '@/lib/azadiOffer'
 import GradientMesh from '@/components/dashboard/GradientMesh'
 import HeroBanner from '@/components/dashboard/HeroBanner'
-import SocialProofTicker from '@/components/dashboard/SocialProofTicker'
 import ReferralWidget from '@/components/dashboard/ReferralWidget'
 import VvipUpgradeBanner from '@/components/dashboard/VvipUpgradeBanner'
 
@@ -160,19 +159,27 @@ export default async function DashboardPage() {
     <div className="animate-fade-in relative w-full max-w-full" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <GradientMesh />
 
-      {/* Header / Hero */}
-      <div style={{ marginBottom: 12 }} className="w-full max-w-full">
-        <HeroBanner
-          name={name}
-          avgScore={avgScore}
-          totalAttempts={totalAttempts}
-          streakDays={streakDays}
-          isPremium={isPremium}
-        />
-        <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: 6 }} className="break-words">
-          {statusLine}
-        </p>
+      {/* Header / Hero + Referral -- both shown at ~50% size, side by side
+          in one row (the SocialProofTicker itself now renders globally
+          above the sidebar/main layout, in dashboard/layout.tsx). */}
+      <div style={{ marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 10 }} className="w-full max-w-full">
+        <div style={{ flex: '1 1 260px', minWidth: 0 }}>
+          <HeroBanner
+            name={name}
+            avgScore={avgScore}
+            totalAttempts={totalAttempts}
+            streakDays={streakDays}
+            isPremium={isPremium}
+            compact
+          />
+        </div>
+        <div style={{ flex: '1 1 260px', minWidth: 0, display: 'flex', alignItems: 'center' }}>
+          <ReferralWidget referralLink={referralLink} compact />
+        </div>
       </div>
+      <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: -4, marginBottom: 12 }} className="break-words">
+        {statusLine}
+      </p>
 
       {/* Scrollable Container */}
       <div style={{ flex: 1, overflowY: 'auto', paddingRight: 4, paddingBottom: 8 }} className="w-full max-w-full">
@@ -252,12 +259,6 @@ export default async function DashboardPage() {
             <Icon name="warning" /> Weak Subjects
           </Link>
         </div>
-      </div>
-
-      {/* Social proof + referral */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }} className="w-full max-w-full">
-        <SocialProofTicker />
-        <ReferralWidget referralLink={referralLink} />
       </div>
 
       {/* VVIP upgrade banner -- premium/admin users never see it */}
