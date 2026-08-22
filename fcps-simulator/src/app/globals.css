@@ -292,14 +292,27 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   }
   .sidebar.mobile-open { transform: translateX(0); }
 
-  /* Tighter tap targets so 4 nav links + everything below fits one
-     screen -- desktop's .sidebar-link (10px 18px padding, 4px margin)
-     is untouched. */
+  /* Tighter tap targets so 5 nav links (incl. Quick Actions) + everything
+     below fits one screen with room to spare -- desktop's .sidebar-link
+     (10px 18px padding, 4px margin) is untouched. */
   .sidebar-link {
-    padding: 7px 16px;
-    margin: 3px 10px;
-    font-size: 0.82rem;
+    padding: 6px 14px;
+    margin: 2px 8px;
+    font-size: 0.78rem;
+    min-height: unset;
   }
+
+  /* The <nav> keeps overflow-y:auto as a safety net for an unusually
+     short device/zoom level, but with the spacing above it should never
+     actually need to scroll on a normal phone. When it doesn't, no
+     scrollbar renders. When it does, hide the scrollbar's own visual
+     track/thumb (still fully swipeable/scrollable) so it never shows up
+     as a stray gray bar cutting across the middle of the drawer. */
+  .sidebar nav {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .sidebar nav::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
   .mobile-menu-toggle {
     display: flex;

@@ -99,9 +99,9 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
 
       <aside className={`sidebar shadow-lg ${mobileOpen ? 'mobile-open' : ''}`}>
       {/* Logo Section */}
-      <div className="p-3 md:p-6 border-b border-emerald-500/10 flex-shrink-0">
+      <div className="p-2 md:p-6 border-b border-emerald-500/10 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 md:w-10 md:h-10 bg-gradient-to-br from-emerald-600 to-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+          <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-emerald-600 to-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
             <BrandMark size={20} />
           </div>
           <div className="min-w-0">
@@ -206,10 +206,10 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
           landing page so the user can pick a plan and pay. Not shown to
           admins, who already have full access to everything. */}
       {profile.role !== 'admin' && (
-        <div className="px-4 mb-2 md:mb-4 flex-shrink-0">
+        <div className="px-4 mb-1 md:mb-4 flex-shrink-0">
           <Link
             href="/#pricing"
-            className="unlock-cta flex items-center justify-center gap-2 w-full rounded-xl px-4 py-2 md:py-3 text-[12px] font-black uppercase tracking-wider text-white shadow-md"
+            className="unlock-cta flex items-center justify-center gap-2 w-full rounded-xl px-4 py-1.5 md:py-3 text-[12px] font-black uppercase tracking-wider text-white shadow-md"
           >
             <span className="text-base"><Icon name="unlocked" /></span>
             Unlock Full Access
@@ -219,13 +219,13 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
 
       {/* myResidency website -- opens in a new tab so an in-progress exam
           session or dashboard view is never lost by navigating away. */}
-      <div className="px-4 mb-2 md:mb-4 flex-shrink-0">
+      <div className="px-4 mb-1 md:mb-4 flex-shrink-0">
         <a
           href="https://myresidency.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
-          className="btn btn-ghost btn-full btn-sm flex items-center justify-center gap-2"
-          style={{ fontSize: '0.75rem', fontWeight: 700 }}
+          className="btn btn-ghost btn-full flex items-center justify-center gap-2"
+          style={{ fontSize: '0.72rem', fontWeight: 700, padding: '6px 12px', minHeight: 'unset' }}
         >
           <Icon name="external" size="sm" />
           myResidency Website
@@ -234,37 +234,37 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
 
       {/* Subscription Status Card */}
       {daysLeft !== null && (
-        <div className="px-4 mb-2 md:mb-4 flex-shrink-0">
+        <div className="px-4 mb-1 md:mb-4 flex-shrink-0">
           <div
-            className={`rounded-xl p-2.5 md:p-4 border ${
+            className={`rounded-xl p-1.5 md:p-4 border ${
               daysLeft <= 7
                 ? 'bg-amber-50 border-amber-200 text-amber-800'
                 : 'bg-emerald-50 border-emerald-100 text-emerald-800'
             }`}
           >
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider">
                 {daysLeft <= 7 ? <><Icon name="warning" size="xs" /> Expiring Soon</> : <><Icon name="correct" size="xs" /> Active Status</>}
               </span>
-            </div>
-            <div className="text-xs font-medium">
-              {daysLeft} days remaining
+              <span className="text-[10px] md:text-xs font-medium">
+                · {daysLeft} days remaining
+              </span>
             </div>
           </div>
         </div>
       )}
 
       {/* User Identity Section */}
-      <div className="p-2.5 md:p-4 bg-slate-50 border-t border-slate-100 flex-shrink-0">
-        <div className="flex items-center gap-3 mb-2 md:mb-4">
-          <div className="w-8 h-8 md:w-9 md:h-9 bg-emerald-600 rounded-lg flex items-center justify-center text-white text-xs font-black flex-shrink-0">
+      <div className="p-2 md:p-4 bg-slate-50 border-t border-slate-100 flex-shrink-0">
+        <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-4">
+          <div className="w-7 h-7 md:w-9 md:h-9 bg-emerald-600 rounded-lg flex items-center justify-center text-white text-xs font-black flex-shrink-0">
             {initials}
           </div>
           <div className="overflow-hidden">
-            <div className="text-sm font-bold text-slate-900 truncate">
+            <div className="text-xs md:text-sm font-bold text-slate-900 truncate">
               {profile.full_name || 'User'}
             </div>
-            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            <div className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider">
               {profile.role === 'admin' ? <><Icon name="premium" size="xs" /> Admin</> : <><Icon name="graduation" size="xs" /> Candidate</>}
             </div>
           </div>
@@ -272,7 +272,8 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
         <button
           type="button"
           onClick={handleSignOutClick}
-          className="btn btn-ghost !border-slate-200 !text-slate-600 btn-full btn-sm !py-1.5 md:!py-2"
+          className="btn btn-ghost !border-slate-200 !text-slate-600 btn-full"
+          style={{ padding: '6px 12px', minHeight: 'unset', fontSize: '0.78rem' }}
         >
           Sign Out
         </button>
