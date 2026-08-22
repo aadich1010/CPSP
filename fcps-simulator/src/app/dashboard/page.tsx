@@ -197,6 +197,7 @@ export default async function DashboardPage() {
         ].map((stat) => (
           <div
             key={stat.label}
+            className="flash-glow-border"
             style={{
               padding: '12px 14px',
               borderRadius: 14,
