@@ -5,6 +5,7 @@ import Link from 'next/link'
 import DeleteAllButton from './DeleteAllButton'
 import SubjectDropdown from './SubjectDropdown'
 import BackupRestoreExport from './BackupRestoreExport'
+import QuestionsTagTable from './QuestionsTagTable'
 import Icon from '@/design-system/Icon';
 import { SUBJECTS } from '@/lib/subjects'
 
@@ -40,6 +41,37 @@ export default async function AdminQuestionsPage({
 
   const { data: questions, count } = await query
   const totalPages = Math.ceil((count ?? 0) / perPage)
+
+  // ── Exam tagging data (question_exam_tags) ────────────────────────────
+  // Non-FCPS exam types the admin can tag questions into, plus this page's
+  // existing tags, so QuestionsTagTable can render checkboxes/badges and
+  // run bulk tag/untag actions without any extra client-side fetch. FCPS
+  // itself is excluded here -- FCPS questions are already filtered by the
+  // `subject` column, not by question_exam_tags.
+  const { data: examTypesData } = await adminDb
+    .from('exam_types')
+    .select('slug, display_name')
+    .eq('is_active', true)
+    .neq('slug', 'fcps-part1')
+    .order('display_name')
+  const examOptions = examTypesData ?? []
+
+  const questionIds = (questions ?? []).map((q) => q.id)
+  const tagsByQuestion: Record<string, { slug: string; display_name: string }[]> = {}
+  if (questionIds.length > 0) {
+    const { data: tagRows } = await adminDb
+      .from('question_exam_tags')
+      .select('question_id, exam_types(slug, display_name)')
+      .in('question_id', questionIds)
+
+    type TagRow = { question_id: string; exam_types: { slug: string; display_name: string } | { slug: string; display_name: string }[] | null }
+    ;(tagRows as TagRow[] | null)?.forEach((row) => {
+      const examType = Array.isArray(row.exam_types) ? row.exam_types[0] : row.exam_types
+      if (!examType) return
+      if (!tagsByQuestion[row.question_id]) tagsByQuestion[row.question_id] = []
+      tagsByQuestion[row.question_id].push(examType)
+    })
+  }
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -121,95 +153,15 @@ export default async function AdminQuestionsPage({
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table + exam tagging */}
       <div className="table-wrapper" style={{ flex: 1, overflowY: 'auto' }}>
-        <table style={{ minWidth: 800 }}>
-          <thead>
-            <tr>
-              <th style={{ width: '45%' }}>Question</th>
-              <th>Subject</th>
-              <th>Difficulty</th>
-              <th>Answer</th>
-              <th>Added</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {!questions?.length ? (
-              <tr>
-                <td colSpan={5} style={{ textAlign: 'center', color: '#475569', padding: '32px' }}>
-                  No questions found.
-                </td>
-              </tr>
-            ) : (
-              questions.map((q) => (
-                <tr key={q.id}>
-                  <td style={{ color: '#1e293b', fontSize: '0.9rem', fontWeight: 500, maxWidth: 500 }}>
-                    <div
-                      style={{
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                      }}
-                    >
-                      {q.question_text}
-                    </div>
-                  </td>
-                  <td>
-                    <span className="badge" style={{ fontSize: '0.7rem', background: 'rgba(13, 148, 136, 0.1)', color: '#0d9488', border: '1px solid rgba(13, 148, 136, 0.2)' }}>
-                      {q.subject}
-                    </span>
-                  </td>
-                  <td>
-                    <span 
-                      style={{ 
-                        fontSize: '0.7rem', 
-                        fontWeight: 800,
-                        padding: '4px 10px',
-                        borderRadius: '6px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        background: q.difficulty === 'Easy' ? 'rgba(22, 163, 74, 0.1)' : q.difficulty === 'Hard' ? 'rgba(220, 38, 38, 0.1)' : 'rgba(217, 119, 6, 0.1)',
-                        color: q.difficulty === 'Easy' ? '#16a34a' : q.difficulty === 'Hard' ? '#dc2626' : '#d97706',
-                        border: `1px solid ${q.difficulty === 'Easy' ? 'rgba(22, 163, 74, 0.2)' : q.difficulty === 'Hard' ? 'rgba(220, 38, 38, 0.2)' : 'rgba(217, 119, 6, 0.2)'}`
-                      }}
-                    >
-                      {q.difficulty || 'Medium'}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      style={{
-                        fontWeight: 800,
-                        color: '#0d9488',
-                        fontFamily: 'monospace',
-                        fontSize: '1rem',
-                      }}
-                    >
-                      {q.correct_answer}
-                    </span>
-                  </td>
-                  <td style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}>
-                    {new Date(q.created_at).toLocaleDateString()}
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <Link
-                        href={`/admin/questions/${q.id}/edit`}
-                        className="btn btn-sm btn-ghost"
-                        style={{ fontSize: '0.75rem', padding: '5px 10px' }}
-                      >
-                        Edit
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <QuestionsTagTable
+          questions={questions ?? []}
+          tagsByQuestion={tagsByQuestion}
+          examOptions={examOptions}
+          subject={subject}
+          filteredCount={count ?? 0}
+        />
       </div>
 
       {/* Pagination */}

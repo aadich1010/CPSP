@@ -202,6 +202,115 @@ export async function deleteQuestion(id: string) {
   redirect('/admin/questions')
 }
 
+// ── Exam tagging (question_exam_tags) ──────────────────────────────────
+// Tags existing question bank rows to the new non-FCPS exams (MS/MD, MCPS,
+// MRCP Part 1, USMLE Step 1) via the many-to-many question_exam_tags table
+// added in supabase/migrations/20260822000000_multi_exam_platform_foundation.sql.
+// get_exam_questions_for_exam() (see 20260822010000 migration) reads ONLY
+// from this table for non-FCPS exams -- nothing here touches the existing
+// `subject` column or the FCPS get_exam_questions() path at all.
+export async function bulkTagQuestions({
+  questionIds,
+  examSlug,
+  action,
+}: {
+  questionIds: string[]
+  examSlug: string
+  action: 'add' | 'remove'
+}) {
+  try {
+    const admin = await requireAdmin()
+    const adminDb = await createAdminClient()
+
+    if (!questionIds?.length) return { error: 'No questions selected.' }
+
+    const { data: examType, error: examTypeError } = await adminDb
+      .from('exam_types')
+      .select('id, display_name')
+      .eq('slug', examSlug)
+      .single()
+
+    if (examTypeError || !examType) return { error: 'Unknown exam.' }
+
+    if (action === 'add') {
+      const rows = questionIds.map((question_id) => ({
+        question_id,
+        exam_type_id: examType.id,
+        tagged_by: admin.id,
+      }))
+      // ignoreDuplicates so re-tagging an already-tagged question is a
+      // harmless no-op instead of a primary-key conflict error.
+      const { error } = await adminDb
+        .from('question_exam_tags')
+        .upsert(rows, { onConflict: 'question_id,exam_type_id', ignoreDuplicates: true })
+      if (error) return { error: error.message }
+    } else {
+      const { error } = await adminDb
+        .from('question_exam_tags')
+        .delete()
+        .eq('exam_type_id', examType.id)
+        .in('question_id', questionIds)
+      if (error) return { error: error.message }
+    }
+
+    // Best-effort audit log write -- mirrors the pattern in
+    // app/admin/user-actions.ts. A failure here must never undo or block
+    // the tagging change itself, which has already succeeded above.
+    const { error: auditError } = await adminDb.from('admin_audit_log').insert({
+      actor_id: admin.id,
+      action: 'question_exam_tag_update',
+      details: {
+        exam_slug: examSlug,
+        exam_name: examType.display_name,
+        operation: action,
+        question_count: questionIds.length,
+      },
+    })
+    if (auditError) console.error('Audit log write failed (tagging still succeeded):', auditError)
+
+    revalidatePath('/admin/questions')
+    return { success: true, count: questionIds.length }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Error updating exam tags'
+    return { error: message }
+  }
+}
+
+// Same operation but scoped to every question matching a subject filter
+// (or the entire bank when subject is 'all'/omitted) rather than a
+// checkbox selection -- this is what makes tagging practical against a
+// 14,000+ row question bank instead of one page (20 rows) at a time.
+export async function bulkTagBySubject({
+  subject,
+  examSlug,
+  action,
+}: {
+  subject: string
+  examSlug: string
+  action: 'add' | 'remove'
+}) {
+  try {
+    await requireAdmin()
+    const adminDb = await createAdminClient()
+
+    let query = adminDb.from('questions').select('id')
+    if (subject && subject !== 'all') query = query.eq('subject', subject)
+
+    const { data: questions, error: qErr } = await query
+    if (qErr) return { error: qErr.message }
+    if (!questions?.length) return { error: 'No questions found for this filter.' }
+
+    return bulkTagQuestions({
+      questionIds: questions.map((q) => q.id),
+      examSlug,
+      action,
+    })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Error updating exam tags'
+    return { error: message }
+  }
+}
+
 export async function deleteAllQuestions() {
   await requireAdmin()
   const adminDb = await createAdminClient()
