@@ -81,7 +81,7 @@ const S = `
 .rs-score-card::before{content:'';position:absolute;top:0;left:22px;right:22px;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(217,180,91,0) 0%,#D9B45B 22%,#F5E3B3 50%,#D9B45B 78%,rgba(217,180,91,0) 100%)}
 .rs-ring-wrap{position:relative;width:140px;height:140px;flex-shrink:0;filter:drop-shadow(0 0 10px rgba(217,180,91,0.3))}
 .rs-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.rs-pct{font-family:var(--font-playfair),'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:700;font-size:2.3rem;line-height:1;background:linear-gradient(96deg,#8A6A2C 0%,#D9B45B 45%,#F5E3B3 62%,#D9B45B 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent}
+.rs-pct{font-family:var(--font-playfair),'Cormorant Garamond',Georgia,serif;font-style:normal;font-weight:700;font-size:2.3rem;line-height:1;background:linear-gradient(96deg,#8A6A2C 0%,#D9B45B 45%,#F5E3B3 62%,#D9B45B 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent}
 .rs-frac{font-size:0.72rem;color:#64748b;font-weight:600;margin-top:2px}
 .rs-verdict{padding:5px 14px;border-radius:20px;font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase}
 .rs-pass{background:rgba(16,185,129,0.1);color:#059669;border:1px solid rgba(16,185,129,0.25)}
