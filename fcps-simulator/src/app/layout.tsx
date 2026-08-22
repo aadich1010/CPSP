@@ -25,31 +25,31 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-  title: 'FCPS Part 1 CBT Simulator | Secure Medical Exam Platform',
+  title: 'MyResidency | Ultimate Multi-Exam CBT Simulator',
   description:
-    'A premium subscription-based Computer Based Test simulator for FCPS Part 1 examination preparation. Practice with real-pattern MCQs across all major subjects.',
-  keywords: 'FCPS, Part 1, MCQ, CBT, Simulator, Medical, Exam, Pakistan',
+    'A premium subscription-based Computer Based Test simulator covering FCPS Part 1, MCPS, MRCP, MD/MS JCAT, and USMLE. Practice with real-pattern MCQs across all major subjects.',
+  keywords: 'FCPS, MCPS, MRCP, JCAT, USMLE, MCQ, CBT, Simulator, Medical, Exam, Pakistan, Residency',
   robots: 'index, follow',
   openGraph: {
-    title: 'FCPS Part 1 CBT Simulator',
+    title: 'MyResidency | Ultimate Multi-Exam CBT Simulator',
     description:
-      'Practice FCPS Part 1 with real-pattern MCQs across all major subjects — secure, subscription-based CBT simulator.',
+      'Access comprehensive digital mock exams, analyze performance, and track your medical residency training progress across FCPS, MCPS, MRCP, JCAT, & USMLE with scholarly precision.',
     type: 'website',
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FCPS Part 1 CBT Simulator',
-    description: 'Practice FCPS Part 1 with real-pattern MCQs across all major subjects.',
+    title: 'MyResidency | Ultimate Multi-Exam CBT Simulator',
+    description: 'Practice FCPS, MCPS, MRCP, JCAT, & USMLE with real-pattern MCQs across all major subjects.',
   },
   // ─── PWA ──────────────────────────────────────────────────────
   // These three blocks are what let Android/iOS install the site as a
   // standalone app (own icon, no browser chrome) instead of a bookmark.
   manifest: '/manifest.json',
-  applicationName: 'FCPS Simulator',
+  applicationName: 'MyResidency',
   appleWebApp: {
     capable: true,
-    title: 'FCPS Simulator',
+    title: 'MyResidency',
     statusBarStyle: 'default',
   },
   icons: {

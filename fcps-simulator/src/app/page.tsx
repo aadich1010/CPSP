@@ -8,6 +8,7 @@ import {
   ArrowRight, Check, MessageCircle, GraduationCap, FileText, Award,
   BookOpen, ChevronDown, Zap, Activity, Lock, Star,
   TrendingUp, Clock, Users, Cpu, Shield, Wifi,
+  Stethoscope, Landmark, Globe2,
 } from 'lucide-react'
 import { FEATURES } from '../lib/featuresData'
 import { AZADI_PLANS, isAzadiOfferActive } from '../lib/azadiOffer'
@@ -22,6 +23,27 @@ const NAV_LINKS = [
   { href: '#hiw',          label: 'How it works' },
   { href: '#testimonials', label: 'Testimonials' },
   { href: '#pricing',      label: 'Pricing'      },
+]
+
+// Exam Selection Gateway (below the Hero) -- one card per exam_types row
+// (see supabase/migrations/20260822000000_multi_exam_platform_foundation.sql
+// for the slugs this must stay in sync with). Each card links to
+// /register?exam=<slug>, which register/page.tsx reads to preselect that
+// exam in the "Select Your Target Exam" dropdown -- so clicking a card here
+// really does carry the choice through to signup, not just decoration.
+// `live` mirrors exam/setup/page.tsx's own honesty rule: only FCPS Part 1
+// and MS/MD (JCAT) have a fully wired-up exam-taking engine today (see that
+// file's "Only MS/MD's single-block format is actually wired up end to end
+// right now" comment) -- the other three show "Coming Soon" here rather
+// than promising a working mock exam this platform can't deliver yet. Flip
+// a slug's `live` to true the same day its exam-taking engine ships, and
+// this section (and only this section) needs updating.
+const EXAM_GATEWAY: { slug: string; label: string; short: string; desc: string; icon: typeof GraduationCap; live: boolean }[] = [
+  { slug: 'fcps-part1',  label: 'FCPS Part 1',    short: 'FCPS-1', desc: 'CPSP’s 2-paper pattern, 100 MCQs / 120 min each',      icon: GraduationCap, live: true  },
+  { slug: 'mcps',        label: 'MCPS',            short: 'MCPS',   desc: 'College of Physicians & Surgeons Pakistan',                 icon: Stethoscope,   live: false },
+  { slug: 'mrcp-part1',  label: 'MRCP (UK)',       short: 'MRCP',   desc: 'Royal College of Physicians, UK',                           icon: Landmark,      live: false },
+  { slug: 'ms-md',       label: 'MD / MS (JCAT)',  short: 'JCAT',   desc: '100 MCQs, 150 min, 250 marks, no negative marking',         icon: BookOpen,      live: true  },
+  { slug: 'usmle-step1', label: 'USMLE',           short: 'USMLE',  desc: 'United States Medical Licensing Examination',               icon: Globe2,        live: false },
 ]
 
 const GATEWAY = [
@@ -112,7 +134,7 @@ const PLANS: Plan[] = [
     price: 'Rs. 1,999',
     amount: 1999,
     period: '1 month',
-    features: ['Full platform access for 30 days', "See exactly where you're losing marks", 'Real exam-timed mock tests'],
+    features: ['All exams — FCPS, MCPS, MRCP, JCAT & USMLE', 'Full question bank access for 30 days', "See exactly where you're losing marks", 'Real exam-timed mock tests'],
     cta: 'Try 1 Month',
     ctaHref: buildHref('Standard', 1999, '1 month'),
     featured: false,
@@ -124,6 +146,7 @@ const PLANS: Plan[] = [
     amount: 4999,
     period: '3 months',
     features: [
+      'All-in-One Multi-Pass — every exam, one subscription',
       '3 months to close every weak area',
       'Pinpoint your weakest subjects instantly',
       'Tamper-proof, fully monitored exams',
@@ -431,7 +454,7 @@ export default function Home() {
       {/* ── ANNOUNCEMENT BAR ── */}
       <div className="w-full flex justify-center border-b border-emerald-100 bg-emerald-50/60">
         <div className="w-full max-w-7xl px-4 py-2 text-center text-xs font-medium tracking-wide text-slate-600 sm:px-6 lg:px-8">
-          Admissions open for Fall 2026 · FCPS Part 1 preparation now live
+          Admissions open for Fall 2026 · FCPS, MCPS, MRCP, JCAT &amp; USMLE preparation now live
           <Link href="/register" className="ml-2 text-emerald-400 underline underline-offset-2 hover:text-emerald-300">
             Get started →
           </Link>
@@ -447,8 +470,8 @@ export default function Home() {
                 <BrandMark size={22} />
               </div>
               <div>
-                <span className="block text-base font-bold tracking-tight text-slate-900">FCPS Simulator</span>
-                <span className="block text-[9px] uppercase tracking-[0.2em] text-emerald-600">Physicians &amp; Surgeons Prep</span>
+                <span className="block text-base font-bold tracking-tight text-slate-900">MyResidency</span>
+                <span className="block text-[9px] uppercase tracking-[0.2em] text-emerald-600">Multi-Exam CBT Simulator</span>
               </div>
             </Link>
 
@@ -516,7 +539,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="mx-auto max-w-md text-sm leading-relaxed text-slate-600 lg:mx-0">
-                Access comprehensive digital mock exams, analyze your performance, and track your specialist medical training progress with scholarly precision.
+                Access comprehensive digital mock exams, analyze performance, and track your medical residency training progress across FCPS, MCPS, MRCP, JCAT, &amp; USMLE with scholarly precision.
               </motion.p>
 
               <motion.div
@@ -589,6 +612,46 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* ── EXAM SELECTION GATEWAY ── */}
+      <section className="w-full flex justify-center border-y border-slate-100 bg-slate-50/60 py-8">
+        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <SectionHead
+            eyebrow="Choose Your Exam"
+            title={<>One platform, <span className="glow-text">every residency exam</span></>}
+            sub="Pick your target exam and MyResidency switches its subject lists, question bank, timer, and analytics to match."
+          />
+          <div className="mt-6 grid w-full grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {EXAM_GATEWAY.map((exam, i) => {
+              const Icon = exam.icon
+              return (
+                <Reveal key={exam.slug} delay={i % 5}>
+                  <Link
+                    href={`/register?exam=${exam.slug}`}
+                    className="group flex h-full flex-col items-center rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-emerald-300 hover:shadow-[0_10px_30px_rgba(16,185,129,0.15)]"
+                  >
+                    <span
+                      className={`mb-1.5 inline-flex items-center gap-1 self-end rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                        exam.live
+                          ? 'bg-emerald-500/10 text-emerald-600'
+                          : 'bg-slate-100 text-slate-400'
+                      }`}
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full ${exam.live ? 'animate-pulse bg-emerald-400' : 'bg-slate-300'}`} />
+                      {exam.live ? 'Live' : 'Coming Soon'}
+                    </span>
+                    <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-[0_0_18px_rgba(16,185,129,0.35)] transition-transform duration-300 group-hover:scale-110">
+                      <Icon size={22} />
+                    </div>
+                    <h3 className="text-sm font-bold text-slate-900">{exam.label}</h3>
+                    <p className="mt-1 text-[11px] leading-snug text-slate-500">{exam.desc}</p>
+                  </Link>
+                </Reveal>
+              )
+            })}
+          </div>
+        </div>
+      </section>
 
       {/* ── STATS ── */}
       <section className="w-full flex justify-center border-y border-slate-100 bg-slate-50">
@@ -694,7 +757,7 @@ export default function Home() {
           <SectionHead
             eyebrow="Pricing"
             title="Choose your plan"
-            sub="Transparent pricing. No hidden fees. Bank Transfer or JazzCash — pick a plan below and we'll show you exactly what to pay."
+            sub="Every plan unlocks all exams — FCPS, MCPS, MRCP, JCAT & USMLE — and their full premium question banks. Bank Transfer or JazzCash — pick a plan below and we'll show you exactly what to pay."
           />
 
           <div className="mt-6 grid w-full grid-cols-1 gap-4 pt-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -861,7 +924,7 @@ export default function Home() {
           </Reveal>
           <Reveal delay={1}>
             <p className="mx-auto mt-3 max-w-sm text-[13px] text-slate-600">
-              Join thousands of medical professionals already preparing smarter with the FCPS Part 1 Simulator.
+              Join thousands of medical professionals already preparing smarter across FCPS, MCPS, MRCP, JCAT, &amp; USMLE with MyResidency.
             </p>
           </Reveal>
           <Reveal delay={2} className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -884,10 +947,10 @@ export default function Home() {
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
                   <BrandMark size={18} />
                 </div>
-                <span className="text-[15px] font-bold text-slate-900">FCPS Simulator</span>
+                <span className="text-[15px] font-bold text-slate-900">MyResidency</span>
               </div>
               <p className="mt-2.5 text-[12.5px] leading-relaxed text-slate-600">
-                The scholarly CBT platform for medical professionals preparing for FCPS Part 1.
+                The scholarly multi-exam CBT platform for medical professionals preparing for FCPS, MCPS, MRCP, JCAT, &amp; USMLE.
               </p>
             </div>
 
@@ -914,7 +977,7 @@ export default function Home() {
           </div>
 
           <div className="mt-6 border-t border-slate-200 pt-4 text-center text-[11px] text-slate-400">
-            © {new Date().getFullYear()} FCPS Part 1 Simulator. All rights reserved.
+            © {new Date().getFullYear()} MyResidency. All rights reserved.
           </div>
         </div>
       </footer>

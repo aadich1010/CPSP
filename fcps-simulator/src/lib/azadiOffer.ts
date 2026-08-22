@@ -48,6 +48,7 @@ export const AZADI_PLANS: AzadiPlan[] = [
     amount: 9999,
     period: '6 months',
     features: [
+      'All exams — FCPS, MCPS, MRCP, JCAT & USMLE',
       '6 months — go through the syllabus twice',
       'Deep subject + difficulty breakdowns',
       'Instant sync across every device',
@@ -67,6 +68,7 @@ export const AZADI_PLANS: AzadiPlan[] = [
     amount: 14999,
     period: '1 year',
     features: [
+      'All-in-One Multi-Pass — every exam, one plan',
       'A full year — zero renewal stress',
       'Complete prep kit: notes + checklists',
       'Direct line to our support team',

@@ -1,7 +1,7 @@
 {
-  "name": "FCPS Part 1 CBT Simulator",
-  "short_name": "FCPS Sim",
-  "description": "Premium Computer Based Test simulator for FCPS Part 1 examination preparation. Real-pattern MCQs across all major subjects.",
+  "name": "MyResidency | Ultimate Multi-Exam CBT Simulator",
+  "short_name": "MyResidency",
+  "description": "Premium Computer Based Test simulator covering FCPS Part 1, MCPS, MRCP, MD/MS JCAT, and USMLE. Real-pattern MCQs across all major subjects.",
   "id": "/",
   "start_url": "/dashboard",
   "scope": "/",

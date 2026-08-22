@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { register } from '@/app/auth/actions'
 import { ArrowRight, Loader2, UserPlus, Mail, Lock, User, ShieldCheck, CheckCircle2, Phone, BadgeCheck, GraduationCap, ClipboardList, Stethoscope, Landmark, Globe2 } from 'lucide-react'
@@ -33,11 +34,34 @@ function fieldGroupFor(slug: string): 'specialty' | 'university' | 'internationa
   return null
 }
 
+// useSearchParams() (used inside RegisterForm to read the landing page
+// gateway's ?exam= preselect) requires a Suspense boundary around it in the
+// App Router, or Next.js bails the whole route out to client-only rendering
+// with a build-time warning. This default export is just that boundary --
+// RegisterForm has the actual page content, unchanged otherwise.
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
+  )
+}
+
+function RegisterForm() {
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState('')
   const [success, setSuccess] = useState('')
-  const [targetExam, setTargetExam] = useState('')
+  // Landing page's Exam Selection Gateway links here as /register?exam=<slug>
+  // so clicking, say, the MD/MS JCAT card lands on this form with that exam
+  // already picked instead of making the student re-select it. Falls back
+  // to '' (the existing "Choose an exam…" placeholder) for a plain /register
+  // visit or an unrecognised slug -- lazy useState initialiser so this only
+  // runs once on mount, not on every render.
+  const searchParams = useSearchParams()
+  const [targetExam, setTargetExam] = useState(() => {
+    const requested = searchParams.get('exam')
+    return EXAM_OPTIONS.some((o) => o.slug === requested) ? requested! : ''
+  })
   const fieldGroup = fieldGroupFor(targetExam)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -341,7 +365,7 @@ export default function RegisterPage() {
 
         {/* bottom trust note */}
         <p className="mt-3 text-center text-[10px] text-slate-400">
-          Protected by end-to-end encryption · FCPS Part 1 Simulator © {new Date().getFullYear()}
+          Protected by end-to-end encryption · MyResidency © {new Date().getFullYear()}
         </p>
       </div>
     </div>
