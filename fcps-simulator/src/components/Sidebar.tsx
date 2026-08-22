@@ -99,10 +99,10 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
 
       <aside className={`sidebar shadow-lg ${mobileOpen ? 'mobile-open' : ''}`}>
       {/* Logo Section */}
-      <div className="p-2 md:p-6 border-b border-emerald-500/10 flex-shrink-0">
+      <div className="p-2 md:p-4 border-b border-emerald-500/10 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-emerald-600 to-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
-            <BrandMark size={20} />
+          <div className="w-8 h-8 md:w-9 md:h-9 bg-gradient-to-br from-emerald-600 to-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+            <BrandMark size={18} />
           </div>
           <div className="min-w-0">
             <div className="text-[13px] md:text-[14px] font-black text-slate-900 leading-tight uppercase tracking-tight truncate">
@@ -126,8 +126,8 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
           on some Android browsers. Sized to content, the whole drawer
           naturally comes out well under one screen's height with room to
           spare, so nothing needs to scroll or stretch at all. */}
-      <nav className="md:flex-1 py-2 md:py-6 space-y-1">
-        <div className="px-6 mb-1 md:mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+      <nav className="md:flex-1 py-2 md:py-3 space-y-0.5">
+        <div className="px-5 mb-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
           Main Menu
         </div>
         {NAV_ITEMS.map((item) => {
@@ -141,7 +141,7 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
               href={item.href}
               className={`sidebar-link ${isActive ? 'active' : ''}`}
             >
-              <Icon name={item.icon as IconName} size="lg" />
+              <Icon name={item.icon as IconName} size="md" />
               <span className="font-semibold">{item.label}</span>
             </Link>
           )
@@ -162,7 +162,7 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
             aria-expanded={quickActionsOpen}
             className={`sidebar-link w-full ${quickActionsOpen ? 'active' : ''}`}
           >
-            <Icon name="bolt" size="lg" />
+            <Icon name="bolt" size="md" />
             <span className="font-semibold flex-1 text-left">Quick Actions</span>
             <span
               className="text-[10px] transition-transform"
@@ -191,8 +191,8 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
         </div>
 
         {profile.role === 'admin' && (
-          <div className="mt-4 md:mt-8">
-            <div className="px-6 mb-1 md:mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          <div className="mt-3 md:mt-4">
+            <div className="px-5 mb-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
               Admin Control
             </div>
             <Link
@@ -217,10 +217,10 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
           other primary CTA in the app (e.g. VvipUpgradeBanner's own
           "Unlock Full Access" button) instead of a phantom custom class. */}
       {profile.role !== 'admin' && (
-        <div className="px-4 mb-1 md:mb-4 flex-shrink-0">
+        <div className="px-4 mb-1 md:mb-2 flex-shrink-0">
           <Link
             href="/#pricing"
-            className="flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-1.5 md:py-3 text-[12px] font-black uppercase tracking-wider text-white shadow-md transition hover:scale-[1.02]"
+            className="flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-1.5 md:py-2 text-[12px] font-black uppercase tracking-wider text-white shadow-md transition hover:scale-[1.02]"
           >
             <span className="text-base"><Icon name="unlocked" /></span>
             Unlock Full Access
@@ -230,7 +230,7 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
 
       {/* myResidency website -- opens in a new tab so an in-progress exam
           session or dashboard view is never lost by navigating away. */}
-      <div className="px-4 mb-1 md:mb-4 flex-shrink-0">
+      <div className="px-4 mb-1 md:mb-2 flex-shrink-0">
         <a
           href="https://myresidency.vercel.app"
           target="_blank"
@@ -245,9 +245,9 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
 
       {/* Subscription Status Card */}
       {daysLeft !== null && (
-        <div className="px-4 mb-1 md:mb-4 flex-shrink-0">
+        <div className="px-4 mb-1 md:mb-2 flex-shrink-0">
           <div
-            className={`rounded-xl p-1.5 md:p-4 border ${
+            className={`rounded-xl p-1.5 md:p-2.5 border ${
               daysLeft <= 7
                 ? 'bg-amber-50 border-amber-200 text-amber-800'
                 : 'bg-emerald-50 border-emerald-100 text-emerald-800'
@@ -266,9 +266,9 @@ export default function Sidebar({ profile, daysLeft, examName = 'FCPS Part 1' }:
       )}
 
       {/* User Identity Section */}
-      <div className="p-2 md:p-4 bg-slate-50 border-t border-slate-100 flex-shrink-0">
-        <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-4">
-          <div className="w-7 h-7 md:w-9 md:h-9 bg-emerald-600 rounded-lg flex items-center justify-center text-white text-xs font-black flex-shrink-0">
+      <div className="p-2 md:p-3 bg-slate-50 border-t border-slate-100 flex-shrink-0">
+        <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2">
+          <div className="w-7 h-7 md:w-8 md:h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white text-xs font-black flex-shrink-0">
             {initials}
           </div>
           <div className="overflow-hidden">
