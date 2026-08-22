@@ -6,6 +6,40 @@ import type { IconName } from '@/design-system/icon-registry';
 import type { CSSProperties } from 'react'
 import { SUBJECTS, SUBJECT_GROUPS, isSubjectAllowed } from '@/lib/subjects'
 import { SUBJECT_COLORS, SUBJECT_COLOR_FALLBACK } from '@/lib/subjectColors'
+import { isAzadiOfferActive, AZADI_OFFER_DEADLINE } from '@/lib/azadiOffer'
+import GradientMesh from '@/components/dashboard/GradientMesh'
+import HeroBanner from '@/components/dashboard/HeroBanner'
+import SocialProofTicker from '@/components/dashboard/SocialProofTicker'
+import ReferralWidget from '@/components/dashboard/ReferralWidget'
+import VvipUpgradeBanner from '@/components/dashboard/VvipUpgradeBanner'
+
+/** Consecutive days (ending today or yesterday) with at least one exam
+ *  attempt -- computed from real exam_attempts.created_at rows, never a
+ *  placeholder. Dates are compared as UTC calendar days for simplicity;
+ *  this can misjudge the streak by one day right around PKT midnight, but
+ *  never fabricates activity that didn't happen. */
+function computeStreakDays(attemptDates: string[]): number {
+  if (attemptDates.length === 0) return 0
+
+  const days = new Set(attemptDates.map((d) => new Date(d).toISOString().slice(0, 10)))
+  const oneDayMs = 86_400_000
+  const todayMs = Math.floor(Date.now() / oneDayMs) * oneDayMs
+
+  // Streak must include today or yesterday to still count as "alive" --
+  // otherwise a student who practiced last week would see a stale streak
+  // badge implying they're still on a roll.
+  const todayKey = new Date(todayMs).toISOString().slice(0, 10)
+  const yesterdayKey = new Date(todayMs - oneDayMs).toISOString().slice(0, 10)
+  if (!days.has(todayKey) && !days.has(yesterdayKey)) return 0
+
+  let streak = 0
+  let cursor = days.has(todayKey) ? todayMs : todayMs - oneDayMs
+  while (days.has(new Date(cursor).toISOString().slice(0, 10))) {
+    streak += 1
+    cursor -= oneDayMs
+  }
+  return streak
+}
 
 // Fixed "executive muted jewel-tone" palette (src/lib/subjectColors.ts) --
 // replaces the earlier golden-angle-generated bright/neon HSL gradients,
@@ -53,6 +87,24 @@ export default async function DashboardPage() {
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
 
+  // Real streak data -- last 60 attempt timestamps is plenty to compute a
+  // "consecutive days" streak; never fabricate this number.
+  const { data: recentAttempts } = await supabase
+    .from('exam_attempts')
+    .select('created_at')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(60)
+  const streakDays = computeStreakDays((recentAttempts ?? []).map((a) => a.created_at as string))
+
+  // Real count of active subscribers for the VVIP trust badge -- see
+  // VvipUpgradeBanner.tsx doc comment on why this must never be hardcoded.
+  const { count: joinedCountRaw } = await supabase
+    .from('profiles')
+    .select('*', { count: 'exact', head: true })
+    .eq('subscription_status', 'active')
+  const joinedCount = joinedCountRaw ?? 0
+
   // Per-subject aggregation happens in Postgres now (see migration
   // 20260722000000_dashboard_stats_rpc.sql) instead of pulling every
   // attempt row down to the browser just to reduce() it client-side.
@@ -99,20 +151,31 @@ export default async function DashboardPage() {
     ? `Subscription active · Expires ${expiresAt}`
     : 'Demo access · 10 questions per exam — ask the admin to upgrade for full access'
 
+  // Referral tag is inert today (see ReferralWidget.tsx doc comment) but the
+  // link itself is real and stable per-student, built from their own id.
+  const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://myresidency.vercel.app'
+  const referralLink = `${siteOrigin}/?ref=${user.id.slice(0, 8)}`
+
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Header */}
-      <div style={{ marginBottom: 12 }}>
-        <h1 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: 0 }}>
-          Good day, Dr. {name}
-        </h1>
-        <p style={{ color: '#64748b', fontSize: '0.75rem' }}>
+    <div className="animate-fade-in relative w-full max-w-full" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <GradientMesh />
+
+      {/* Header / Hero */}
+      <div style={{ marginBottom: 12 }} className="w-full max-w-full">
+        <HeroBanner
+          name={name}
+          avgScore={avgScore}
+          totalAttempts={totalAttempts}
+          streakDays={streakDays}
+          isPremium={isPremium}
+        />
+        <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: 6 }} className="break-words">
           {statusLine}
         </p>
       </div>
-      
+
       {/* Scrollable Container */}
-      <div style={{ flex: 1, overflowY: 'auto', paddingRight: 4, paddingBottom: 8 }}>
+      <div style={{ flex: 1, overflowY: 'auto', paddingRight: 4, paddingBottom: 8 }} className="w-full max-w-full">
       {/* Stats Row */}
       <div
         style={{
@@ -189,6 +252,23 @@ export default async function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* Social proof + referral */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }} className="w-full max-w-full">
+        <SocialProofTicker />
+        <ReferralWidget referralLink={referralLink} />
+      </div>
+
+      {/* VVIP upgrade banner -- premium/admin users never see it */}
+      {!isPremium && (
+        <div style={{ marginBottom: 20 }} className="w-full max-w-full">
+          <VvipUpgradeBanner
+            pricingHref="/#pricing"
+            joinedCount={joinedCount}
+            offerDeadline={isAzadiOfferActive() ? AZADI_OFFER_DEADLINE : undefined}
+          />
+        </div>
+      )}
 
       {/* Subject Grid, grouped by paper */}
       <div style={{ marginTop: 20 }}>
