@@ -128,11 +128,18 @@ const S = `
 .rs-bk-n{font-size:1.2rem;font-weight:900;line-height:1}
 .rs-bk-l{font-size:0.55rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-top:2px}
 /* Subject bars */
-.rs-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-.rs-bar-name{font-size:0.6rem;font-weight:600;color:#64748b;width:98px;flex-shrink:0;text-align:right;white-space:normal;line-height:1.15;word-break:break-word}
-.rs-bar-track{flex:1;height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden}
+.rs-bar-row{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.rs-bar-name{font-size:0.58rem;font-weight:600;color:#64748b;width:92px;flex-shrink:0;text-align:right;white-space:normal;line-height:1.1;word-break:break-word}
+.rs-bar-track{flex:1;height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden}
 .rs-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
-.rs-bar-pct{font-size:0.6rem;font-weight:700;color:#0f172a;width:30px;text-align:right}
+.rs-bar-pct{font-size:0.58rem;font-weight:700;color:#0f172a;width:28px;text-align:right;flex-shrink:0}
+/* Thin, unobtrusive scrollbar for the Subject-Wise Mastery list -- only
+   ever engages when a paper has enough subjects to exceed the card's
+   fixed height (e.g. JCAT's 18, or a Mixed FCPS attempt); short lists
+   never show a scrollbar at all. */
+.rs-bar-scroll{scrollbar-width:thin;scrollbar-color:rgba(16,185,129,0.3) transparent}
+.rs-bar-scroll::-webkit-scrollbar{width:4px}
+.rs-bar-scroll::-webkit-scrollbar-thumb{background:rgba(16,185,129,0.3);border-radius:4px}
 /* Review pane */
 .rs-review{height:100%;display:flex;flex-direction:column}
 .rs-filters{flex-shrink:0;display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid #f1f5f9;background:#ffffff}
@@ -489,10 +496,17 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                   </div>
                 </motion.div>
 
-                {/* Top-right: Subject Mastery */}
-                <motion.div className="rs-card" initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{delay:0.15}}>
-                  <div className="rs-label">Subject-Wise Mastery</div>
-                  <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:4}}>
+                {/* Top-right: Subject Mastery. display:flex + overflow:hidden
+                    on the card, with the bar list as the ONLY scrolling
+                    region inside (flex:1/minHeight:0/overflowY:auto) --
+                    permanent fix so a paper with many subjects (JCAT's 18,
+                    or any Mixed FCPS attempt) can never grow past this
+                    card's fixed grid-row height and spill into the cards
+                    next to it, the way it did before. Study Insight below
+                    stays pinned and visible either way. */}
+                <motion.div className="rs-card" initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{delay:0.15}} style={{display:'flex',flexDirection:'column',overflow:'hidden'}}>
+                  <div className="rs-label" style={{flexShrink:0}}>Subject-Wise Mastery</div>
+                  <div className="rs-bar-scroll" style={{marginTop:8,flex:1,minHeight:0,overflowY:'auto',display:'flex',flexDirection:'column',gap:3}}>
                     {subjectData.map((s,idx)=>(
                       <div key={s.name} className="rs-bar-row">
                         <div className="rs-bar-name">{s.name}</div>
@@ -509,14 +523,14 @@ export default function PremiumResultScreen({ questions, answers, subject, mode,
                     ))}
                   </div>
                   {!subjectDataReliable && (
-                    <div style={{marginTop:6,fontSize:'0.6rem',color:'#94a3b8',fontStyle:'italic'}}>
+                    <div style={{marginTop:6,fontSize:'0.6rem',color:'#94a3b8',fontStyle:'italic',flexShrink:0}}>
                       Per-subject breakdown unavailable for this attempt — overall score above is accurate.
                     </div>
                   )}
                   {/* Personal progress insight -- based only on this student's own real data */}
-                  <div style={{marginTop:12,padding:'8px 10px',background:'rgba(16,185,129,0.06)',borderRadius:9,border:'1px solid rgba(16,185,129,0.15)'}}>
-                    <div className="rs-label" style={{marginBottom:4}}>Study Insight</div>
-                    <div style={{fontSize:'0.7rem',color:'#475569',lineHeight:1.5}}>
+                  <div style={{marginTop:8,padding:'6px 10px',background:'rgba(16,185,129,0.06)',borderRadius:9,border:'1px solid rgba(16,185,129,0.15)',flexShrink:0}}>
+                    <div className="rs-label" style={{marginBottom:3}}>Study Insight</div>
+                    <div style={{fontSize:'0.66rem',color:'#475569',lineHeight:1.4}}>
                       {!subjectDataReliable ? (
                         <>Your overall score is <strong style={{color:'#10B981'}}>{pct}%</strong> ({correct}/{total} correct). Subject-level detail isn&apos;t available for this attempt.</>
                       ) : strongest ? (
