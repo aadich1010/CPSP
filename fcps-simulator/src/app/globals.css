@@ -115,6 +115,39 @@ p, h1, h2, h3, h4, li, a { overflow-wrap: break-word; }
   pointer-events: none;
 }
 
+/* ─── BORDER BEAM, COUNTER-CLOCKWISE (exam gateway cards, feature/pricing
+   cards, primary CTA buttons) ──────────────────────────────────
+   Same rotating conic-gradient "flashing light" ring as .border-beam
+   above, just spinning the opposite direction -- 360deg -> 0deg instead of
+   0deg -> 360deg -- per explicit request that these particular cards/
+   buttons read as spinning anticlockwise rather than clockwise. Kept as a
+   SEPARATE class (not a modification of .border-beam) so the existing
+   Elite Pro pricing card, which already used .border-beam, keeps its
+   original clockwise spin untouched. */
+@keyframes border-beam-ccw {
+  0%   { transform: rotate(360deg); }
+  100% { transform: rotate(0deg);   }
+}
+.border-beam-ccw::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0deg,
+    var(--cyan) 60deg,
+    var(--emerald) 120deg,
+    transparent 180deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-beam-ccw 3s linear infinite;
+  pointer-events: none;
+}
+
 /* ─── PULSE LINE (ECG effect) ─────────────────────────────────── */
 @keyframes ecg-draw {
   0%   { stroke-dashoffset: 400; }

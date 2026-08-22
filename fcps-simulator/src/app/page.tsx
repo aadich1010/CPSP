@@ -284,8 +284,12 @@ function GlowBtn({
     )
   return (
     <Link href={href}
-      className={`inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:scale-[1.03] hover:shadow-[0_0_35px_rgba(16,185,129,0.65)] ${pad} ${className}`}>
-      {children}
+      className={`group relative inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:scale-[1.03] hover:shadow-[0_0_35px_rgba(16,185,129,0.65)] ${pad} ${className}`}>
+      {/* Rotating counter-clockwise "flashing light" ring, same treatment
+          as the card grids -- primary CTA buttons are the "buttons" half
+          of the explicit cards/buttons/tabs request. */}
+      <span className="border-beam-ccw pointer-events-none absolute inset-0 rounded-xl" aria-hidden />
+      <span className="relative z-[1] inline-flex items-center gap-2">{children}</span>
     </Link>
   )
 }
@@ -313,9 +317,13 @@ function GlassCard({
       } ${className}`}
       style={style}
     >
-      {featured && (
-        <div className="border-beam pointer-events-none absolute inset-0 rounded-2xl" style={{ zIndex: 0 }} aria-hidden />
-      )}
+      {/* Rotating "flashing light" border on every card, not just the
+          featured one -- the featured card (Elite Pro) keeps the original
+          clockwise .border-beam it already had; every other GlassCard
+          (Feature cards, Standard/Advanced/Platinum pricing, the hero's
+          Quick Gateway panel) gets the counter-clockwise variant per
+          explicit request that these read as spinning anticlockwise. */}
+      <div className={`${featured ? 'border-beam' : 'border-beam-ccw'} pointer-events-none absolute inset-0 rounded-2xl`} style={{ zIndex: 0 }} aria-hidden />
       <div className="relative" style={{ zIndex: 1 }}>{children}</div>
     </div>
   )
@@ -628,8 +636,12 @@ export default function Home() {
                 <Reveal key={exam.slug} delay={i % 5}>
                   <Link
                     href={`/register?exam=${exam.slug}`}
-                    className="group flex h-full flex-col items-center rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-emerald-300 hover:shadow-[0_10px_30px_rgba(16,185,129,0.15)]"
+                    className="group relative flex h-full flex-col items-center rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-emerald-300 hover:shadow-[0_10px_30px_rgba(16,185,129,0.15)]"
                   >
+                    {/* Rotating counter-clockwise "flashing light" border --
+                        the explicit ask from the screenshot of this exact
+                        card grid. */}
+                    <span className="border-beam-ccw pointer-events-none absolute inset-0 rounded-2xl" aria-hidden />
                     <span
                       className={`mb-1.5 inline-flex items-center gap-1 self-end rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
                         exam.live
