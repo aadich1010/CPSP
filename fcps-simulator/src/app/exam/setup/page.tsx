@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Play, ArrowLeft, ArrowRight, Check, Shuffle, X } from 'lucide-react'
 import Icon from '@/design-system/Icon';
-import { SUBJECT_GROUPS } from '@/lib/subjects'
+import { SUBJECT_GROUPS, isSubjectAllowed } from '@/lib/subjects'
 
 const MIXED_ALL = 'Mixed (All Subjects)'
 
@@ -34,6 +34,16 @@ export default function ExamSetupPage() {
   const router = useRouter()
   const [isPremium, setIsPremium] = useState(false)
   const [loading,   setLoading]   = useState(true)
+  // null = unrestricted (every Paper II subject open). See isSubjectAllowed()
+  // in src/lib/subjects.ts and the server-side gate inside get_exam_questions()
+  // -- this is a UX convenience for graying out locked cards; the real
+  // access boundary is enforced there, not here.
+  const [allowedSubjects, setAllowedSubjects] = useState<string[] | null>(null)
+  // Set when a ?subject= deep link (e.g. a dashboard card click) points at
+  // a Paper II subject this student doesn't currently have access to --
+  // shown as an inline notice on Step 1 instead of silently letting them
+  // through to Step 3 for a subject they can't actually start an exam in.
+  const [lockedNotice, setLockedNotice] = useState<string | null>(null)
 
   const [step, setStep] = useState<Step>(1)
   // groupName is null once "Mixed (All Subjects)" is picked at step 1 --
@@ -65,12 +75,20 @@ export default function ExamSetupPage() {
       if (!user) { router.push('/login'); return }
       const { data: profile } = await supabase
         .from('profiles')
-        .select('subscription_status')
+        .select('subscription_status, role, allowed_subjects')
         .eq('id', user.id)
         .single()
       const premium = profile?.subscription_status === 'active'
       setIsPremium(premium)
       setCount(premium ? '50' : '10')
+      // Admins and demo accounts are never subject-gated -- mirrors the
+      // v_role = 'admin' or v_status = 'demo' short-circuit inside
+      // get_exam_questions() (see the 20260821000000 migration).
+      setAllowedSubjects(
+        profile?.role === 'admin' || profile?.subscription_status === 'demo'
+          ? null
+          : ((profile?.allowed_subjects as string[] | null) ?? null)
+      )
       setLoading(false)
     })
 
@@ -82,18 +100,32 @@ export default function ExamSetupPage() {
       setSubjectCounts(counts)
     })
 
-    // pre-select from URL ?subject= (e.g. clicked a card on the dashboard)
-    // -- jump straight to the count/mode step since the subject's already
-    // decided, same shortcut the old single-screen picker offered.
+  }, [router])
+
+  // pre-select from URL ?subject= (e.g. clicked a card on the dashboard)
+  // -- jump straight to the count/mode step since the subject's already
+  // decided, same shortcut the old single-screen picker offered. Split into
+  // its own effect gated on `!loading` so allowedSubjects is populated
+  // before this decides whether the requested subject is actually open --
+  // otherwise a Paper II subject the student has since lost access to
+  // would jump straight to Step 3 as if nothing were wrong.
+  useEffect(() => {
+    if (loading) return
     const sp = new URLSearchParams(window.location.search)
     const pre = sp.get('subject')
-    if (pre) {
-      setSubject(pre)
-      const owningGroup = SUBJECT_GROUPS.find((g) => (g.subjects as string[]).includes(pre))
-      setGroupName(owningGroup?.name ?? null)
-      setStep(3)
+    if (!pre) return
+
+    if (!isSubjectAllowed(allowedSubjects, pre)) {
+      setLockedNotice(`You don't currently have access to ${pre}. Ask your admin to unlock it, or pick another subject below.`)
+      return
     }
-  }, [router])
+
+    setSubject(pre)
+    const owningGroup = SUBJECT_GROUPS.find((g) => (g.subjects as string[]).includes(pre))
+    setGroupName(owningGroup?.name ?? null)
+    setStep(3)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading])
 
   const activeGroup = SUBJECT_GROUPS.find((g) => g.name === groupName) ?? null
   const popupGroup  = SUBJECT_GROUPS.find((g) => g.name === weightagePopup) ?? null
@@ -253,6 +285,19 @@ export default function ExamSetupPage() {
                 ))}
               </div>
 
+              {/* A restricted student mixing "all of Paper II" would silently
+                  only draw from their allowed subset -- get_exam_questions()
+                  filters it out server-side regardless, so this isn't a
+                  security gap either way. Disabling the button here is
+                  purely so the label ("All of Paper II") never overpromises
+                  what the exam will actually contain. */}
+              {popupGroup.subjects.some((s) => !isSubjectAllowed(allowedSubjects, s)) && (
+                <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-[11px] font-semibold text-amber-700">
+                  <Icon name="warning" size="xs" /> Some subjects in this section aren&apos;t unlocked for you yet.
+                  Pick a specific subject below to see what&apos;s available.
+                </p>
+              )}
+
               <div className="mt-5 space-y-2">
                 <button
                   type="button"
@@ -264,7 +309,8 @@ export default function ExamSetupPage() {
                 <button
                   type="button"
                   onClick={() => startMixedForGroup(popupGroup.name)}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 py-2.5 text-xs font-bold text-white shadow-[0_0_16px_rgba(16,185,129,0.3)] transition-all hover:scale-[1.02]"
+                  disabled={popupGroup.subjects.some((s) => !isSubjectAllowed(allowedSubjects, s))}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 py-2.5 text-xs font-bold text-white shadow-[0_0_16px_rgba(16,185,129,0.3)] transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
                 >
                   <Shuffle size={13} /> Start Mixed Exam — All of {popupGroup.name.split(' — ')[0]}
                 </button>
@@ -290,6 +336,11 @@ export default function ExamSetupPage() {
                 <h2 className="text-sm font-bold text-slate-700">Which paper are you practicing?</h2>
                 <p className="mt-0.5 text-xs text-slate-400">Pick a section, or mix everything together.</p>
               </div>
+              {lockedNotice && (
+                <p className="rounded-lg bg-amber-50 px-3 py-2 text-[11px] font-semibold text-amber-700">
+                  <Icon name="warning" size="xs" /> {lockedNotice}
+                </p>
+              )}
               <div className="space-y-2">
                 {SUBJECT_GROUPS.map((g) => (
                   <button
@@ -337,20 +388,27 @@ export default function ExamSetupPage() {
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
                 {activeGroup.subjects.map((s) => {
                   const empty = (subjectCounts[s] ?? 0) === 0
+                  const locked = !isSubjectAllowed(allowedSubjects, s)
                   return (
                     <button
                       key={s}
                       type="button"
                       onClick={() => pickSubject(s)}
-                      title={`${subjectCounts[s] ?? 0} questions`}
+                      title={
+                        locked
+                          ? 'Not unlocked for you yet — ask your admin for access'
+                          : `${subjectCounts[s] ?? 0} questions`
+                      }
                       className={`truncate rounded-lg px-3 py-2.5 text-center text-xs font-bold text-white transition-all ${
-                        empty
+                        locked
+                          ? 'cursor-not-allowed bg-slate-400/70'
+                          : empty
                           ? 'cursor-not-allowed bg-slate-300'
                           : 'bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[0_2px_8px_rgba(16,185,129,0.25)] hover:scale-[1.03] hover:shadow-[0_4px_14px_rgba(16,185,129,0.4)]'
                       }`}
-                      disabled={empty}
+                      disabled={empty || locked}
                     >
-                      {s}
+                      {locked ? <Icon name="locked" /> : null} {s}
                     </button>
                   )
                 })}

@@ -83,6 +83,72 @@ export const SUBJECTS = [
 
 export type Subject = (typeof SUBJECTS)[number]
 
+/**
+ * Paper II — Applied & Specialty subject names, flattened out of
+ * SUBJECT_GROUPS below for easy membership checks (`.includes(subject)`).
+ * This is the only paper that per-student subject access (`profiles.
+ * allowed_subjects`, see supabase/migrations/20260821000000_add_allowed_
+ * subjects_paper2_gating.sql) ever restricts -- Paper I and Clinical
+ * Practice are always fully accessible once a subscription is active.
+ *
+ * Declared straight from SUBJECT_GROUPS[1] (defined further down this
+ * file) rather than duplicated, so this can never silently drift from the
+ * real Paper II member list the way the DB-side copy inside
+ * get_exam_questions() has to (SQL can't import a TS constant, so that one
+ * is a hand-kept mirror -- see that migration's comment).
+ */
+export const PAPER2_SUBJECTS: Subject[] = [
+  'Surgery & Allied',
+  'Anesthesia',
+  'Applied Physiology',
+  'Applied Pathology',
+  'Applied Pharmacology',
+  'Applied Biochemistry',
+  'Clinical Anatomy',
+  'Obstetrics & Gynecology',
+  'Pediatrics',
+  'ENT',
+  'Ophthalmology',
+  'Immunology',
+  'Radiology (Imaging Basics)',
+  'Dermatology (Basic Sciences)',
+  'Emergency Medicine / Critical Care Basics',
+  'Cardiology',
+  'Neurology',
+  'Pulmonology',
+  'Gastroenterology',
+  'Nephrology',
+  'Endocrinology',
+  'Urology',
+  'Orthopedics',
+  'Oncology / Medical Oncology',
+]
+
+/**
+ * True when `subject` is open to this student. Mirrors the gate inside
+ * get_exam_questions() exactly (see the migration referenced above):
+ *   - allowedSubjects === null/undefined  -> unrestricted, everything open
+ *     (the default the moment a subscription is activated -- see
+ *     activateSubscription() in src/app/admin/user-actions.ts, which never
+ *     touches allowed_subjects).
+ *   - subject is outside Paper II (Paper I / Clinical Practice)  -> always
+ *     open, never gated by this column.
+ *   - otherwise  -> open only if `subject` is in `allowedSubjects`.
+ *
+ * This is a UX convenience for hiding/graying out locked cards -- the real
+ * enforcement is server-side inside get_exam_questions(), so getting this
+ * wrong client-side can produce a confusing UI but never an actual access
+ * bypass.
+ */
+export function isSubjectAllowed(
+  allowedSubjects: string[] | null | undefined,
+  subject: string
+): boolean {
+  if (allowedSubjects === null || allowedSubjects === undefined) return true
+  if (!(PAPER2_SUBJECTS as readonly string[]).includes(subject)) return true
+  return allowedSubjects.includes(subject)
+}
+
 export interface SubjectGroup {
   name: string
   description: string

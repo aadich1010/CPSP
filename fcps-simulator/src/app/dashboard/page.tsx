@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Icon from '@/design-system/Icon';
 import type { IconName } from '@/design-system/icon-registry';
 import type { CSSProperties } from 'react'
-import { SUBJECTS, SUBJECT_GROUPS } from '@/lib/subjects'
+import { SUBJECTS, SUBJECT_GROUPS, isSubjectAllowed } from '@/lib/subjects'
 import { SUBJECT_COLORS, SUBJECT_COLOR_FALLBACK } from '@/lib/subjectColors'
 
 // Fixed "executive muted jewel-tone" palette (src/lib/subjectColors.ts) --
@@ -35,9 +35,17 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, email, subscription_expires_at, subscription_status, role')
+    .select('full_name, email, subscription_expires_at, subscription_status, role, allowed_subjects')
     .eq('id', user.id)
     .single()
+
+  // Admins and demo accounts are never subject-gated -- mirrors the same
+  // short-circuit inside get_exam_questions() (see supabase/migrations/
+  // 20260821000000_add_allowed_subjects_paper2_gating.sql).
+  const allowedSubjects: string[] | null =
+    profile?.role === 'admin' || profile?.subscription_status === 'demo'
+      ? null
+      : ((profile?.allowed_subjects as string[] | null) ?? null)
 
   // Total attempt count — cheap, uses attempts_user_created_idx, no rows transferred.
   const { count: totalAttemptsCount } = await supabase
@@ -199,16 +207,39 @@ export default async function DashboardPage() {
                 gap: 8,
               }}
             >
-              {group.subjects.map((subject) => (
-                <Link
-                  key={subject}
-                  href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
-                  className="subject-pill"
-                  style={subjectPillStyle(subject)}
-                >
-                  {subject}
-                </Link>
-              ))}
+              {group.subjects.map((subject) => {
+                const locked = !isSubjectAllowed(allowedSubjects, subject)
+                if (locked) {
+                  return (
+                    <div
+                      key={subject}
+                      className="subject-pill"
+                      title="Not unlocked for you yet — ask your admin for access"
+                      style={{
+                        background: '#e2e8f0',
+                        color: '#94a3b8',
+                        cursor: 'not-allowed',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      <Icon name="locked" size="xs" /> {subject}
+                    </div>
+                  )
+                }
+                return (
+                  <Link
+                    key={subject}
+                    href={`/exam/setup?subject=${encodeURIComponent(subject)}`}
+                    className="subject-pill"
+                    style={subjectPillStyle(subject)}
+                  >
+                    {subject}
+                  </Link>
+                )
+              })}
             </div>
           </div>
         ))}

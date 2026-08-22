@@ -155,6 +155,18 @@ export async function updateQuestion(id: string, formData: FormData) {
   const subject          = formData.get('subject')          as string
   const difficulty       = formData.get('difficulty')       as string || 'Medium'
 
+  // Roman Urdu translation fields -- all optional, never required, never
+  // affect grading/subject tagging. See src/app/admin/questions/[id]/edit/
+  // page.tsx and supabase/migrations/20260816000000_roman_urdu_translation_
+  // support.sql.
+  const roman_urdu_question_text = formData.get('roman_urdu_question_text') as string | null
+  const roman_urdu_option_a      = formData.get('roman_urdu_option_a')      as string | null
+  const roman_urdu_option_b      = formData.get('roman_urdu_option_b')      as string | null
+  const roman_urdu_option_c      = formData.get('roman_urdu_option_c')      as string | null
+  const roman_urdu_option_d      = formData.get('roman_urdu_option_d')      as string | null
+  const roman_urdu_option_e      = formData.get('roman_urdu_option_e')      as string | null
+  const roman_urdu_explanation   = formData.get('roman_urdu_explanation')   as string | null
+
   const { error } = await adminDb.from('questions').update({
     question_text,
     option_a,
@@ -166,6 +178,13 @@ export async function updateQuestion(id: string, formData: FormData) {
     explanation: explanation || null,
     subject,
     difficulty,
+    roman_urdu_question_text: roman_urdu_question_text || null,
+    roman_urdu_option_a: roman_urdu_option_a || null,
+    roman_urdu_option_b: roman_urdu_option_b || null,
+    roman_urdu_option_c: roman_urdu_option_c || null,
+    roman_urdu_option_d: roman_urdu_option_d || null,
+    roman_urdu_option_e: roman_urdu_option_e || null,
+    roman_urdu_explanation: roman_urdu_explanation || null,
   }).eq('id', id)
 
   if (error) throw new Error(error.message)

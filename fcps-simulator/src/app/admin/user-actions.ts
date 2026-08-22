@@ -216,6 +216,43 @@ export async function deleteUserAccount(userId: string) {
   return { success: true }
 }
 
+/**
+ * Grants (or clears) per-student Paper II subject access. `subjects: null`
+ * means unrestricted -- every Paper II subject open, the same state a
+ * freshly-activated subscription starts in (see activateSubscription()
+ * above, which never touches this column). Passing an array -- including
+ * an empty one -- restricts the student to exactly those Paper II
+ * subjects; Paper I and Clinical Practice are never affected (see
+ * isSubjectAllowed() in src/lib/subjects.ts and the enforcement inside
+ * get_exam_questions(), supabase/migrations/20260821000000_add_allowed_
+ * subjects_paper2_gating.sql).
+ */
+export async function setAllowedSubjects(userId: string, subjects: string[] | null) {
+  const admin = await requireAdmin()
+  const adminDb = await createAdminClient()
+
+  const { error } = await adminDb
+    .from('profiles')
+    .update({ allowed_subjects: subjects })
+    .eq('id', userId)
+
+  if (error) {
+    console.error('Set allowed subjects error:', error)
+    return { success: false, error: error.message }
+  }
+
+  const { error: auditError } = await adminDb.from('admin_audit_log').insert({
+    actor_id: admin.id,
+    action: 'set_allowed_subjects',
+    target_user_id: userId,
+    details: { subjects },
+  })
+  if (auditError) console.error('Audit log write failed (allowed subjects still saved):', auditError)
+
+  revalidatePath('/admin/users')
+  return { success: true }
+}
+
 export type UserDetails = {
   profile: {
     id: string
@@ -228,6 +265,7 @@ export type UserDetails = {
     role: string | null
     subscription_status: string | null
     subscription_expires_at: string | null
+    allowed_subjects: string[] | null
     created_at: string
   } | null
   examStats: { attempts: number; avgScore: number | null }
@@ -250,7 +288,7 @@ export async function getUserDetails(userId: string): Promise<UserDetails> {
   const [{ data: profile }, { data: attempts }, { data: auditRows }] = await Promise.all([
     adminDb
       .from('profiles')
-      .select('id, full_name, email, phone, pmdc_number, medical_college, blocked_until, role, subscription_status, subscription_expires_at, created_at')
+      .select('id, full_name, email, phone, pmdc_number, medical_college, blocked_until, role, subscription_status, subscription_expires_at, allowed_subjects, created_at')
       .eq('id', userId)
       .maybeSingle(),
     adminDb.from('exam_attempts').select('score, total_questions').eq('user_id', userId),

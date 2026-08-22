@@ -147,6 +147,21 @@ export default function Sidebar({ profile, daysLeft }: SidebarProps) {
         </div>
       )}
 
+      {/* myResidency website -- opens in a new tab so an in-progress exam
+          session or dashboard view is never lost by navigating away. */}
+      <div className="px-4 mb-4">
+        <a
+          href="https://myresidency.vercel.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-ghost btn-full btn-sm flex items-center justify-center gap-2"
+          style={{ fontSize: '0.75rem', fontWeight: 700 }}
+        >
+          <Icon name="external" size="sm" />
+          myResidency Website
+        </a>
+      </div>
+
       {/* Subscription Status Card */}
       {daysLeft !== null && (
         <div className="px-4 mb-4">

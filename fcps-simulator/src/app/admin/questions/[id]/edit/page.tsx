@@ -144,7 +144,83 @@ export default async function EditQuestionPage({
             />
           </div>
 
-          <div style={{ display: 'flex', gap: 12 }}>
+          {/* Roman Urdu translation -- optional alternate-language copy of
+              every field above (see supabase/migrations/20260816000000_
+              roman_urdu_translation_support.sql). Never required, never
+              re-tags the subject/answer -- purely a display alternative for
+              students who read Roman Urdu more comfortably than English.
+              Previously only settable through Import/Restore; this is the
+              first place an admin can see or edit it on a single question. */}
+          <div
+            style={{
+              marginTop: 24,
+              paddingTop: 20,
+              borderTop: '1px dashed #cbd5e1',
+            }}
+          >
+            <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#000000', marginBottom: 4 }}>
+              Roman Urdu Translation (optional)
+            </h2>
+            <p style={{ color: '#64748b', fontSize: '0.8rem', marginBottom: 16 }}>
+              Urdu written in English/Latin letters. Leave blank to show only the English version to students.
+            </p>
+
+            <div className="form-group">
+              <label className="label" htmlFor="roman_urdu_question_text">Question Text (Roman Urdu)</label>
+              <textarea
+                id="roman_urdu_question_text"
+                name="roman_urdu_question_text"
+                rows={4}
+                className="input"
+                style={{ resize: 'vertical' }}
+                defaultValue={question.roman_urdu_question_text || ''}
+                placeholder="Roman Urdu translation of the question stem..."
+              />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {['A', 'B', 'C', 'D'].map((opt) => (
+                <div key={opt} className="form-group">
+                  <label className="label" htmlFor={`roman_urdu_option_${opt.toLowerCase()}`}>
+                    Option {opt} (Roman Urdu)
+                  </label>
+                  <input
+                    id={`roman_urdu_option_${opt.toLowerCase()}`}
+                    name={`roman_urdu_option_${opt.toLowerCase()}`}
+                    className="input"
+                    defaultValue={question[`roman_urdu_option_${opt.toLowerCase()}`] || ''}
+                    placeholder={`Option ${opt} in Roman Urdu...`}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="form-group">
+              <label className="label" htmlFor="roman_urdu_option_e">Option E (Roman Urdu)</label>
+              <input
+                id="roman_urdu_option_e"
+                name="roman_urdu_option_e"
+                className="input"
+                defaultValue={question.roman_urdu_option_e || ''}
+                placeholder="Leave blank if this question has no Option E"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="label" htmlFor="roman_urdu_explanation">Explanation (Roman Urdu)</label>
+              <textarea
+                id="roman_urdu_explanation"
+                name="roman_urdu_explanation"
+                rows={3}
+                className="input"
+                style={{ resize: 'vertical' }}
+                defaultValue={question.roman_urdu_explanation || ''}
+                placeholder="Roman Urdu translation of the explanation..."
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
             <button type="submit" className="btn btn-primary">
               Update Question
             </button>

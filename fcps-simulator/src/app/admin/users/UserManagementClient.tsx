@@ -9,8 +9,10 @@ import {
   blockUser,
   unblockUser,
   changeUserPassword,
+  setAllowedSubjects,
 } from '@/app/admin/user-actions'
 import type { UserDetails } from '@/app/admin/user-actions'
+import { PAPER2_SUBJECTS } from '@/lib/subjects'
 
 interface Profile {
   id:                       string
@@ -23,6 +25,7 @@ interface Profile {
   role:                     string | null
   subscription_status:      string | null
   subscription_expires_at:  string | null
+  allowed_subjects:         string[] | null
   created_at:               string
 }
 
@@ -95,6 +98,13 @@ export default function UserManagementClient({ profiles: initial }: Props) {
   const [editError, setEditError] = useState('')
   const [editNotice, setEditNotice] = useState('')
 
+  // ── Edit panel: Paper II subject access ────────────────────────────────
+  // null = unrestricted (every Paper II subject open -- the default state,
+  // see setAllowedSubjects()'s doc comment). A non-null array is exactly
+  // the set of Paper II subjects this student may practice/examine in.
+  const [subjectRestricted, setSubjectRestricted] = useState(false)
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([])
+
   async function openDetails(userId: string) {
     setDetailsUserId(userId)
     setDetailsData(null)
@@ -114,6 +124,10 @@ export default function UserManagementClient({ profiles: initial }: Props) {
     setNewPassword('')
     setEditError('')
     setEditNotice('')
+    const p = profiles.find((x) => x.id === userId)
+    const allowed = p?.allowed_subjects ?? null
+    setSubjectRestricted(allowed !== null)
+    setSelectedSubjects(allowed ?? [])
   }
 
   function closeEdit() {
@@ -121,6 +135,33 @@ export default function UserManagementClient({ profiles: initial }: Props) {
     setNewPassword('')
     setEditError('')
     setEditNotice('')
+  }
+
+  function toggleSubject(subject: string) {
+    setSelectedSubjects((prev) =>
+      prev.includes(subject) ? prev.filter((s) => s !== subject) : [...prev, subject]
+    )
+  }
+
+  async function saveSubjectAccess(userId: string) {
+    const subjects = subjectRestricted ? selectedSubjects : null
+    setLoading(userId)
+    setEditError('')
+    setEditNotice('')
+    const result = await setAllowedSubjects(userId, subjects)
+    if (result.success) {
+      setProfiles((prev) =>
+        prev.map((p) => (p.id === userId ? { ...p, allowed_subjects: subjects } : p))
+      )
+      setEditNotice(
+        subjects === null
+          ? 'Subject access saved — all Paper II subjects unlocked.'
+          : `Subject access saved — ${subjects.length} Paper II subject${subjects.length === 1 ? '' : 's'} allowed.`
+      )
+    } else {
+      setEditError(result.error || 'Could not save subject access.')
+    }
+    setLoading(null)
   }
 
   // Auto-open the Details panel once, on mount, if the page was deep-linked
@@ -803,6 +844,63 @@ export default function UserManagementClient({ profiles: initial }: Props) {
                   </button>
                 </div>
               )}
+            </div>
+
+            {/* Paper II Subject Access */}
+            <div style={{ marginBottom: 20 }}>
+              <h3 style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>
+                Paper II Subject Access
+              </h3>
+              <p style={{ fontSize: '0.78rem', color: '#94a3b8', marginBottom: 10 }}>
+                Paper I — Basic Sciences and Clinical Practice are always fully accessible.
+                Restrict this student to specific Paper II — Applied &amp; Specialty subjects
+                below, or leave unrestricted to allow all of them.
+              </p>
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.8rem', color: '#334155', fontWeight: 600, marginBottom: 10, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={subjectRestricted}
+                  onChange={(e) => setSubjectRestricted(e.target.checked)}
+                />
+                Restrict to selected Paper II subjects only
+              </label>
+
+              {subjectRestricted && (
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '4px 10px',
+                    maxHeight: 180,
+                    overflowY: 'auto',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: 8,
+                    padding: '8px 10px',
+                    marginBottom: 10,
+                  }}
+                >
+                  {PAPER2_SUBJECTS.map((s) => (
+                    <label key={s} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.76rem', color: '#475569', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedSubjects.includes(s)}
+                        onChange={() => toggleSubject(s)}
+                      />
+                      {s}
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={() => saveSubjectAccess(editUserId)}
+                disabled={loading === editUserId}
+                className="btn btn-sm btn-primary"
+                style={{ fontSize: '0.75rem', padding: '6px 14px' }}
+              >
+                Save Subject Access
+              </button>
             </div>
 
             {/* Change password */}
